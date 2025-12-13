@@ -20,7 +20,7 @@ nodejs作为服务端的drpy实现。全面升级异步写法
 * [猫源调试教程](/docs/catDebug.md)
 * [接口压测教程](/docs/httpTest.md)
 * [AI编程工具 trae](https://www.trae.ai/account-setting#subscription) | 邮编ZIP输入: 518000
-* [免费AI-360纳米](https://bot.n.cn/)|[免费AI-当贝AI](https://ai.dangbei.com/chat)
+* [免费AI-360纳米](https://bot.n.cn/)|[免费AI-当贝AI](https://ai.dangbei.com/chat)|[国外聚合全模型](https://lmarena.ai/)
 * [本站防止爬虫协议](/robots.txt)
 * [油猴脚本-反切屏检测](/public/monkey/check_screen_leave.user.js)
 * [油猴脚本-通用网页脚本框架](/public/monkey/clipboard-sender.user.js)
@@ -55,6 +55,11 @@ nodejs作为服务端的drpy实现。全面升级异步写法
 * [DS 二进制插件项目-file-index](https://github.com/hjdhnx/file-index)
 * [DS web插件项目-drplayer](https://github.com/hjdhnx/DrPlayer)
 * [drpy2打包项目](https://github.com/hjdhnx/drpy-webpack)
+
+### 免费壳子推荐
+
+* [酷9](https://wwbty.lanzouv.com/iGoUV3d3hxuf)
+* [千寻](https://wwbty.lanzouv.com/iSSN93d3hyzg)
 
 ## 更新记录
 
@@ -179,6 +184,7 @@ pm2 restart drpys
 * [源动力-新](https://tvshare.cn/)
 * [源动力-老](https://sourcepower.top/index)
 * [电竞专业反应测试](https://www.arealme.com/brain-memory-game/zh/)
+* [桌面启动器](https://wwbty.lanzouv.com/iDZaP3d3i5ud)
 
 ## AI接入
 
