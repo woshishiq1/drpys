@@ -9,6 +9,7 @@
 // @match        https://connect.huaweicloud.com/*
 // @match        https://*.huaweicloud.com/*
 // @match        https://*.iconfont.cn/*
+// @match        https://*.ziwierp.cn/*
 // @run-at       document-end
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setClipboard
@@ -1314,18 +1315,66 @@
     }
 
     function toggleButtons() {
-        // 把除了本身（显按钮）之外的所有按钮切换可见性
         const btn = buttonMap.get('toggle-buttons');
         const nowHidden = Array.from(buttonMap.values()).some(b => b.style.visibility === 'hidden');
         for (const [id, el] of buttonMap) {
             if (id === 'toggle-buttons') continue;
             el.style.visibility = nowHidden ? 'visible' : 'hidden';
         }
-        if (btn) {
-            btn.textContent = nowHidden ? '隐按钮' : '显按钮';
-            btn.style.borderStyle = nowHidden ? 'inset' : 'outset';
-        }
         store.set('buttons.hidden', nowHidden ? 0 : 1);
+        const hidden = store.get('buttons.hidden', 0) === 1;
+        const boxes = columns.columns;
+        const btnBox = btn ? btn.parentElement : null;
+        if (hidden) {
+            for (const [, box] of boxes) {
+                if (box !== btnBox) {
+                    box.style.display = 'none';
+                }
+            }
+            if (btnBox) {
+                btnBox.style.position = 'fixed';
+                btnBox.style.top = CONFIG.buttonTop + 'px';
+                btnBox.style.left = '0px';
+                btnBox.style.width = '18px';
+                btnBox.style.zIndex = ZIndexManager.getNextZIndex();
+            }
+            if (btn) {
+                btn.textContent = '<<';
+                btn.style.borderStyle = 'inset';
+                btn.style.width = '18px';
+                btn.style.minWidth = '18px';
+                btn.style.padding = '0';
+                btn.style.visibility = 'visible';
+            }
+        } else {
+            for (const [, box] of boxes) {
+                box.style.display = '';
+            }
+            if (btnBox) {
+                let colIndex = 1;
+                for (const [idx, b] of boxes) {
+                    if (b === btnBox) {
+                        colIndex = idx;
+                        break;
+                    }
+                }
+                const offset = getLayoutOffset();
+                const left = CONFIG.baseLeft + offset + (colIndex - 1) * CONFIG.columnGap;
+                
+                btnBox.style.position = 'fixed';
+                btnBox.style.left = left + 'px';
+                btnBox.style.top = CONFIG.buttonTop + 'px';
+                btnBox.style.width = CONFIG.columnWidth + 'px';
+                btnBox.style.zIndex = 2147483646;
+            }
+            if (btn) {
+                btn.textContent = '隐按钮';
+                btn.style.borderStyle = 'inset';
+                btn.style.width = '100%';
+                btn.style.minWidth = '';
+                btn.style.padding = '';
+            }
+        }
     }
 
     function switchTheme() {
@@ -3480,6 +3529,9 @@
             window.commandSelector = commandSelector;
         }
         commandSelector.toggle();
+        if (commandSelector.visible) {
+            commandSelector.updateCommandButtons();
+        }
         if (btnEl) {
             btnEl.style.borderStyle = commandSelector.visible ? 'inset' : 'outset';
         }
@@ -4991,18 +5043,48 @@
         const buttonsHidden = store.get('buttons.hidden', 0) === 1;
         if (buttonsHidden) {
             for (const [id, el] of buttonMap) {
-                if (id === 'toggle-buttons') {
-                    el.textContent = '显按钮';
-                    el.style.borderStyle = 'outset';
-                    continue;
-                }
+                if (id === 'toggle-buttons') continue;
                 el.style.visibility = 'hidden';
+            }
+            const btn = buttonMap.get('toggle-buttons');
+            const btnBox = btn ? btn.parentElement : null;
+            for (const [, box] of columns.columns) {
+                if (box !== btnBox) {
+                    box.style.display = 'none';
+                }
+            }
+            if (btnBox) {
+                btnBox.style.position = 'fixed';
+                btnBox.style.top = CONFIG.buttonTop + 'px';
+                btnBox.style.left = '0px';
+                btnBox.style.width = '18px';
+                btnBox.style.zIndex = ZIndexManager.getNextZIndex();
+            }
+            if (btn) {
+                btn.textContent = '<<';
+                btn.style.borderStyle = 'inset';
+                btn.style.width = '18px';
+                btn.style.minWidth = '18px';
+                btn.style.padding = '0';
+                btn.style.visibility = 'visible';
             }
         } else {
             const btnToggle = buttonMap.get('toggle-buttons');
             if (btnToggle) {
                 btnToggle.textContent = '隐按钮';
                 btnToggle.style.borderStyle = 'inset';
+            }
+            for (const [, box] of columns.columns) {
+                box.style.display = '';
+            }
+            const btn = buttonMap.get('toggle-buttons');
+            const btnBox = btn ? btn.parentElement : null;
+            if (btnBox) {
+                btnBox.style.position = '';
+                btnBox.style.left = '';
+                btnBox.style.top = '';
+                btnBox.style.width = CONFIG.columnWidth + 'px';
+                btnBox.style.zIndex = '';
             }
         }
 
