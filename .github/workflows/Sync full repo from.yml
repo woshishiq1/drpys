@@ -23,7 +23,7 @@ jobs:
 
       - name: Add upstream and fetch
         run: |
-          git remote add upstream https://github.com/leilingzero/leva.git || true
+          git remote add upstream https://github.com/jasondd1983/drpy-node.git || true
           git fetch upstream
 
       - name: Merge upstream/main into your main
