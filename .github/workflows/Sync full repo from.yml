@@ -1,0 +1,44 @@
+name: Sync full repo from jasondd1983 drpy-node
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # 每小时北京时间 00:00 自动运行
+  workflow_dispatch:        # 支持手动触发
+
+jobs:
+  sync_full:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout your repo
+        uses: actions/checkout@v3
+        with:
+          ref: main
+          fetch-depth: 0  # 关键！完整历史才能支持 merge
+
+      - name: Set up Git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Add upstream and fetch
+        run: |
+          git remote add upstream https://github.com/leilingzero/leva.git || true
+          git fetch upstream
+
+      - name: Merge upstream/main into your main
+        run: |
+          git merge upstream/main --allow-unrelated-histories -m "Merge upstream main into local main" || echo "Nothing to merge"
+          git push origin main
+
+  cleanup_runs:
+    runs-on: ubuntu-latest
+    needs: sync_full
+
+    steps:
+      - name: Delete old workflow runs, keep last 10
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          retain_days: 0
+          keep_minimum_runs: 10
