@@ -800,6 +800,10 @@
                     实时日志控制台
                 </div>
                 <div class="terminal-controls">
+                    <button class="terminal-btn" onclick="toggleHeartbeatVisibility()">
+                        <i class="fas fa-heartbeat" id="heartbeatIcon"></i>
+                        <span id="heartbeatText">显示心跳</span>
+                    </button>
                     <button class="terminal-btn" onclick="toggleDisplayMode()">
                         <i class="fas fa-list-ul" id="displayModeIcon"></i>
                         <span id="displayModeText">日志模式</span>
@@ -855,6 +859,7 @@
     let currentFilter = 'all';
     let logs = [];
     let displayMode = 'log'; // 'raw' 或 'log'
+    let heartbeatVisible = false;
 
     // 初始化
     window.onload = function () {
@@ -921,72 +926,146 @@
 
         // 限制日志数量
         if (logs.length > 1000) {
-            logs = logs.slice(-1000);
+            logs.shift();
         }
 
-        renderLogs();
+        // 优化：直接追加DOM而不是重绘
+        if (shouldShowLog(logEntry)) {
+            const terminalContent = document.getElementById('terminalContent');
+            const logElement = createLogElement(logEntry);
+            terminalContent.appendChild(logElement);
+            
+            // 保持DOM数量合理
+            if (terminalContent.children.length > 1000) {
+                terminalContent.removeChild(terminalContent.firstChild);
+            }
+
+            if (autoScrollEnabled) {
+                terminalContent.scrollTop = terminalContent.scrollHeight;
+            }
+        }
+        
         updateStats();
     }
 
     // 渲染日志
     function renderLogs() {
         const terminalContent = document.getElementById('terminalContent');
-        const filteredLogs = currentFilter === 'all' ? logs : logs.filter(log => log.type === currentFilter);
-
         terminalContent.innerHTML = '';
 
+        const fragment = document.createDocumentFragment();
+        const filteredLogs = logs.filter(shouldShowLog);
+
         filteredLogs.forEach(log => {
-            const logElement = document.createElement('div');
-
-            if (displayMode === 'log') {
-                // 日志模式：单行显示
-                logElement.className = 'log-entry log-mode';
-                const logLine = formatAsLogLine(log);
-
-                // 解析日志行，分离前缀和内容
-                const logMatch = logLine.match(/^(\[.*?\])\s*(\[.*?\])\s*(.*)$/);
-                if (logMatch) {
-                    const [, timestamp, logType, content] = logMatch;
-                    logElement.innerHTML = `
-                            <div class="log-line ${log.type}">
-                                <span class="log-prefix">
-                                    <span class="log-timestamp-tag">${timestamp}</span>
-                                    <span class="log-type-tag ${log.type}">${logType}</span>
-                                </span>
-                                <span class="log-message">${content}</span>
-                            </div>
-                        `;
-                } else {
-                    // 如果无法解析，使用原始格式
-                    logElement.innerHTML = `<div class="log-line ${log.type}">${logLine}</div>`;
-                }
-            } else {
-                // 原始数据模式：原有的显示方式
-                logElement.className = 'log-entry';
-
-                let contentHtml = log.content;
-                if (log.data) {
-                    try {
-                        const jsonStr = JSON.stringify(log.data, null, 2);
-                        contentHtml += `<div class="log-json">${jsonStr}</div>`;
-                    } catch (e) {
-                        contentHtml += `<div class="log-json">${log.data}</div>`;
-                    }
-                }
-
-                logElement.innerHTML = `
-                        <div class="log-timestamp">${log.timestamp}</div>
-                        <div class="log-type ${log.type}">${log.type}</div>
-                        <div class="log-content">${contentHtml}</div>
-                    `;
-            }
-
-            terminalContent.appendChild(logElement);
+            fragment.appendChild(createLogElement(log));
         });
+
+        terminalContent.appendChild(fragment);
 
         if (autoScrollEnabled) {
             terminalContent.scrollTop = terminalContent.scrollHeight;
         }
+    }
+
+    // 创建日志元素
+    function createLogElement(log) {
+        const logElement = document.createElement('div');
+
+        if (displayMode === 'log') {
+            // 日志模式：单行显示
+            logElement.className = 'log-entry log-mode';
+            const logLine = formatAsLogLine(log);
+
+            // 解析日志行，分离前缀和内容
+            const logMatch = logLine.match(/^(\[.*?\])\s*(\[.*?\])\s*(.*)$/);
+            if (logMatch) {
+                const [, timestamp, logType, content] = logMatch;
+                logElement.innerHTML = `
+                        <div class="log-line ${log.type}">
+                            <span class="log-prefix">
+                                <span class="log-timestamp-tag">${timestamp}</span>
+                                <span class="log-type-tag ${log.type}">${logType}</span>
+                            </span>
+                            <span class="log-message">${content}</span>
+                        </div>
+                    `;
+            } else {
+                // 如果无法解析，使用原始格式
+                logElement.innerHTML = `<div class="log-line ${log.type}">${logLine}</div>`;
+            }
+        } else {
+            // 原始数据模式：原有的显示方式
+            logElement.className = 'log-entry';
+
+            let contentHtml = log.content;
+            if (log.data) {
+                try {
+                    const jsonStr = JSON.stringify(log.data, null, 2);
+                    contentHtml += `<div class="log-json">${jsonStr}</div>`;
+                } catch (e) {
+                    contentHtml += `<div class="log-json">${log.data}</div>`;
+                }
+            }
+
+            logElement.innerHTML = `
+                    <div class="log-timestamp">${log.timestamp}</div>
+                    <div class="log-type ${log.type}">${log.type}</div>
+                    <div class="log-content">${contentHtml}</div>
+                `;
+        }
+        return logElement;
+    }
+
+    // 判断日志是否应该显示
+    function shouldShowLog(log) {
+        if (currentFilter !== 'all' && log.type !== currentFilter) return false;
+        if (!heartbeatVisible && isHeartbeat(log)) return false;
+        return true;
+    }
+
+    // 判断是否是心跳包
+    function isHeartbeat(log) {
+        if (!log.data) return false;
+        
+        // 直接心跳类型
+        if (log.data.type === 'heartbeat') return true;
+        
+        // ECHO类型中包含心跳
+        if (log.data.type === 'echo') {
+             let content = log.data.originalMessage || log.data.message || log.data.data;
+             // 尝试解析字符串内容
+             if (typeof content === 'string') {
+                 try { 
+                     // 简单判断字符串是否包含心跳特征，避免解析开销
+                     if (content.includes('"type":"heartbeat"')) return true;
+                     const parsed = JSON.parse(content);
+                     if (parsed && parsed.type === 'heartbeat') return true;
+                 } catch(e) {}
+             }
+             // 如果是对象
+             if (content && typeof content === 'object' && content.type === 'heartbeat') {
+                 return true;
+             }
+        }
+        return false;
+    }
+
+    // 切换心跳显示
+    function toggleHeartbeatVisibility() {
+        heartbeatVisible = !heartbeatVisible;
+        const icon = document.getElementById('heartbeatIcon');
+        const text = document.getElementById('heartbeatText');
+        
+        if (heartbeatVisible) {
+            icon.className = 'fas fa-heart-broken';
+            text.textContent = '隐藏心跳';
+        } else {
+            icon.className = 'fas fa-heartbeat';
+            text.textContent = '显示心跳';
+        }
+        
+        renderLogs();
+        addLog(`心跳显示已${heartbeatVisible ? '启用' : '禁用'}`, 'system');
     }
 
     // 过滤日志
