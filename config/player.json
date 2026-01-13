@@ -2,6 +2,7 @@
   "wallpaper": "https://api.likepoems.com/img/bing/",
   "spider": "../public/jar/custom_spider.jar;md5;cc3b3d2ddf389338b62eccd4a938b610",
   "homepage": "https://github.com/hjdhnx/drpy-node",
+  "logo": "https://avatars.githubusercontent.com/u/49803097?v=4",
   "aiLogo": "https://image.baidu.com/search/index?tn=baiduimage&ct=201326592&lm=-1&cl=2&word=%E7%8B%97%E4%BD%9C%E4%B8%BA%E8%BD%AF%E4%BB%B6%E5%9B%BE%E6%A0%87&dyTabStr=MCwxMiwzLDEsMiwxMyw3LDYsNSw5",
   "homeLogo": "https://github.catvod.com/https://raw.githubusercontent.com/hjdhnx/drpy-node/refs/heads/main/public/images/logo500x200-1.png",
   "sniffer": {
