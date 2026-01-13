@@ -27,8 +27,8 @@ class YunDrive {
      * 设置必要的配置参数，包括正则表达式、加密密钥、API基础URL等
      */
     constructor() {
-        // 移动云盘分享链接的正则表达式
-        this.regex = /https:\/\/yun.139.com\/shareweb\/#\/w\/i\/([^&]+)/;
+        // 移动云盘分享链接的正则表达式，支持更多格式
+        this.regex = /https:\/\/(yun|caiyun)\.139\.com\/(shareweb\/#\/w\/i\/|sharewap\/#\/w\/i\/|w\/i\/)([^&\?]+)/;
         // AES加密密钥
         this.x = CryptoJS.enc.Utf8.parse("PVGDwmcvfs1uV3d1");
         // API基础URL
@@ -143,17 +143,25 @@ class YunDrive {
     /**
      * 从分享URL中提取分享ID
      * 
-     * 支持两种格式的移动云盘分享链接
+     * 支持多种格式的移动云盘分享链接
      * 
      * @async
      * @param {string} url - 移动云盘分享链接
      * @returns {Promise<void>}
      */
     async getShareID(url) {
-        // 匹配两种格式的分享链接
-        const matches = this.regex.exec(url) || /https:\/\/caiyun.139.com\/m\/i\?([^&]+)/.exec(url);
-        if (matches && matches[1]) {
-            this.linkID = matches[1];
+        // 匹配多种格式的分享链接
+        let matches = this.regex.exec(url);
+        if (!matches) {
+            // 处理yun.139.com和caiyun.139.com的/m/i格式
+        matches = /https:\/\/(yun|caiyun)\.139\.com\/(sharewap\/)?#?\/?m\/i\?([^&]+)/.exec(url);
+            if (matches && matches[3]) {
+                this.linkID = matches[3];
+                return;
+            }
+        }
+        if (matches && matches[3]) {
+            this.linkID = matches[3];
         }
     }
 
