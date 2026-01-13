@@ -1,3 +1,13 @@
+"""
+@header({
+  searchable: 1,
+  filterable: 1,
+  quickSearch: 1,
+  title: '4k影视',
+  lang: 'hipy'
+})
+"""
+
 # -*- coding: utf-8 -*-
 # 4K影视插件 - 优化版本
 import re
