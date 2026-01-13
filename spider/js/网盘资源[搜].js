@@ -27,7 +27,7 @@ var rule = {
     play_parse: true,
     search_match: true,
     limit: 10,
-    网盘搜索_img: 'https://pan.losfer.cn/view.php/6f48c2262c08f929f50b5ba35c3f9aab.png',
+ 
     action: async function (action, value) {
         if (action === 'only_search') {
             return '此源为纯搜索源，直接搜索即可，如输入 大奉打更人';
@@ -38,7 +38,7 @@ var rule = {
     推荐: async function () {
         return [{
             vod_id: 'only_search',
-            vod_pic: rule.网盘搜索_img,
+            vod_pic: this.publicUrl + '/images/icon_cookie/搜索.jpg',
             vod_name: '这是个纯搜索源哦',
             vod_tag: 'action'
         }];

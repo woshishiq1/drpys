@@ -65,16 +65,15 @@ var rule = {
     filterable: 1,
     timeout: 30000,
     quickSearch: 0,
-    class_name: '傻样电影&傻样剧集&傻样天翼&傻样123&傻样115&傻样动漫&傻样综艺&傻样短剧',
-    class_url: '1&2&3&4&5&30&35&36',
+    class_name: '电影&剧集&综艺&动画&短剧&115&123&天移迅',
+    class_url: '1&2&3&4&5&6&30&35&36',
     class_parse: async () => {},
     预处理: async () => {
         // await Quark.initQuark()
         return []
     },
-    
-    推荐: async function() {
-        let { input, pdfa, pdfh, pd } = this;
+    推荐: async function () {
+        let {input, pdfa, pdfh, pd} = this;
         let html = await request(input);
         let d = [];
         let data = pdfa(html, '.module-items .module-item');
@@ -86,12 +85,11 @@ var rule = {
                 desc: pdfh(it, '.module-item-text&&Text'),
                 url: pd(it, 'a&&href')
             });
-    });
-    return setResult(d);
-   },
-
-    一级: async function() {
-        let { input, pdfa, pdfh, pd } = this;
+        });
+        return setResult(d);
+    },
+    一级: async function () {
+        let {input, pdfa, pdfh, pd} = this;
         let html = await request(input);
         let d = [];
         let data = pdfa(html, '.module-items .module-item');
@@ -103,16 +101,16 @@ var rule = {
                 desc: pdfh(it, '.module-item-text&&Text'),
                 url: pd(it, 'a&&href')
             });
-    });
-    return setResult(d);
-   },
-        二级: async function(ids) {
+        });
+        return setResult(d);
+    },
+   
+    二级: async function (ids) {
     try {
         console.log("开始加载二级内容...");
         let loadStartTime = Date.now();
-        
         let { input, pdfa, pdfh, pd } = this;
-        let html = await request(input); 
+        let html = await request(input);
         let data = pdfa(html, '.module-row-title');
 
         let vod = {
@@ -126,238 +124,326 @@ var rule = {
             vod_actor: pdfh(html, '.video-info-actor:eq(1)&&Text') || '',
             vod_director: pdfh(html, '.video-info-actor:eq(0)&&Text') || ''
         };
-        
+
         let playform = [];
         let playurls = [];
         let playPans = [];
-        
-        // 按网盘类型计数
+
+        // 按网盘类型计数（用于线路命名
         let panCounters = {
             '夸克': 1,
-            '优汐': 1, 
+            '优汐': 1,
             '百度': 1,
             '天翼': 1,
             '123': 1,
-            '移动': 1
+            '移动': 1,
+            '阿里': 1 
         };
-        
-        // 收集所有线路信息
+
+        // 收集所有线路信息（用于后续排序）
         let allLines = [];
-        
+
+        // 1. 统一收集所有链接并自动去重
+        let allLinks = new Set();
         for (let item of data) {
-            let link = pd(item, 'p&&Text').trim();
-            if (/pan.quark.cn/.test(link)) {
+            let link = pd(item, 'p&&Text');
+            if (link) {
+                link = link.trim();
+                allLinks.add(link); 
+            }
+        }
+
+        // 2. 统计去重后的百度链接数量（用于百度线路命名逻辑）
+        let baiduLinks = Array.from(allLinks).filter(link => /pan\.baidu\.com/.test(link));
+        let baiduLinkCount = baiduLinks.length;
+
+        // 3. 遍历去重后的链接，按网盘类型逐一处理
+        for (let link of allLinks) {
+            // 夸克网盘处理
+            if (/\.quark/.test(link)) {
                 playPans.push(link);
                 let shareData = await Quark.getShareData(link);
                 if (shareData) {
                     let videos = await Quark.getFilesByShareUrl(shareData);
-                    if (videos.length > 0) {
-                        let lineName = '夸克#' + panCounters.夸克;
-                        let playUrl = videos.map((v) => {
-                            let list = [shareData.shareId, v.stoken, v.fid, v.share_fid_token, v.subtitle ? v.subtitle.fid : '', v.subtitle ? v.subtitle.share_fid_token : ''];
-                            return v.file_name + '$' + list.join('*');
-                        }).join('#');
-                        allLines.push({name: lineName, url: playUrl, type: '夸克'});
-                        panCounters.夸克++;
-                    } else {
-                        let lineName = '夸克#' + panCounters.夸克;
-                        allLines.push({name: lineName, url: "资源已经失效，请访问其他资源", type: '夸克'});
-                        panCounters.夸克++;
-                    }
+                    let lineName = '夸克#' + panCounters.夸克;
+                    // 处理视频链接或失效提示
+                    let playUrl = videos.length > 0 
+                        ? videos.map(v => `${v.file_name}$${[
+                            shareData.shareId,
+                            v.stoken,
+                            v.fid,
+                            v.share_fid_token,
+                            v.subtitle?.fid || '',
+                            v.subtitle?.share_fid_token || ''
+                        ].join('*')}`).join('#')
+                        : "资源已经失效，请访问其他资源";
+                    allLines.push({ name: lineName, url: playUrl, type: '夸克' });
+                    panCounters.夸克++;
                 }
-            } else if (/drive.uc.cn/i.test(link)) {
+            }
+            // 优汐（UC）网盘处理
+            else if (/\.uc/i.test(link)) {
                 playPans.push(link);
                 let shareData = await UC.getShareData(link);
                 if (shareData) {
                     let videos = await UC.getFilesByShareUrl(shareData);
-                    if (videos.length > 0) {
-                        let lineName = '优汐#' + panCounters.优汐;  // 使用优汐计数
-                        let playUrl = videos.map((v) => {
-                            let list = [shareData.shareId, v.stoken, v.fid, v.share_fid_token, v.subtitle ? v.subtitle.fid : '', v.subtitle ? v.subtitle.share_fid_token : ''];
-                            return v.file_name + '$' + list.join('*');
-                        }).join('#');
-                        allLines.push({name: lineName, url: playUrl, type: '优汐'});  // 类型改为优汐
-                        panCounters.优汐++;
-                    } else {
-                        let lineName = '优汐#' + panCounters.优汐;
-                        allLines.push({name: lineName, url: "资源已经失效，请访问其他资源", type: '优汐'});
-                        panCounters.优汐++;
-                    }
-                  }
-                }else if (/cloud.189.cn/.test(link)) {
+                    let lineName = '优汐#' + panCounters.优汐;
+                    let playUrl = videos.length > 0 
+                        ? videos.map(v => `${v.file_name}$${[
+                            shareData.shareId,
+                            v.stoken,
+                            v.fid,
+                            v.share_fid_token,
+                            v.subtitle?.fid || '',
+                            v.subtitle?.share_fid_token || ''
+                        ].join('*')}`).join('#')
+                        : "资源已经失效，请访问其他资源";
+                    allLines.push({ name: lineName, url: playUrl, type: '优汐' });
+                    panCounters.优汐++;
+                }
+            }
+            // 天翼网盘处理
+            else if (/\.189/.test(link)) {
                 playPans.push(link);
-                let data = await Cloud.getShareData(link)
-                Object.keys(data).forEach(it => {
+                let cloudData = await Cloud.getShareData(link);
+                Object.keys(cloudData).forEach(it => {
                     let lineName = '天翼-' + it;
-                    const urls = data[it].map(item => item.name + "$" + [item.fileId, item.shareId].join('*')).join('#');
-                    allLines.push({name: lineName, url: urls, type: '天翼'});
-                })
+                    const urls = cloudData[it].map(item => 
+                        `${item.name}$${[item.fileId, item.shareId].join('*')}`
+                    ).join('#');
+                    allLines.push({ name: lineName, url: urls, type: '天翼' });
+                });
             }
-            else if (/yun.139.com/.test(link)) {
+            // 移动网盘处理
+            else if (/\.139/.test(link)) {
                 playPans.push(link);
-                let data = await Yun.getShareData(link)
-                Object.keys(data).forEach(it => {
+                let yunData = await Yun.getShareData(link);
+                Object.keys(yunData).forEach(it => {
                     let lineName = '移动-' + it;
-                    const urls = data[it].map(item => item.name + "$" + [item.contentId, item.linkID].join('*')).join('#');
-                    allLines.push({name: lineName, url: urls, type: '移动'});
-                })
+                    const urls = yunData[it].map(item => 
+                        `${item.name}$${[item.contentId, item.linkID].join('*')}`
+                    ).join('#');
+                    allLines.push({ name: lineName, url: urls, type: '移动' });
+                });
             }
-           else if(/123/.test(link)) {
+            // 123网盘处理
+            else if (/\.123/.test(link)) {
                 playPans.push(link);
-                let shareData = await Pan.getShareData(link)
-                let videos = await Pan.getFilesByShareUrl(shareData)
+                let shareData = await Pan.getShareData(link);
+                let videos = await Pan.getFilesByShareUrl(shareData);
                 Object.keys(videos).forEach(it => {
                     let lineName = '123-' + it;
-                    const urls = videos[it].map(v => {
-                        const list = [v.ShareKey, v.FileId, v.S3KeyFlag, v.Size, v.Etag];
-                        return v.FileName + '$' + list.join('*');
-                    }).join('#');
-                    allLines.push({name: lineName, url: urls, type: '123'});
-                })
+                    const urls = videos[it].map(v => 
+                        `${v.FileName}$${[v.ShareKey, v.FileId, v.S3KeyFlag, v.Size, v.Etag].join('*')}`
+                    ).join('#');
+                    allLines.push({ name: lineName, url: urls, type: '123' });
+                });
             }
-            else if (/baidu/i.test(link)) {
+            // 百度网盘处理（保留原命名逻辑）
+            else if (/\.baidu/.test(link)) {
                 playPans.push(link);
-                let shareData = await Baidu.getShareData(link);
-                if (shareData) {
-                    let files = await Baidu.getFilesByShareUrl(shareData);
-                    if (files.videos && files.videos.length > 0) {
-                        let lineName = `百度#${panCounters.百度}`;
-                        let playUrl = files.videos.map(v =>
-                            `${v.file_name}$${[shareData.shareId, v.fid, v.file_name].join('*')}`
-                        ).join('#');
-                        allLines.push({name: lineName, url: playUrl, type: '百度'});
-                        panCounters.百度++;
+                let baiduData = await Baidu2.getShareData(link);
+                
+                Object.keys(baiduData).forEach((it, index) => {
+                    let lineName;
+                    // 单个百度链接：命名为"百度#1"；多个：按链接后缀命名
+                    if (baiduLinkCount === 1) {
+                        lineName = '百度#1';
                     } else {
-                        let lineName = `百度#${panCounters.百度}`;
-                        allLines.push({name: lineName, url: "资源已经失效，请访问其他资源", type: '百度'});
-                        panCounters.百度++;
+                        let lastPart = it.split('/').pop();
+                        lineName = '百度-' + lastPart;
                     }
+
+                    const urls = baiduData[it].map(item => 
+                        item.name + "$" + [item.path, item.uk, item.shareid, item.fsid].join('*')
+                    ).join('#');
+                    allLines.push({ name: lineName, url: urls, type: '百度' });
+                });
+            }
+            else if (/\.alipan/.test(link)) {
+                playPans.push(link);
+                const shareData = await Ali.getShareData(link);
+                if (shareData) {
+                    const videos = await Ali.getFilesByShareUrl(shareData);
+                    let lineName = '阿里#' + panCounters.阿里; 
+                    let playUrl;
+                    if (videos.length > 0) {
+                        playUrl = videos.map((v) => {
+                            const ids = [
+                                v.share_id, 
+                                v.file_id, 
+                                v.subtitle ? v.subtitle.file_id : ''
+                            ];
+                            return `${v.name}$${ids.join('*')}`;
+                        }).join('#');
+                    } else {
+                        playUrl = "资源已经失效，请访问其他资源"; // 失效提示与其他网盘统一
+                    }
+                    allLines.push({ name: lineName, url: playUrl, type: '阿里' });
+                    panCounters.阿里++; 
                 }
             }
         }
-        // 按照line_order排序
+
         allLines.sort((a, b) => {
             let aIndex = rule.line_order.indexOf(a.type);
             let bIndex = rule.line_order.indexOf(b.type);
+            // 未在排序列表的线路放最后
             if (aIndex === -1) aIndex = Infinity;
             if (bIndex === -1) bIndex = Infinity;
             return aIndex - bIndex;
         });
-        
-        // 提取排序后的结果
+
+        // 5. 组装最终结果
         playform = allLines.map(line => line.name);
         playurls = allLines.map(line => line.url);
-        
         vod.vod_play_from = playform.join("$$$");
         vod.vod_play_url = playurls.join("$$$");
         vod.vod_play_pan = playPans.join("$$$");
-        
-        let loadEndTime = Date.now();
-        let loadTime = (loadEndTime - loadStartTime) / 1000;
-        console.log(`二级内容加载完成，耗时: ${loadTime.toFixed(2)}秒`);
-        
+
         return vod;
     } catch (error) {
         console.error(`❌ 二级函数执行出错: ${error.message}`);
+        // 错误时返回统一错误信息
         return {
             vod_name: '加载失败',
             type_name: '错误',
             vod_pic: '',
             vod_content: `加载失败: ${error.message}`,
-            vod_remarks: '请检查网络或配置',
+            vod_remarks: '请检查网络连接或配置是否正确',
             vod_play_from: '加载错误$$$所有链接无效',
-            vod_play_url: `错误信息: ${error.message}$$$请重试或检查配置`,
+            vod_play_url: `错误详情: ${error.message}$$$建议重试或联系维护者`,
             vod_play_pan: ''
         };
     }
 },
 
-    搜索: async function() {
-        let { input, pdfa, pdfh, pd,KEY } = this;
+
+    搜索: async function () {
+        let {input, pdfa, pdfh, pd, KEY} = this;
         let html = await request(input);
         let d = [];
         let data = pdfa(html, '.module-items .module-search-item');
         data.forEach(it => {
             let title = pdfh(it, '.video-info&&a&&title');
             if (rule.search_match) {
-            data = data.filter(it => {
-                return title && new RegExp(KEY, "i").test(title);
-            });
-        }
+                data = data.filter(it => {
+                    return title && new RegExp(KEY, "i").test(title);
+                });
+            }
             d.push({
                 title: title,
                 img: pd(it, 'img&&data-src'),
                 desc: pdfh(it, '.module-item-text&&Text'),
-                url: pd(it, 'a&&href')
+                url: pd(it, '.video-info&&a&&href')
             });
-    });
-    return setResult(d);
-   },
-    lazy: async function(flag, id, flags) {
-        let {input,mediaProxyUrl} = this;
-        let ids = input.split('*');
-        let urls = [];
-        let UCDownloadingCache = {};
-        let UCTranscodingCache = {};
-        if (flag.startsWith('夸克')) {
-            console.log("夸克网盘解析开始")
-            let down = await Quark.getDownload(ids[0], ids[1], ids[2], ids[3], true);
-            let headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-                'origin': 'https://pan.quark.cn',
-                'referer': 'https://pan.quark.cn/',
-                'Cookie': Quark.cookie
+        });
+        return setResult(d);
+    },
+    lazy: async function (flag, id, flags) {
+    let { input, mediaProxyUrl } = this;
+    let ids = input.split('*');
+    let urls = [];
+    let UCDownloadingCache = {};
+    let UCTranscodingCache = {};
+
+    if (flag.startsWith('夸克')) {
+        console.log("夸克网盘解析开始");
+        const down = await Quark.getDownload(ids[0], ids[1], ids[2], ids[3], true);
+            const headers = {
+                // 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 QuarkPC/4.5.5.535 quark-cloud-drive/2.5.40 Channel/pckk_other_ch',
+                // 'origin': 'https://pan.quark.cn',
+                // 'referer': 'https://pan.quark.cn/',
+                'Cookie': ENV.get('quark_cookie')
             };
-            let transcoding = (await Quark.getLiveTranscoding(ids[0], ids[1], ids[2], ids[3])).filter((t) => t.accessable);
+            down.forEach((t) => {
+                if(t.url!==undefined){
+                    urls.push(t.name, t.url+ "#isVideo=true##fastPlayMode##threads=20#")
+                    urls.push("猫"+t.name, `http://127.0.0.1:5575/proxy?thread=${ENV.get('thread') || 6}&chunkSize=1024&url=` + encodeURIComponent(t.url));
+                }
+            });
+            const transcoding = (await Quark.getLiveTranscoding(ids[0], ids[1], ids[2], ids[3])).filter((t) => t.accessable);
             transcoding.forEach((t) => {
-                urls.push(t.resolution === 'low' ? "流畅" : t.resolution === 'high' ? "高清" : t.resolution === 'super' ? "超清" : t.resolution, t.video_info.url)
+                urls.push(t.resolution === 'low' ? "流畅" : t.resolution === 'high' ? "高清" : t.resolution === 'super' ? "超清" : t.resolution, t.video_info.url+ "#isVideo=true##fastPlayMode##threads=20#")
             });
-            return {
-                parse: 0,
-                url: urls,
-                header: headers
-            }
-        } else if (flag.startsWith('UC')) {
-            console.log("UC网盘解析开始");
-            if (!UCDownloadingCache[ids[1]]) {
-                let down = await UC.getDownload(ids[0], ids[1], ids[2], ids[3], true);
-                if (down) UCDownloadingCache[ids[1]] = down;
-            }
-            let downCache = UCDownloadingCache[ids[1]];
-            return await UC.getLazyResult(downCache, mediaProxyUrl)
-        } else if (flag.startsWith('移动')) {
-                console.log("移动网盘解析开始");
-                let url = await Yun.getSharePlay(ids[0], ids[1]);
-                return {
-                    url: `${url}`
-                };
-            } else if (flag.startsWith('天翼')) {
-                console.log("天翼网盘解析开始");
-                let url = await Cloud.getShareUrl(ids[0], ids[1]);
-                return {
-                    url: `${url}`
-                };
-            } else if (flag.startsWith('123')) {
-                console.log("123网盘解析开始");
-                let url = await Pan.getDownload(ids[0], ids[1], ids[2], ids[3], ids[4]);
-                 urls.push("原画", url);
-                return {
-                    parse: 0,
-                    url: urls
-                };
-            } else if (flag.startsWith('百度')) {
-            console.log("百度网盘解析开始");
-            let down = await Baidu.getDownload(ids[0], ids[1], ids[2]);
-            let headers = {
-                'User-Agent': 'netdisk;1.4.2;22021211RC;android-android;12;JSbridge4.4.0;jointBridge;1.1.0;',
-                'Referer': 'https://pan.baidu.com'
-            };
-            urls.push("原画", `${down.dlink}`);
-            return {
-                parse: 0,
-                url: urls,
-                header: headers
-            };
+        
+        return {
+            parse: 0,
+            url: urls,
+            header: headers
+        };
+    } else if (flag.startsWith('UC')) {
+        console.log("UC网盘解析开始");
+        if (!UCDownloadingCache[ids[1]]) {
+            let down = await UC.getDownload(ids[0], ids[1], ids[2], ids[3], true);
+            if (down) UCDownloadingCache[ids[1]] = down;
         }
+        let downCache = UCDownloadingCache[ids[1]];
+        return await UC.getLazyResult(downCache, mediaProxyUrl);
+    } else if (flag.startsWith('移动')) {
+        console.log("移动网盘解析开始");
+        let url = await Yun.getSharePlay(ids[0], ids[1]);
+        return {
+            url: `${url}`
+        };
+    } else if (flag.startsWith('天翼')) {
+        console.log("天翼网盘解析开始");
+        let url = await Cloud.getShareUrl(ids[0], ids[1]);
+        return {
+            url: `${url}`
+        };
+    } else if (flag.startsWith('123')) {
+        console.log("123网盘解析开始");
+        let url = await Pan.getDownload(ids[0], ids[1], ids[2], ids[3], ids[4]);
+        urls.push("原画", url);
+        return {
+            parse: 0,
+            url: urls
+        };
+    } else if (flag.startsWith('阿里')) {
+        const transcoding_flag = {
+            UHD: "4K 超清",
+            QHD: "2K 超清",
+            FHD: "1080 全高清",
+            HD: "720 高清",
+            SD: "540 标清",
+            LD: "360 流畅"
+        };
+        console.log("阿里网盘解析开始"); 
+        const down = await Ali.getDownload(ids[0], ids[1], flag === 'down');
+        urls.push("原画", down.url + "#isVideo=true##ignoreMusic=true#");
+        urls.push("极速原画", down.url + "#fastPlayMode##threads=10#");
+        const transcoding = (await Ali.getLiveTranscoding(ids[0], ids[1])).sort((a, b) => b.template_width - a.template_width);
+        transcoding.forEach((t) => {
+            if (t.url !== '') {
+                urls.push(transcoding_flag[t.template_id], t.url);
+            }
+        });
+        return {
+            parse: 0,
+            url: urls,
+            header: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+                'Referer': 'https://www.aliyundrive.com/'
+            }
+        };
+    } else if (flag.startsWith('百度')) {
+        console.log("百度网盘开始解析"); // 统一引号格式
+        let url = await Baidu2.getAppShareUrl(ids[0], ids[1], ids[2], ids[3]);
+        urls.push("原画", url + "#isVideo=true##fastPlayMode##threads=10#");
+        urls.push(
+            "原代本", 
+            `http://127.0.0.1:7777/?thread=${ENV.get('thread') || 6}&form=urlcode&randUa=1&url=` + 
+            encodeURIComponent(url)
+        );
+        return {
+            parse: 0,
+            url: urls,
+            header: {
+                "User-Agent": 'netdisk;P2SP;2.2.91.136;android-android;'
+                // "Cookie": ENV.get('baidu_cookie'),
+            }
+        };
     }
+},
 }

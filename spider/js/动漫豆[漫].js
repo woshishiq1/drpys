@@ -1,7 +1,19 @@
+/*
+@header({
+  searchable: 2,
+  filterable: 1,
+  quickSearch: 1,
+  title: '动漫豆',
+  author: '',
+  '类型': '动漫',
+  lang: 'ds'
+})
+*/
+
 var rule = {
-    author: '251207_DS&DR2',
+    author: '',
     title: '动漫豆',
-    类型: '影视',
+    类型: '动漫',
     host: 'https://www.dmdou.com/',
     searchable: 2,
     quickSearch: 1,

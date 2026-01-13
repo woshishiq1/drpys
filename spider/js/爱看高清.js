@@ -1,3 +1,14 @@
+/*
+@header({
+  searchable: 2,
+  filterable: 1,
+  quickSearch: 1,
+  title: '爱看高清',
+  '类型': '影视',
+  lang: 'ds'
+})
+*/
+
 var rule = {
     类型: '影视',
     title: '爱看高清',

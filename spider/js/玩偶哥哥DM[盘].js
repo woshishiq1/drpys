@@ -308,7 +308,7 @@ var rule = {
             down.forEach((t) => {
                 if(t.url!==undefined){
                     urls.push(t.name, t.url+ "#isVideo=true##fastPlayMode##threads=20#")
-                    urls.push("猫"+t.name, `http://127.0.0.1:5575/proxy?thread=${ENV.get('thread') || 6}&chunkSize=256&url=` + encodeURIComponent(t.url));
+                    urls.push("猫"+t.name, `http://127.0.0.1:5575/proxy?thread=${ENV.get('thread') || 6}&chunkSize=1024&url=` + encodeURIComponent(t.url));
                 }
             });
             const transcoding = (await Quark.getLiveTranscoding(ids[0], ids[1], ids[2], ids[3])).filter((t) => t.accessable);
