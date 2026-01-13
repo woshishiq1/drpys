@@ -4,6 +4,7 @@ webdav影视[盘]@@?render=1&type=url&params=../json/webdav.json@@WebDav影视[�
 ftp[盘]@@?render=1&type=url&params=../json/ftp.json@@FTP[盘]
 alist@@?render=1&type=url&params=../json/alist.json@@Alist[盘]
 emby@@{"server":"http://139.9.106.196:2345","username":"kid","password":""}@@小雅动漫[EM³]
+我的哔哩[官]@@?render=1&type=url&params=../json/哔哩戏曲.json@@哔哩戏曲[官]
 哔哩收藏[官]@@?render=1&type=url&params=../json/哔哩收藏.json@@哔哩收藏[官]
 我的哔哩[官]@@?render=1&type=url&params=../json/哔哩教育.json@@哔哩教育[官]
 我的哔哩[官]@@?render=1&type=url&params=../json/哔哩少儿.json@@哔哩少儿[官]
@@ -11,6 +12,7 @@ emby@@{"server":"http://139.9.106.196:2345","username":"kid","password":""}@@小
 我的哔哩[官]@@?render=1&type=url&params=../json/哔哩大杂烩.json@@哔哩大杂烩[官]
 直播转点播[合]@@?type=url&params=../json/live2cms.json@@IPTV直播
 直播转点播[合]@@?type=url&params=../json/live2cms-sc.json@@IPTV四川[官]
+直播转点播[合]@@?type=url&params=../json/live2cms-mv.json@@一万部电影[合]
 采集之王[合]@@?type=url&params=../json/采集静态.json$1@@采王道长[合]
 采集之王[合]@@?type=url&params=../json/采集[zy]静态.json$1@@采王zy[密]
 采集之王[合]@@?type=url&params=../json/采集[密]静态.json$1$@@采王成人[密]
@@ -74,3 +76,5 @@ AppHs@@{"host":"https://dy.stxbed.com","app_id":"haigou","deviceid":"","versionC
 AppYqk@@{"host":"https://gapi0320.3njzmrx1.com/config.json,https://gapi0320.lq0okex8.com/config.json,https://gapi0320.zabqs8xp.com/config.json,https://yappconfig-20250628-1318635097.cos.ap-shanghai.myqcloud.com/config.json,https://yconfig-20250628-1360051343.cos.ap-guangzhou.myqcloud.com/config.json","appId":"d6d520ea90904f1ba680ed6c9c9f9007","appkey":"70af67d2b6cf47679b397ea4c1886877","udid":"bfc18c00-c866-46cb-8d7b-121c39b942d4","bundlerId":"com.flotimingo.ts","source":"1001_default","version":"1.3.10","versionCode":1104}@@一起看[Ayq]
 AppYqk@@{"host":"https://gapi0725.5p8jcjc.com/config.json,https://gapi0725.olrv5gz.com/config.json,https://gapi0725.mvljeat.com/config.json,https://jzapp-1318635097.cos.ap-shanghai.myqcloud.com/config.json,https://juzi-config-1360051343.cos.ap-shanghai.myqcloud.com/config.json","appId":"fea23e11fc1241409682880e15fb2851","appkey":"f384b87cc9ef41e4842dda977bae2c7f","udid":"bfc18c00-c866-46cb-8d7b-121c39b942d4","bundlerId":"com.voraguzzee.ts","source":"1003_default","version":"1.0.1","versionCode":1000}@@橘子TV[Ayq]
 php@@{"host":"https://www.baidu.com"}@@php测试
+TG频道@@?type=url&params=../json/TG频道配置.json@@TG频道[优]
+TG频道@@?type=url&params=../json/TG短剧频道.json@@短剧频道[优]
