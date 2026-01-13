@@ -4,6 +4,7 @@
   filterable: 0,
   quickSearch: 0,
   title: '推送',
+  '类型': '影视',
   lang: 'ds'
 })
 */
@@ -41,6 +42,8 @@ var rule = {
         let playurls = []
         // log('[push_agent] orId:', orId);
         input = decodeURIComponent(orId);
+        // 清理输入，只保留有效的URL部分，移除可能的日志内容
+        input = input.replace(/\[\d{4}-\d{2}-\d{2}.*$/, '').trim();
         let icon = urljoin(publicUrl, './images/icon_cookie/推送.jpg');
         let vod = {
             vod_pic: icon,
@@ -75,7 +78,7 @@ var rule = {
             let list = input.split('@');
             // log(list);
             for (let i = 0; i < list.length; i++) {
-                if (/pan.quark.cn|drive.uc.cn|www.alipan.com|www.aliyundrive.com|cloud.189.cn|yun.139.com|www.123684.com|www.123865.com|www.123912.com|www.123pan.com|www.123pan.cn|www.123592.com|pan.baidu.com/.test(list[i])) {
+                if (/pan.quark.cn|drive.uc.cn|www.alipan.com|www.aliyundrive.com|cloud.189.cn|yun.139.com|caiyun.139.com|www.123684.com|www.123865.com|www.123912.com|www.123pan.com|www.123pan.cn|www.123592.com|pan.baidu.com/.test(list[i])) {
                     if (/pan.quark.cn/.test(list[i])) {
                         playPans.push(list[i]);
                         const shareData = Quark.getShareData(list[i]);
@@ -131,28 +134,45 @@ var rule = {
                     if (/cloud.189.cn/.test(list[i])) {
                         playPans.push(list[i]);
                         let data = await Cloud.getShareData(list[i])
+                        let hasValidFiles = false;
                         Object.keys(data).forEach(it => {
-                            playform.push('Cloud-' + it)
-                            const urls = data[it].map(item => item.name + "$" + [item.fileId, item.shareId].join('*')).join('#');
-                            playurls.push(urls);
+                            if (Array.isArray(data[it]) && data[it].length > 0) {
+                                playform.push('Cloud-' + it)
+                                const urls = data[it].map(item => item.name + "$" + [item.fileId, item.shareId].join('*')).join('#');
+                                playurls.push(urls);
+                                hasValidFiles = true;
+                            }
                         })
+                        if (!hasValidFiles) {
+                            playform.push('Cloud-' + Date.now());
+                            playurls.push("资源已经失效，请访问其他资源")
+                        }
                     }
-                    if (/yun.139.com/.test(list[i])) {
+                    if (/yun.139.com|caiyun.139.com/.test(list[i])) {
                         playPans.push(list[i]);
                         let data = await Yun.getShareData(list[i])
+                        let hasValidFiles = false;
                         Object.keys(data).forEach(it => {
-                            playform.push('Yun-' + it)
-                            const urls = data[it].map(item => item.name + "$" + [item.contentId, item.linkID].join('*')).join('#');
-                            playurls.push(urls);
+                            if (Array.isArray(data[it]) && data[it].length > 0) {
+                                playform.push('Yun-' + it)
+                                const urls = data[it].map(item => item.name + "$" + [item.contentId, item.linkID].join('*')).join('#');
+                                playurls.push(urls);
+                                hasValidFiles = true;
+                            }
                         })
+                        if (!hasValidFiles) {
+                            playform.push('Yun-' + Date.now());
+                            playurls.push("资源已经失效，请访问其他资源")
+                        }
                     }
-                    if (/www.123684.com|www.123865.com|www.123912.com/.test(list[i])) {
+                    if (/www.123684.com|www.123865.com|www.123912.com|www.123pan.com|www.123pan.cn|www.123592.com/.test(list[i])) {
                         playPans.push(list[i]);
                         let shareData = await Pan.getShareData(list[i])
                         let videos = await Pan.getFilesByShareUrl(shareData)
-                        if (videos.length > 0) {
+                        let allVideos = Array.isArray(videos) ? videos : Object.values(videos).flat();
+                        if (allVideos.length > 0) {
                             playform.push('Pan123-' + shareData);
-                            playurls.push(videos.map((v) => {
+                            playurls.push(allVideos.map((v) => {
                                 const list = [v.ShareKey, v.FileId, v.S3KeyFlag, v.Size, v.Etag];
                                 return v.FileName + '$' + list.join('*');
                             }).join('#'))
@@ -162,7 +182,6 @@ var rule = {
                         let data = await Baidu2.getShareData(list[i])
                         let vod_content_add = [vod.vod_content];
                         Object.keys(data).forEach((it, index) => {
-                            // playform.push('Baidu-' + it)
                             playform.push('Baidu-' + Number(index + 1));
                             vod_content_add.push(it);
                             const urls = data[it].map(item => item.name + "$" + [item.path, item.uk, item.shareid, item.fsid].join('*')).join('#');
@@ -175,7 +194,7 @@ var rule = {
                     playurls.push("推送" + '$' + list[i])
                 }
             }
-        } else if (/pan.quark.cn|drive.uc.cn|www.alipan.com|www.aliyundrive.com|cloud.189.cn|yun.139.com|www.123684.com|www.123865.com|www.123912.com|www.123pan.com|www.123pan.cn|www.123592.com|pan.baidu.com/.test(input)) {
+        } else if (/pan.quark.cn|drive.uc.cn|www.alipan.com|www.aliyundrive.com|cloud.189.cn|yun.139.com|caiyun.139.com|www.123684.com|www.123865.com|www.123912.com|www.123pan.com|www.123pan.cn|www.123592.com|pan.baidu.com/.test(input)) {
             if (/pan.quark.cn/.test(input)) {
                 playPans.push(input);
                 const shareData = Quark.getShareData(input);
@@ -231,39 +250,54 @@ var rule = {
             if (/cloud.189.cn/.test(input)) {
                 playPans.push(input);
                 let data = await Cloud.getShareData(input)
+                let hasValidFiles = false;
                 Object.keys(data).forEach(it => {
-                    playform.push('Cloud-' + it)
-                    const urls = data[it].map(item => item.name + "$" + [item.fileId, item.shareId].join('*')).join('#');
-                    playurls.push(urls);
+                    if (Array.isArray(data[it]) && data[it].length > 0) {
+                        playform.push('Cloud-' + it)
+                        const urls = data[it].map(item => item.name + "$" + [item.fileId, item.shareId].join('*')).join('#');
+                        playurls.push(urls);
+                        hasValidFiles = true;
+                    }
                 })
+                if (!hasValidFiles) {
+                    playform.push('Cloud-' + Date.now());
+                    playurls.push("资源已经失效，请访问其他资源")
+                }
             }
-            if (/yun.139.com/.test(input)) {
+            if (/yun.139.com|caiyun.139.com/.test(input)) {
                 playPans.push(input);
                 let data = await Yun.getShareData(input)
+                let hasValidFiles = false;
                 Object.keys(data).forEach(it => {
-                    playform.push('Yun-' + it)
-                    const urls = data[it].map(item => item.name + "$" + [item.contentId, item.linkID].join('*')).join('#');
-                    playurls.push(urls);
+                    if (Array.isArray(data[it]) && data[it].length > 0) {
+                        playform.push('Yun-' + it)
+                        const urls = data[it].map(item => item.name + "$" + [item.contentId, item.linkID].join('*')).join('#');
+                        playurls.push(urls);
+                        hasValidFiles = true;
+                    }
                 })
+                if (!hasValidFiles) {
+                    playform.push('Yun-' + Date.now());
+                    playurls.push("资源已经失效，请访问其他资源")
+                }
             }
             if (/www.123684.com|www.123865.com|www.123912.com|www.123pan.com|www.123pan.cn|www.123592.com/.test(input)) {
                 playPans.push(input);
                 let shareData = await Pan.getShareData(input)
                 let videos = await Pan.getFilesByShareUrl(shareData)
-                Object.keys(videos).forEach(it => {
-                    playform.push('Pan123-' + it)
-                    const urls = videos[it].map(v => {
+                let allVideos = Array.isArray(videos) ? videos : Object.values(videos).flat();
+                if (allVideos.length > 0) {
+                    playform.push('Pan123-' + shareData);
+                    playurls.push(allVideos.map((v) => {
                         const list = [v.ShareKey, v.FileId, v.S3KeyFlag, v.Size, v.Etag];
                         return v.FileName + '$' + list.join('*');
-                    }).join('#');
-                    playurls.push(urls);
-                })
+                    }).join('#'));
+                }
             }
             if (/pan.baidu.com/.test(input)) {
                 let data = await Baidu2.getShareData(input)
                 let vod_content_add = [vod.vod_content];
                 Object.keys(data).forEach((it, index) => {
-                    // playform.push('Baidu-' + it)
                     playform.push('Baidu-' + Number(index + 1));
                     vod_content_add.push(it);
                     const urls = data[it].map(item => item.name + "$" + [item.path, item.uk, item.shareid, item.fsid].join('*')).join('#');
@@ -282,17 +316,25 @@ var rule = {
     },
     lazy: async function (flag, id, flags) {
         let {input, mediaProxyUrl} = this;
+        const urls = [];
+        // 如果id包含完整的URL（比如playParse直接传入完整URL），尝试从中提取云盘链接
+        if (id && id.includes('http')) {
+            // 使用正则表达式提取有效的云盘URL
+            const urlRegex = /https?:\/\/[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+/g;
+            const matches = id.match(urlRegex);
+            if (matches && matches.length > 0) {
+                input = matches[0];
+            }
+        }
         if (flag === '推送') {
             if (tellIsJx(input)) {
                 return {parse: 1, jx: 1, url: input}
-            } else if (/m3u8|mp4|m3u/.test(input)) {
-                return {url: input}
             } else {
-                return {parse: 1, url: input}
+                // 确保返回parse: 0和正确的URL格式，避免前端创建新的播放列表
+                return {parse: 0, url: ["原画", input]}
             }
         } else if (/Quark-|UC-|Ali-|Cloud-|Yun-|Pan123-|Baidu-/.test(flag)) {
-            const ids = input.split('*');
-            const urls = [];
+            const ids = id.split('*');
             let UCDownloadingCache = {};
             let downUrl = ''
             if (flag.startsWith('Quark-')) {
@@ -306,8 +348,8 @@ var rule = {
                 };
                 down.forEach((t) => {
                     if(t.url!==undefined){
-                        urls.push(t.name, t.url+ "#isVideo=true##fastPlayMode##threads=20#")
                         urls.push("猫"+t.name, `http://127.0.0.1:5575/proxy?thread=${ENV.get('thread') || 6}&chunkSize=256&url=` + encodeURIComponent(t.url));
+                        urls.push(t.name, t.url+ "#isVideo=true##fastPlayMode##threads=20#")
                     }
                 });
                 const transcoding = (await Quark.getLiveTranscoding(ids[0], ids[1], ids[2], ids[3])).filter((t) => t.accessable);
@@ -371,15 +413,19 @@ var rule = {
             if (flag.startsWith('Cloud-')) {
                 log("天翼云盘解析开始")
                 const url = await Cloud.getShareUrl(ids[0], ids[1]);
+                urls.push("原画", url + "#isVideo=true#")
                 return {
-                    url: url + "#isVideo=true#",
+                    parse: 0,
+                    url: urls
                 }
             }
             if (flag.startsWith('Yun-')) {
                 log('移动云盘解析开始')
                 const url = await Yun.getSharePlay(ids[0], ids[1])
+                urls.push("原画", url + "#isVideo=true#")
                 return {
-                    url: url
+                    parse: 0,
+                    url: urls
                 }
             }
             if (flag.startsWith('Pan123-')) {
@@ -397,25 +443,12 @@ var rule = {
             }
             if (flag.startsWith('Baidu-')) {
                 log('百度网盘开始解析')
-                //网页转码
-                // let url = await Baidu2.getShareUrl(ids[0],ids[1],ids[2],ids[3])
-                // let urls = []
-                // url.map(it=>{
-                //     urls.push(it.name,it.url + "#isVideo=true##fastPlayMode##threads=10#")
-                // })
-                // return {
-                //     parse:0,
-                //     url:urls,
-                //     header:{
-                //         "User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0',
-                //         "Cookie": ENV.get('baidu_cookie'),
-                //     }
-                // }
                 //App原画不转存
                 let url = await Baidu2.getAppShareUrl(ids[0], ids[1], ids[2], ids[3])
+                urls.push("原画", url + "#isVideo=true##fastPlayMode##threads=10#")
                 return {
                     parse: 0,
-                    url: url + "#isVideo=true##fastPlayMode##threads=10#",
+                    url: urls,
                     header: {
                         "User-Agent": 'netdisk;P2SP;2.2.91.136;android-android;',
                         "Cookie": ENV.get('baidu_cookie'),
