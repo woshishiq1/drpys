@@ -4,6 +4,50 @@
  */
 import FormData from 'form-data';
 import https from "https";
+import diagnosticsChannel from 'diagnostics_channel';
+
+let undiciStripUASubscribed = false;
+
+function ensureUndiciStripUASubscription() {
+    if (undiciStripUASubscribed) {
+        return;
+    }
+    undiciStripUASubscribed = true;
+
+    diagnosticsChannel.channel('undici:request:create').subscribe(({request}) => {
+        if (!request || !Array.isArray(request.headers)) {
+            return;
+        }
+        const headers = request.headers;
+
+        let shouldStrip = false;
+        for (let i = 0; i < headers.length; i += 2) {
+            const k = headers[i];
+            if (typeof k === 'string' && k.toLowerCase() === 'x-remove-user-agent') {
+                shouldStrip = true;
+                break;
+            }
+        }
+        if (!shouldStrip) {
+            return;
+        }
+
+        for (let i = 0; i < headers.length; i += 2) {
+            const k = headers[i];
+            if (typeof k === 'string' && k.toLowerCase() === 'x-remove-user-agent') {
+                headers.splice(i, 2);
+                i -= 2;
+            }
+        }
+        for (let i = 0; i < headers.length; i += 2) {
+            const k = headers[i];
+            if (typeof k === 'string' && k.toLowerCase() === 'user-agent') {
+                headers.splice(i, 2);
+                i -= 2;
+            }
+        }
+    });
+}
 
 /**
  * FetchAxios类 - HTTP客户端实现
@@ -69,6 +113,18 @@ class FetchAxios {
         // 执行请求拦截器
         for (const interceptor of this.interceptors.request) {
             finalConfig = await interceptor(finalConfig) || finalConfig;
+        }
+
+        if (finalConfig.headers) {
+            const headerKeys = Object.keys(finalConfig.headers);
+            for (const key of headerKeys) {
+                if (key.toLowerCase() === 'user-agent' && finalConfig.headers[key] === 'RemoveUserAgent') {
+                    delete finalConfig.headers[key];
+                    finalConfig.headers['x-remove-user-agent'] = '1';
+                    ensureUndiciStripUASubscription();
+                    break;
+                }
+            }
         }
 
         // 拼接查询参数
