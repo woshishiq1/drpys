@@ -20,7 +20,19 @@ var rule = {
     quickSearch: 1,
     filterable: 0,
     headers: {
-        'User-Agent': MOBILE_UA
+        'User-Agent': MOBILE_UA,
+        'Accept': 'application/json, text/plain, */*',
+        'accept-language': 'zh-CN,zh;q=0.9',
+        'cache-control': 'no-cache',
+        'pragma': 'no-cache',
+        'priority': 'u=1, i',
+        'sec-ch-ua': '"Google Chrome";v="143", "Chromium";v="143", "Not A(Brand";v="24"',
+        'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-platform': '"Windows"',
+        'sec-fetch-dest': 'empty',
+        'sec-fetch-mode': 'cors',
+        'sec-fetch-site': 'same-origin',
+        'x-platform': 'web'
     },
     play_parse: true,
     search_match: true,
