@@ -64,7 +64,7 @@ async function lazy(input, params) {
      * 包含多个备用解析接口，提高解析成功率
      */
     let parse_list = [
-        "https://zy.qiaoji8.com/gouzi.php?url=",    // 主要解析接口
+        "https://kalbim.xatut.top/kalbim2025/781718/play/video_player.php?url=",    // 主要解析接口
         "http://1.94.221.189:88/algorithm.php?url=" // 备用解析接口
     ]
     
