@@ -16,8 +16,10 @@ EXCLUDE_DIRS = ['.git', '.idea', 'soft', 'examples', 'apps/cat', 'plugins/pvideo
 EXCLUDE_FILES = ['config/env.json', '.env', '.claude', 'clipboard.txt', 'clipboard.txt.bak', '.plugins.js', 'yarn.lock',
                  't4_daemon.pid',
                  'spider/js/UC分享.js', 'spider/js/百忙无果[官].js',
+                 'spider/catvod/mtv60w[差].js',
                  'json/UC分享.json',
-                 'jx/奇奇.js', 'jx/芒果关姐.js', 'data/settings/link_data.json', 'index.json', 'custom.json']
+                 'jx/_30wmv.js', 'jx/奇奇.js', 'jx/芒果关姐.js', 'data/settings/link_data.json', 'index.json',
+                 'custom.json']
 
 
 def get_script_dir():
@@ -43,13 +45,14 @@ def filter_green_files(script_dir):
     return green_files
 
 
-def generate_archive_name(script_dir, green=False):
+def generate_archive_name(script_dir, green=False, use_zip=False):
     """
     生成压缩包文件名
     
     Args:
         script_dir (str): 脚本所在目录
         green (bool): 是否为green模式
+        use_zip (bool): 是否使用ZIP格式
         
     Returns:
         str: 压缩包的完整路径
@@ -62,7 +65,8 @@ def generate_archive_name(script_dir, green=False):
 
     # 根据是否传入 green 参数生成压缩包文件名
     archive_suffix = "-green" if green else ""
-    archive_name = f"{current_dir}-{current_time}{archive_suffix}.7z"
+    archive_ext = ".zip" if use_zip else ".7z"
+    archive_name = f"{current_dir}-{current_time}{archive_suffix}{archive_ext}"
 
     # 压缩包输出路径 (脚本所在目录的外面)
     parent_dir = os.path.abspath(os.path.join(script_dir, ".."))
@@ -106,7 +110,7 @@ def build_exclude_params(script_dir, green=False):
     return exclude_params
 
 
-def execute_compression(archive_path, script_dir, exclude_params):
+def execute_compression(archive_path, script_dir, exclude_params, use_zip=False):
     """
     执行7z压缩命令
     
@@ -114,9 +118,11 @@ def execute_compression(archive_path, script_dir, exclude_params):
         archive_path (str): 压缩包输出路径
         script_dir (str): 脚本所在目录
         exclude_params (list): 排除参数列表
+        use_zip (bool): 是否使用ZIP格式
     """
     # 构建命令，打包目录内容而不包含目录本身
-    command = f"7z a \"{archive_path}\" \"{script_dir}\\*\" " + " ".join(exclude_params)
+    archive_type = "zip" if use_zip else "7z"
+    command = f"7z a -t{archive_type} \"{archive_path}\" \"{script_dir}\\*\" " + " ".join(exclude_params)
 
     # 打印构建的命令进行调试
     print(f"构建的 7z 命令: {command}")
@@ -129,22 +135,23 @@ def execute_compression(archive_path, script_dir, exclude_params):
         print(f"压缩失败: {e}")
 
 
-def compress_directory(script_dir, green=False):
+def compress_directory(script_dir, green=False, use_zip=False):
     """
     压缩目录为7z包
     
     Args:
         script_dir (str): 要压缩的目录路径
         green (bool): 是否启用green模式，筛选带[密]的文件
+        use_zip (bool): 是否使用ZIP格式
     """
     # 生成压缩包文件名和路径
-    archive_path = generate_archive_name(script_dir, green)
+    archive_path = generate_archive_name(script_dir, green, use_zip)
 
     # 构建排除参数
     exclude_params = build_exclude_params(script_dir, green)
 
     # 执行压缩
-    execute_compression(archive_path, script_dir, exclude_params)
+    execute_compression(archive_path, script_dir, exclude_params, use_zip)
 
 
 if __name__ == "__main__":
@@ -154,7 +161,8 @@ if __name__ == "__main__":
     # 解析命令行参数
     parser = argparse.ArgumentParser(description="压缩当前目录为 7z 包，支持可选参数。")
     parser.add_argument('-g', '--green', action='store_true', help="启用 green 模式，筛选 js 目录下所有带 [密] 的文件。")
+    parser.add_argument('-z', '--zip', action='store_true', help="使用 ZIP 格式打包，默认使用 7z 格式。")
     args = parser.parse_args()
 
     # 调用压缩函数
-    compress_directory(script_dir, green=args.green)
+    compress_directory(script_dir, green=args.green, use_zip=args.zip)

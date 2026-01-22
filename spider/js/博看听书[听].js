@@ -17,11 +17,18 @@ var rule = {
     url: '/voice/book/list?instance_id=25304&page=fypage&category_id=fyclass&num=24',
     detailUrl: '/voice/album/units?album_id=fyid&page=1&num=200&order=1',
     searchUrl: 'https://es.bookan.com.cn/api/v3/voice/book?instanceId=25304&keyword=**&pageNum=fypage&limitNum=20',
+    author: 'EylinSir',
+    logo: 'https://pp.myapp.com/ma_icon/0/icon_52647879_1746000007/256',
+    hikerListCol: 'icon_4',
     searchable: 2,
     quickSearch: 0,
     class_name: '少年读物&儿童文学&国学经典&文艺少年&育儿心经&心理哲学&青春励志&历史小说&故事会&音乐戏剧&相声评书',
     class_url: '1305&1304&1320&1306&1309&1310&1307&1312&1303&1317&1319',
     headers: {'User-Agent': 'MOBILE_UA'},
+    lazy: async function() {
+        let {input} = this;
+        return input;
+    },
     推荐: '*',
     一级: 'json:data.list;name;cover;extra.author;id',
     二级: async function () {

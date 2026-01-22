@@ -88,6 +88,17 @@ var rule = {
     },
 
     lazy: async function (flag, id, flags) {
+        let {requestHost} = this;
+        const parseObj = executeParse('_30wmv', requestHost, id);
+        // console.log('parseObj:', parseObj);
+        if (parseObj[0]) {
+            const _data = await req(parseObj[1]);
+            const data = JSON.parse(_data.content);
+            // console.log('data:', data);
+            return {
+                parse: 0, url: data.url, header: data.header
+            }
+        }
         return {parse: 0, url: id}
     },
     proxy_rule: async function (params) {

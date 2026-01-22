@@ -184,9 +184,15 @@ const category = async function (filePath, env, tid, pg = 1, filter = 1, extend 
 const detail = async function (filePath, env, ids) {
     const moduleObject = await init(filePath, env);
     const vod_id = Array.isArray(ids) ? ids[0] : ids;
-    return json2Object(await moduleObject.detail(vod_id));
+    let detailResult = '{}';
+    // console.log('type of detailContent:', typeof moduleObject.detailContent);
+    if (moduleObject.detailContent) { // tvbox形式猫源二级参数传ids列表
+        detailResult = await moduleObject.detailContent(ids);
+    } else { // ds/cat传非id
+        detailResult = await moduleObject.detail(vod_id);
+    }
+    return json2Object(detailResult);
 }
-
 
 const search = async function (filePath, env, wd, quick = 0, pg = 1) {
     const moduleObject = await init(filePath, env);

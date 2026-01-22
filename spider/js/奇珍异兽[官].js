@@ -195,4 +195,8 @@ var rule = {
         });
         return setResult(d);
     },
+    lazy: async function () {
+        let {input} = this;
+        return {jx: 1, url: input}
+    }
 }

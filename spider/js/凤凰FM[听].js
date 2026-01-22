@@ -108,10 +108,8 @@ var rule = {
         });
         return setResult(d);
     },
-    lazy: async function () {
-        return {
-            parse: 0,
-            url: input
-        };
+    lazy: async function() {
+        let {input} = this;
+        return input;
     },
 }

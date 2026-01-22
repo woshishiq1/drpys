@@ -397,7 +397,7 @@ var rule = {
 
                 d.push(genMultiInput('play_proxy_mode', '设置播放代理模式', '默认为1，可自行配置成其他值如:2 (1 内存加速,2 磁盘加速 其他:内存加速)', images.settings));
                 d.push(getInput('get_play_proxy_mode', '查看播放代理模式', images.settings));
-                d.push(genMultiInput('enable_dr2', '设置drpy2源启用状态', '设置为1启用drpy2脚本服务，需要壳子内置处理；设置为2启用drpy2在线接口服务(默认2，设置其他值关闭)', images.settings));
+                d.push(genMultiInput('enable_dr2', '设置drpy2源启用状态', '设置为1启用drpy2脚本服务，需要壳子内置处理；设置为2启用drpy2-fast，需要壳子适配新so(默认1，设置其他值关闭)', images.settings));
                 d.push(getInput('get_enable_dr2', '查看drpy2源启用状态', images.settings));
                 d.push(genMultiInput('enable_py', '设置py源启用状态', '设置为1可启用此功能,设置为2启用T4(默认没设置也属于启动，设置其他值关闭)', images.settings));
                 d.push(getInput('get_enable_py', '查看py源启用状态', images.settings));

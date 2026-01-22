@@ -206,6 +206,6 @@ var rule = {
     },
     lazy: async function () {
         let {input} = this;
-        return {parse: 1, jx: 1, url: input}
+        return {jx: 1, url: input}
     }
 }

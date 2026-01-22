@@ -250,7 +250,7 @@ const start = async () => {
         } else {
             console.log('Not running on Vercel!');
         }
-
+        return true;
     } catch (err) {
         fastify.log.error(err);
         process.exit(1);
@@ -265,8 +265,10 @@ const stop = async () => {
         // 停止主服务器
         await fastify.server.close();
         console.log('🛑 所有服务已优雅停止');
+        return true;
     } catch (err) {
         fastify.log.error(`停止服务器时发生错误:${err.message}`);
+        return false;
     }
 };
 

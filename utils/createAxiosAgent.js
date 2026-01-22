@@ -39,10 +39,23 @@ export function createAxiosInstance(options = {}) {
 
     const httpsAgent = new https.Agent(httpsAgentOptions);
 
-    // 配置 axios 使用代理
     const _axios = axios.create({
-        httpAgent,  // 用于 HTTP 请求的代理
-        httpsAgent, // 用于 HTTPS 请求的代理
+        httpAgent,
+        httpsAgent,
+    });
+
+    _axios.interceptors.request.use(config => {
+        if (config && config.headers) {
+            const headers = config.headers;
+            const keys = Object.keys(headers);
+            for (const key of keys) {
+                if (key.toLowerCase() === 'user-agent' && headers[key] === 'RemoveUserAgent') {
+                    delete headers[key];
+                    break;
+                }
+            }
+        }
+        return config;
     });
 
     return _axios;

@@ -49,6 +49,7 @@ import m3u8ProxyController from './m3u8-proxy.js';
 import unifiedProxyController from './unified-proxy.js';
 // WebSocket实时弹幕日志控制器
 import websocketServerController from "./websocketServer.js";
+import githubController from './github.js';
 
 /**
  * 注册所有路由控制器
@@ -104,6 +105,8 @@ export const registerRoutes = (fastify, options) => {
     fastify.register(m3u8ProxyController, options);
     // 注册统一代理路由
     fastify.register(unifiedProxyController, options);
+    // 注册GitHub Release路由
+    fastify.register(githubController, options);
 };
 
 /**
