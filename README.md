@@ -11,7 +11,10 @@ nodejs作为服务端的drpy实现。全面升级异步写法
 ### 常用超链接
 
 * [本项目主页-免翻](https://git-proxy.playdreamer.cn/hjdhnx/drpy-node)
-* [接口文档](docs/apidoc.md) | [接口列表如定时任务](docs/apiList.md) | [小猫影视-待对接T4](https://github.com/waifu-project/movie/pull/135)
+* ~~[最新DS本地包-适配皮卡丘](/gh/release)~~
+* [DS本地包下载中心](/admin/download)
+* [接口文档](docs/apidoc.md) | [接口列表如定时任务](docs/apiList.md) |
+  ~~[小猫影视-待对接T4](https://github.com/waifu-project/movie/pull/135)~~
 * [代码质量评估工具说明](docs/codeCheck.md) | [DS项目代码评估报告](docs/codeCheckReport.md)
 * [本地配置接口-动态本地](/config?healthy=1&pwd=$pwd)
 * [本地配置接口-动态外网/局域网](/config/1?healthy=1&pwd=$pwd)
@@ -20,6 +23,7 @@ nodejs作为服务端的drpy实现。全面升级异步写法
 * [猫源调试教程](/docs/catDebug.md)
 * [接口压测教程](/docs/httpTest.md)
 * [AI编程工具 trae](https://www.trae.ai/account-setting#subscription) | 邮编ZIP输入: 518000
+* [推荐使用AI模型-GLM4.7](https://www.bigmodel.cn/glm-coding?ic=DRV3C8M5NX) | [GLM配置文档](https://docs.bigmodel.cn/cn/coding-plan/tool/trae)
 * [免费AI-360纳米](https://bot.n.cn/)|[免费AI-当贝AI](https://ai.dangbei.com/chat)|[国外聚合全模型](https://lmarena.ai/)
 * [本站防止爬虫协议](/robots.txt)
 * [油猴脚本-反切屏检测](/public/monkey/check_screen_leave.user.js)
@@ -60,32 +64,25 @@ nodejs作为服务端的drpy实现。全面升级异步写法
 
 * [酷9](https://wwbty.lanzouv.com/iGoUV3d3hxuf)
 * [千寻](https://wwbty.lanzouv.com/iSSN93d3hyzg)
+* [皮卡丘](https://github.com/ingriddaleusag-dotcom/PeekPiliRelease)
 
 ## 更新记录
+
+### 20260118
+
+更新至V1.3.18
+
+### 20260115
+
+更新至V1.3.17
+
+### 20260113
+
+更新至V1.3.16
 
 ### 20260112
 
 更新至V1.3.15
-
-### 20251017
-
-更新至V1.3.14
-
-### 20251015
-
-更新至V1.3.13
-
-### 20251014
-
-更新至V1.3.12
-
-### 20251013
-
-更新至V1.3.11
-
-### 20251012
-
-更新至V1.3.10
 
 [点此查看完整更新记录](docs/updateRecord.md)
 
@@ -189,6 +186,7 @@ pm2 restart drpys
 * [源动力-老](https://sourcepower.top/index)
 * [电竞专业反应测试](https://www.arealme.com/brain-memory-game/zh/)
 * [桌面启动器](https://wwbty.lanzouv.com/iDZaP3d3i5ud)
+* [不知名获取网盘CK工具](http://sspa8.top:8100/pan/admin/index.php)
 
 ## AI接入
 

@@ -7,7 +7,7 @@ import url from 'url';
 const EXCLUDE_DIRS = ['.git', '.idea', 'soft', 'examples', 'apps/cat', 'plugins/pvideo', 'plugins/req-proxy', 'plugins/pup-sniffer', 'plugins/mediaProxy', 'pyTools', 'drop_code', 'jstest', 'local', 'logs', '对话1.txt', 'vod_cache', 'data/mv'];
 
 // 要排除的文件列表
-const EXCLUDE_FILES = ['config/env.json', '.env', '.claude', 'clipboard.txt', 'clipboard.txt.bak', '.plugins.js', 'yarn.lock', 't4_daemon.pid', 'spider/js/UC分享.js', 'spider/js/百忙无果[官].js', 'json/UC分享.json', 'jx/奇奇.js', 'jx/芒果关姐.js', 'data/settings/link_data.json', 'index.json', 'custom.json'];
+const EXCLUDE_FILES = ['config/env.json', '.env', '.claude', 'clipboard.txt', 'clipboard.txt.bak', '.plugins.js', 'yarn.lock', 't4_daemon.pid', 'spider/js/UC分享.js', 'spider/js/百忙无果[官].js', 'spider/catvod/mtv60w[差].js', 'json/UC分享.json', 'jx/_30wmv.js', 'jx/奇奇.js', 'jx/芒果关姐.js', 'data/settings/link_data.json', 'index.json', 'custom.json'];
 
 // 获取脚本所在目录
 const getScriptDir = () => dirname(resolve(url.fileURLToPath(import.meta.url)));
@@ -37,7 +37,7 @@ const filterGreenFiles = (scriptDir) => {
 };
 
 // 压缩目录
-const compressDirectory = (scriptDir, green) => {
+const compressDirectory = (scriptDir, green, useZip) => {
     const currentDir = basename(scriptDir);
     const currentTime = new Date().toLocaleDateString('zh-CN', {
         year: 'numeric',
@@ -45,12 +45,13 @@ const compressDirectory = (scriptDir, green) => {
         day: '2-digit'
     }).replace(/\//g, '');
     const archiveSuffix = green ? '-green' : '';
-    const archiveName = `${currentDir}-${currentTime}${archiveSuffix}.7z`;
+    const archiveExt = useZip ? '.zip' : '.7z';
+    const archiveName = `${currentDir}-${currentTime}${archiveSuffix}${archiveExt}`;
 
     const parentDir = resolve(scriptDir, '..');
     const archivePath = join(parentDir, archiveName);
 
-    // 构建 7z 命令
+    // 构建压缩命令参数
     const excludeParams = [];
 
     // 排除目录
@@ -77,7 +78,7 @@ const compressDirectory = (scriptDir, green) => {
     }
 
     // 构建命令，打包目录内容而不包含目录本身
-    const command = `7z a "${archivePath}" "${join(scriptDir, '*')}" -r ${excludeParams.join(' ')}`;
+    const command = `7z a -t${useZip ? 'zip' : '7z'} "${archivePath}" "${join(scriptDir, '*')}" -r ${excludeParams.join(' ')}`;
     console.log(`构建的 7z 命令: ${command}`);
 
     try {
@@ -95,8 +96,9 @@ const main = () => {
     // 简单解析命令行参数
     const args = process.argv.slice(2);
     const green = args.includes('-g') || args.includes('--green');
+    const useZip = args.includes('-z') || args.includes('--zip');
 
-    compressDirectory(scriptDir, green);
+    compressDirectory(scriptDir, green, useZip);
 };
 
 main();

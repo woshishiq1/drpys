@@ -1,6 +1,6 @@
 {
   "name": "drpy-node",
-  "version": "1.3.15",
+  "version": "1.3.18",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -14,8 +14,12 @@
     "node22-win": "chcp 65001 && node --trace-deprecation --experimental-sqlite index.js",
     "package": "python package.py",
     "package-green": "python package.py -g",
+    "package-zip": "python package.py -z",
+    "package-green-zip": "python package.py -g -z",
     "packageJS": "node package.js",
     "packageJS-green": "node package.js -g",
+    "packageJS-zip": "node package.js -z",
+    "packageJS-green-zip": "node package.js -g -z",
     "gzip-1": "node controllers/encoder.js json/十六万歌曲.json",
     "ungzip-1": "node controllers/decoder.js json/十六万歌曲.json.gz",
     "moontv": "node scripts/mjs/moontv.mjs 采集2025.json -p"
