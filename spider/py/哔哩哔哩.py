@@ -236,11 +236,7 @@ B = ''
 A = str
 import sys, os, json as Bg, threading as x, hashlib, time as X, random as B8
 
-try:
-    # from base.spider import Spider as BaseSpider
-    from base.spider import BaseSpider
-except ImportError:
-    from t4.base.spider import BaseSpider
+from base.spider import BaseSpider
 from requests import session as Bh, utils as Bi, head
 from requests.adapters import HTTPAdapter as Cw, Retry
 from concurrent.futures import ThreadPoolExecutor as Cx, as_completed as Bj
@@ -499,7 +495,12 @@ class Spider(BaseSpider):
 
     def __init__(self, query_params=None, t4_api=None):
         super().__init__(query_params=query_params, t4_api=t4_api)
-        self.localProxyUrl = self.getProxyUrl() + '&type='
+        self.localProxyUrl = self.getProxyUrl()
+        if 'hikerSkey' in self.localProxyUrl:
+            self.localProxyUrl += 'hipy_py_哔哩哔哩&type='
+        else:
+            self.localProxyUrl += '&siteType=3&siteKey=hipy_py_哔哩哔哩&type='
+        # print('localProxyUrl:', self.localProxyUrl)
         self.time_diff1 = {V: [0, 300], A0: [300, 900], AL: [900, 1800], AQ: [1800, 3600],
                            '5': [3600, 0x4ee2d6d415b85acef80ffffffff]};
         self.time_diff = L;
@@ -2324,7 +2325,15 @@ class Spider(BaseSpider):
         else:
             c = C.pool.submit(C.start_heartbeat, G, E, Q, J, F(M), Z);
             C.task_pool.append(c)
-        return D
+        D['urls'] = D['url']
+        # print(D)
+        result = {
+            'parse': 0,
+            'url': D['url'],
+            'header': D['header']
+        }
+        print(result)
+        return result
 
     def live_playerContent(D, id):
         K = 'url_info';

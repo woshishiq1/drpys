@@ -4,6 +4,7 @@
   filterable: 1,
   quickSearch: 1,
   title: '七猫小说',
+  类型: '小说',
   logo: 'https://cdn-front.qimao.com/global/static/images/favicon2022.ico',
   lang: 'hipy'
 })
