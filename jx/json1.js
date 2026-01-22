@@ -82,7 +82,7 @@ async function lazy(input, params) {
     let timeout = 8000;                                            // 设置请求超时时间为8秒
     
     // 调用第三方解析API获取视频直链
-    let obj = await requestJson('https://cdnsrc.cdnapi.top/json/?url=' + input, {headers, timeout});
+    let obj = await requestJson('https://kalbim.xatut.top/kalbim2025/781718/play/video_player.php?url=' + input, {headers, timeout});
     
     return obj.url                                                 // 返回解析后的视频播放链接
 }
