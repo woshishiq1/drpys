@@ -10,7 +10,7 @@
 })
 */
 
-const Pan_API = 'http://127.0.0.1:6080'; // PanCheck的API地址 自行替换
+const Pan_API = 'https://pancheck.banye.tech:7777'; // PanCheck的API地址 自行替换
 const Pan_So = 'https://so.252035.xyz'; // PanSou地址，自行替换
 const PAN_TYPES = '百度网盘,夸克网盘,UC网盘,天翼云盘,移动云盘'; // 默认搜索的网盘类型和排序，逗号分隔
 const MAX_RESULTS = 15; // 默认搜索结果数量 （每个网盘类型最多15条）

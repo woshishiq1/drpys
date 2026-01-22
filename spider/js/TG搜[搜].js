@@ -10,7 +10,7 @@
 })
 */
 
-const Pan_API = 'http://127.0.0.1:6080';  // 网盘链接有效性检测过滤api，需自行替换
+const Pan_API = 'https://pancheck.banye.tech:7777';  // 网盘链接有效性检测过滤api，需自行替换
 const Pan_Sift = [];
 const DEFAULT_CHANNELS = 'douerpan,bdwpzhpd,wydwpzy,sgkwpzy,zyywpzy,Baidu_Netdisk,PanjClub,youxigs,yunpanuc,zyfb123,ysxb48,xiangnikanj';//定义频道
 const DEFAULT_SOURCES = ['百度网盘', '夸克网盘', 'UC网盘', '移动云盘', '天翼云盘', '115网盘', '阿里云盘', '123云盘'];//定义搜索网盘类型及顺序

@@ -93,7 +93,7 @@ const rule = {
   host: 'https://t.me',
   url: '/s/fyclass',
   searchUrl: '?q=**',
-  Pan_API: 'http://127.0.0.1:6080',  // 网盘链接有效性检测过滤api，需自行替换
+  Pan_API: 'https://pancheck.banye.tech:7777',  // 网盘链接有效性检测过滤api，需自行替换
   logo: 'https://api.xinac.net/icon/?url=https://t.me',
   searchable: 1,
   quickSearch: 1,

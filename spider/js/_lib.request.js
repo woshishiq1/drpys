@@ -1,5 +1,19 @@
 const iconv = require('iconv-lite');
 
+function sanitizeUserAgent(headers) {
+    if (!headers) {
+        return headers;
+    }
+    const keys = Object.keys(headers);
+    for (const key of keys) {
+        if (key.toLowerCase() === 'user-agent' && headers[key] === 'RemoveUserAgent') {
+            delete headers[key];
+            break;
+        }
+    }
+    return headers;
+}
+
 async function requestHtml(url, options) {
     try {
         let html = (await req(url, options)).content;
@@ -30,15 +44,20 @@ async function getPublicIp() {
 
 async function getHtml(config) {
     try {
-        return await axios.request(typeof config === "string" ? config : {
+        if (typeof config === "string") {
+            return await axios.request(config)
+        }
+        const cfg = {
             url: config.url,
             method: config.method || 'GET',
             headers: config.headers || {
                 'User-Agent': PC_UA
             },
             data: config.data || '',
-            responseType: config.responseType || '',//'arraybuffer'
-        })
+            responseType: config.responseType || ''
+        };
+        cfg.headers = sanitizeUserAgent(cfg.headers);
+        return await axios.request(cfg)
     } catch (e) {
         return e.response
     }
@@ -54,6 +73,7 @@ async function req_(reqUrl, mt, headers, data) {
         },
         data: data || '',
     };
+    config.headers = sanitizeUserAgent(config.headers);
     let res = await axios.request(config);
     return res.data;
 }
@@ -68,6 +88,7 @@ async function req_encoding(reqUrl, mt, headers, encoding, data) {
         data: data || '',
         responseType: 'arraybuffer'
     };
+    config.headers = sanitizeUserAgent(config.headers);
     let res = await axios.request(config);
     if (encoding) {
         res.data = iconv.decode(res.data, encoding);
@@ -88,6 +109,7 @@ async function req_proxy(reqUrl, mt, headers, data) {
             port: "7890"
         }
     };
+    config.headers = sanitizeUserAgent(config.headers);
     if (data) {
         config.data = data;
     }
