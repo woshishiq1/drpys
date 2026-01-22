@@ -63,7 +63,7 @@ const jx = {
      * 添加url属性直接暴露api，不走系统。建议web解析才写这个属性,json解析隐藏起来
      * @type {string}
      */
-    url: 'https://bfq.cfwlgzs.cn/player?url=',
+    url: 'https://www.ckplayer.vip/jiexi/?url=',
 };
 
 /**
