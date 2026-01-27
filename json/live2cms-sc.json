@@ -11,12 +11,12 @@
   },
   {
     "name": "四川联通-本地M3U",
-    "url": "./live_sc_unicom.m3u",
+    "url": "./tv/live_sc_unicom.m3u",
     "img": "./lives.jpg"
   },
   {
     "name": "四川联通-本地TXT",
-    "url": "./live_sc_unicom.txt",
+    "url": "./tv/live_sc_unicom.txt",
     "img": "./lives.jpg"
   }
 ]
