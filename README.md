@@ -46,6 +46,7 @@ nodejs作为服务端的drpy实现。全面升级异步写法
 * [DS时钟插件-白色时钟](/apps/clock/white_clock.html)|[日历时钟](/apps/clock/index.html)
 * [DS庆祝页面-完结撒花](/apps/happy/index.html)
 * [bookReader](/apps/book-reader)
+* [系统备份与恢复](/apps/backup-restore/index.html)
 * [代码加解密工具](/admin/encoder)
 * [央视点播解析工具](/proxy/央视大全[官]/index.html)
 * [在线猫ds源主页](/cat/index.html)
@@ -68,21 +69,13 @@ nodejs作为服务端的drpy实现。全面升级异步写法
 
 ## 更新记录
 
+### 20260125
+
+更新至V1.3.19
+
 ### 20260118
 
 更新至V1.3.18
-
-### 20260115
-
-更新至V1.3.17
-
-### 20260113
-
-更新至V1.3.16
-
-### 20260112
-
-更新至V1.3.15
 
 [点此查看完整更新记录](docs/updateRecord.md)
 
