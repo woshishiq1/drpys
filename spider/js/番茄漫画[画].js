@@ -5,6 +5,7 @@
   quickSearch: 0,
   title: '番茄漫画',
   '类型': '漫画',
+  logo: 'https://www.18zf.net/d/file/p/2023/1107/3ty5orktxrc.jpg',
   lang: 'ds'
 })
 */
@@ -17,6 +18,7 @@ var rule = {
     url: 'fyclass',
     searchUrl: '/api/search?key=**&tab_type=8&offset=((fypage-1)*10)',
     detailUrl: '/api/detail?book_id=fyid',
+    logo: 'https://www.18zf.net/d/file/p/2023/1107/3ty5orktxrc.jpg',
     headers: {'User-Agent': 'UC_UA'},
     searchable: 1,
     quickSearch: 0,
