@@ -5,51 +5,16 @@
  */
 import formBody from '@fastify/formbody';
 import websocket from '@fastify/websocket';
-// WebSocket实时日志控制器-最早引入才能全局拦截console日志
-import websocketController from './websocket.js';
-// 静态文件服务控制器
-import staticController from './static.js';
-// 文档服务控制器
-import docsController from './docs.js';
-// 配置管理控制器
-import configController from './config.js';
-// API接口控制器
-import apiController from './api.js';
-// 媒体代理控制器
-import mediaProxyController from './mediaProxy.js';
-// 根路径控制器
-import rootController from './root.js';
-// 编码器控制器
-import encoderController from './encoder.js';
-// 解码器控制器
-import decoderController from './decoder.js';
-// 认证编码控制器
-import authCoderController from './authcoder.js';
-// Web界面控制器
-import webController from './web.js';
-// HTTP请求控制器
-import httpController from './http.js';
-// 剪贴板推送控制器
-import clipboardPusherController from './clipboard-pusher.js';
-// 任务控制器（已注释）
-// import taskController from './tasker.js';
-// 定时任务控制器
-import cronTaskerController from './cron-tasker.js';
-// 源检查控制器
-import sourceCheckerController from './source-checker.js';
-// 图片存储控制器
-import imageStoreController from './image-store.js';
-// WebDAV 代理控制器
-import webdavProxyController from './webdav-proxy.js';
-// FTP 代理控制器
-import ftpProxyController from './ftp-proxy.js';
-// 文件代理控制器
-import fileProxyController from './file-proxy.js';
-import m3u8ProxyController from './m3u8-proxy.js';
-import unifiedProxyController from './unified-proxy.js';
-// WebSocket实时弹幕日志控制器
-import websocketServerController from "./websocketServer.js";
-import githubController from './github.js';
+
+// 懒加载辅助函数
+const lazyRegister = (fastify, importFn, options) => {
+    fastify.register(async (instance, opts) => {
+        const module = await importFn();
+        const plugin = module.default || module;
+        // 使用传入的 options (全局配置)
+        await instance.register(plugin, options);
+    });
+};
 
 /**
  * 注册所有路由控制器
@@ -62,51 +27,52 @@ export const registerRoutes = (fastify, options) => {
     fastify.register(formBody);
     // 注册WebSocket插件
     fastify.register(websocket);
-    // 注册WebSocket路由
-    fastify.register(websocketController, options);
-    // 注册静态文件服务路由
-    fastify.register(staticController, options);
-    // 注册文档服务路由
-    fastify.register(docsController, options);
-    // 注册配置管理路由
-    fastify.register(configController, options);
-    // 注册API接口路由
-    fastify.register(apiController, options);
-    // 注册媒体代理路由
-    fastify.register(mediaProxyController, options);
-    // 注册根路径路由
-    fastify.register(rootController, options);
-    // 注册编码器路由
-    fastify.register(encoderController, options);
-    // 注册解码器路由
-    fastify.register(decoderController, options);
-    // 注册认证编码路由
-    fastify.register(authCoderController, options);
-    // 注册Web界面路由
-    fastify.register(webController, options);
-    // 注册HTTP请求路由
-    fastify.register(httpController, options);
-    // 注册剪贴板推送路由
-    fastify.register(clipboardPusherController, options);
-    // 注册任务路由（已注释）
-    // fastify.register(taskController, options);
-    // 注册定时任务路由
-    fastify.register(cronTaskerController, options);
-    // 注册源检查路由
-    fastify.register(sourceCheckerController, options);
-    // 注册图片存储路由
-    fastify.register(imageStoreController, options);
-    // 注册 WebDAV 代理路由
-    fastify.register(webdavProxyController, options);
-    // 注册 FTP 代理路由
-    fastify.register(ftpProxyController, options);
-    // 注册文件代理路由
-    fastify.register(fileProxyController, options);
-    fastify.register(m3u8ProxyController, options);
+    
+    // WebSocket实时日志控制器-最早引入才能全局拦截console日志
+    lazyRegister(fastify, () => import('./websocket.js'), options);
+    // 静态文件服务控制器
+    lazyRegister(fastify, () => import('./static.js'), options);
+    // 文档服务控制器
+    lazyRegister(fastify, () => import('./docs.js'), options);
+    // 配置管理控制器
+    lazyRegister(fastify, () => import('./config.js'), options);
+    // API接口控制器
+    lazyRegister(fastify, () => import('./api.js'), options);
+    // 媒体代理控制器
+    lazyRegister(fastify, () => import('./mediaProxy.js'), options);
+    // 根路径控制器
+    lazyRegister(fastify, () => import('./root.js'), options);
+    // 编码器控制器
+    lazyRegister(fastify, () => import('./encoder.js'), options);
+    // 解码器控制器
+    lazyRegister(fastify, () => import('./decoder.js'), options);
+    // 认证编码控制器
+    lazyRegister(fastify, () => import('./authcoder.js'), options);
+    // Web界面控制器
+    lazyRegister(fastify, () => import('./web.js'), options);
+    // HTTP请求控制器
+    lazyRegister(fastify, () => import('./http.js'), options);
+    // 剪贴板推送控制器
+    lazyRegister(fastify, () => import('./clipboard-pusher.js'), options);
+    // 任务控制器（已注释）
+    // lazyRegister(fastify, () => import('./tasker.js'), options);
+    // 定时任务控制器
+    lazyRegister(fastify, () => import('./cron-tasker.js'), options);
+    // 源检查控制器
+    lazyRegister(fastify, () => import('./source-checker.js'), options);
+    // 图片存储控制器
+    lazyRegister(fastify, () => import('./image-store.js'), options);
+    // WebDAV 代理控制器
+    lazyRegister(fastify, () => import('./webdav-proxy.js'), options);
+    // FTP 代理控制器
+    lazyRegister(fastify, () => import('./ftp-proxy.js'), options);
+    // 文件代理控制器
+    lazyRegister(fastify, () => import('./file-proxy.js'), options);
+    lazyRegister(fastify, () => import('./m3u8-proxy.js'), options);
     // 注册统一代理路由
-    fastify.register(unifiedProxyController, options);
+    lazyRegister(fastify, () => import('./unified-proxy.js'), options);
     // 注册GitHub Release路由
-    fastify.register(githubController, options);
+    lazyRegister(fastify, () => import('./github.js'), options);
 };
 
 /**
@@ -116,5 +82,5 @@ export const registerRoutes = (fastify, options) => {
  * @param {Object} options - 路由配置选项
  */
 export const registerWsRoutes = (wsApp, options) => {
-    wsApp.register(websocketServerController, options);
+    lazyRegister(wsApp, () => import("./websocketServer.js"), options);
 }
