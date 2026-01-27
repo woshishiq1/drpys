@@ -737,12 +737,11 @@ class BaseSpider {
     }
 
     async fetch(url, options) {
-        const content = (await req(url, options)).content;
+        const resp = await req(url, options);
         return {
-            content,
+            ...resp,
             get data() { // data尝试返回object
                 try {
-                    // console.log('get data:', this.content);
                     return this.content.parseX;
                 } catch (e) {
                     return {};

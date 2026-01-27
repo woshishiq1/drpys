@@ -34,7 +34,7 @@ var rule = {
     limit: 90,
     double: false,
     play_parse: true,
-    class_parse: '.stui-header__menu li:gt(0):lt(7);a&&Text;a&&href;/(\\d+).html',
+  //  class_parse: '.stui-header__menu li:gt(0):lt(7);a&&Text;a&&href;/(\\d+).html',
 
     推荐: async function(tid, pg, filter, extend) {
         return this.一级();

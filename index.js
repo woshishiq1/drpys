@@ -1,3 +1,6 @@
+import { performance } from 'perf_hooks';
+const startTime = performance.now();
+
 import * as fastlogger from './controllers/fastlogger.js'
 import path from 'path';
 import os from 'os';
@@ -35,11 +38,16 @@ const catLibDir = path.join(__dirname, 'spider/catLib');
 const xbpqDir = path.join(__dirname, 'spider/xbpq');
 const configDir = path.join(__dirname, 'config');
 
-const pluginProcs = startAllPlugins(__dirname);
-// console.log('pluginProcs:', pluginProcs);
+// 异步启动插件，不阻塞主线程
+let pluginProcs = {};
+setTimeout(() => {
+    pluginProcs = startAllPlugins(__dirname);
+}, 0);
 
 // 添加钩子事件
 fastify.addHook('onReady', async () => {
+    const endTime = performance.now();
+    console.log(`🚀 Server started in ${(endTime - startTime).toFixed(2)}ms`);
     try {
         await daemon.startDaemon();
         fastify.log.info('Python守护进程已启动');

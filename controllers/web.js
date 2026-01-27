@@ -1,4 +1,4 @@
-import {readFileSync, existsSync, readdirSync, statSync, unlinkSync} from 'fs';
+import {readFileSync, existsSync, readdirSync, statSync, unlinkSync, mkdirSync, copyFileSync, lstatSync, writeFileSync} from 'fs';
 import {createReadStream} from 'fs';
 import {execSync} from 'child_process';
 import path from 'path';
@@ -15,6 +15,7 @@ const DOWNLOAD_AUTH_SECRET = process.env.DOWNLOAD_AUTH_SECRET || 'drpys_download
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRootDir = path.dirname(__dirname);
+const pkg = JSON.parse(readFileSync(path.join(projectRootDir, 'package.json'), 'utf-8'));
 
 const generateDownloadToken = (filename) => {
     const timestamp = Date.now();
@@ -200,14 +201,22 @@ export default (fastify, options, done) => {
                 const sizeClass = latestPackage ? '' : ' not-packed';
                 const token = generateDownloadToken(file.name);
                 const downloadUrl = `/admin/download/${file.name}?auth=${token}`;
+                
+                let buildTime = '未打包';
+                if (latestPackage && latestPackage.mtime) {
+                    const date = new Date(latestPackage.mtime);
+                    buildTime = date.toLocaleString('zh-CN', { hour12: false });
+                }
+
                 return '<div class="download-item">' +
                     '<div class="download-info">' +
-                    '<strong>' + file.name + '</strong>' +
+                    '<div class="download-name">' + file.name + '</div>' +
                     '<div class="file-type">' + file.desc + '</div>' +
+                    '<div class="build-info">版本: ' + pkg.version + ' | 打包时间: ' + buildTime + '</div>' +
                     '</div>' +
                     '<div class="download-size' + sizeClass + '">' + fileSize + '</div>' +
                     '<div class="download-actions">' +
-                    '<a href="' + downloadUrl + '">下载</a>' +
+                    '<a href="' + downloadUrl + '" class="download-btn">下载</a>' +
                     '<button class="copy-btn" onclick="copyLink(\'' + downloadUrl + '\')">复制链接</button>' +
                     '</div>' +
                     '</div>';
@@ -348,6 +357,175 @@ export default (fastify, options, done) => {
                 message: '清除历史文件失败',
                 error: error.message,
             });
+        }
+    });
+
+    const BACKUP_PATHS = [
+        '.env',
+        '.plugins.js',
+        'config/env.json',
+        'config/map.txt',
+        'config/parses.conf',
+        'config/player.json',
+        'scripts/cron',
+        'plugins'
+    ];
+
+    const BACKINFO_FILENAME = '.backinfo';
+
+    const getBackupRootDir = () => {
+        return path.join(path.dirname(projectRootDir), path.basename(projectRootDir) + '-backup');
+    };
+
+    const getBackinfoPath = (backupDir) => {
+        return path.join(backupDir, BACKINFO_FILENAME);
+    };
+
+    const loadBackinfo = (backupDir) => {
+        const infoPath = getBackinfoPath(backupDir);
+        if (!existsSync(infoPath)) {
+            return null;
+        }
+        try {
+            const content = readFileSync(infoPath, 'utf-8');
+            return JSON.parse(content);
+        } catch (e) {
+            return null;
+        }
+    };
+
+    const saveBackinfo = (backupDir, data) => {
+        const infoPath = getBackinfoPath(backupDir);
+        writeFileSync(infoPath, JSON.stringify(data, null, 2), 'utf-8');
+    };
+
+    const getEffectiveBackupPaths = (backupDir) => {
+        const info = loadBackinfo(backupDir);
+        if (info && Array.isArray(info.paths) && info.paths.length > 0) {
+            return {paths: info.paths, info};
+        }
+        return {paths: BACKUP_PATHS, info};
+    };
+
+    const copyRecursiveSync = (src, dest) => {
+        const stats = lstatSync(src);
+        if (stats.isDirectory()) {
+            if (!existsSync(dest)) {
+                mkdirSync(dest, { recursive: true });
+            }
+            readdirSync(src).forEach((childItemName) => {
+                copyRecursiveSync(path.join(src, childItemName), path.join(dest, childItemName));
+            });
+        } else {
+            const destDir = path.dirname(dest);
+            if (!existsSync(destDir)) {
+                mkdirSync(destDir, { recursive: true });
+            }
+            copyFileSync(src, dest);
+        }
+    };
+
+    fastify.get('/admin/backup/config', {
+        preHandler: validateBasicAuth
+    }, async (request, reply) => {
+        const backupDir = getBackupRootDir();
+        let paths;
+        let lastBackupAt = null;
+        let lastRestoreAt = null;
+        if (!existsSync(backupDir)) {
+            paths = BACKUP_PATHS;
+        } else {
+            const result = getEffectiveBackupPaths(backupDir);
+            paths = result.paths;
+            if (result.info) {
+                lastBackupAt = result.info.lastBackupAt || null;
+                lastRestoreAt = result.info.lastRestoreAt || null;
+            }
+        }
+        return reply.send({success: true, paths, lastBackupAt, lastRestoreAt});
+    });
+
+    fastify.post('/admin/backup', {
+        preHandler: validateBasicAuth
+    }, async (request, reply) => {
+        if (IS_VERCEL) {
+            return reply.code(403).send({ success: false, message: 'Vercel环境不支持备份' });
+        }
+        try {
+            const backupDir = getBackupRootDir();
+            if (!existsSync(backupDir)) {
+                mkdirSync(backupDir, { recursive: true });
+            }
+
+            const {paths, info} = getEffectiveBackupPaths(backupDir);
+            const details = [];
+            for (const item of paths) {
+                const srcPath = path.join(projectRootDir, item);
+                const destPath = path.join(backupDir, item);
+                
+                if (existsSync(srcPath)) {
+                    copyRecursiveSync(srcPath, destPath);
+                    details.push(`Backed up: ${item}`);
+                } else {
+                    details.push(`Skipped (not found): ${item}`);
+                }
+            }
+
+            const now = new Date().toISOString();
+            const customPaths = info && Array.isArray(info.paths) && info.paths.length > 0 ? info.paths : [];
+            const backinfoData = {
+                paths: customPaths,
+                lastBackupAt: now,
+                lastRestoreAt: info && info.lastRestoreAt ? info.lastRestoreAt : null
+            };
+            saveBackinfo(backupDir, backinfoData);
+
+            return reply.send({ success: true, message: '备份完成', backupDir, details });
+        } catch (error) {
+            fastify.log.error(`Backup failed: ${error.message}`);
+            return reply.code(500).send({ success: false, message: '备份失败: ' + error.message });
+        }
+    });
+
+    fastify.post('/admin/restore', {
+        preHandler: validateBasicAuth
+    }, async (request, reply) => {
+        if (IS_VERCEL) {
+            return reply.code(403).send({ success: false, message: 'Vercel环境不支持恢复' });
+        }
+        try {
+            const backupDir = getBackupRootDir();
+            if (!existsSync(backupDir)) {
+                return reply.code(404).send({ success: false, message: '备份目录不存在' });
+            }
+
+            const {paths, info} = getEffectiveBackupPaths(backupDir);
+            const details = [];
+            for (const item of paths) {
+                const srcPath = path.join(backupDir, item);
+                const destPath = path.join(projectRootDir, item);
+                
+                if (existsSync(srcPath)) {
+                    copyRecursiveSync(srcPath, destPath);
+                    details.push(`Restored: ${item}`);
+                } else {
+                    details.push(`Skipped (not found in backup): ${item}`);
+                }
+            }
+
+            const now = new Date().toISOString();
+            const customPaths = info && Array.isArray(info.paths) && info.paths.length > 0 ? info.paths : [];
+            const backinfoData = {
+                paths: customPaths,
+                lastBackupAt: info && info.lastBackupAt ? info.lastBackupAt : null,
+                lastRestoreAt: now
+            };
+            saveBackinfo(backupDir, backinfoData);
+
+            return reply.send({ success: true, message: '恢复完成', backupDir, details });
+        } catch (error) {
+            fastify.log.error(`Restore failed: ${error.message}`);
+            return reply.code(500).send({ success: false, message: '恢复失败: ' + error.message });
         }
     });
 
