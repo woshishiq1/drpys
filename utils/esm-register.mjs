@@ -12,7 +12,7 @@ export async function load(url, context, nextLoad) {
         const relativeUrl = url.replaceAll('assets://js/lib/', '../catLib/');
         const catLibJsPath = path.join(assets_path, relativeUrl);
         const catLibHref = pathToFileURL(catLibJsPath).href;
-        console.log(`[assets url]: ${url} [relativeUrl]:${relativeUrl}\n[catLibJsPath]: ${catLibJsPath} [catLibHref]:${catLibHref}`);
+        // console.log(`[assets url]: ${url} [relativeUrl]:${relativeUrl}\n[catLibJsPath]: ${catLibJsPath} [catLibHref]:${catLibHref}`);
         url = catLibHref;
     }
     // 解决不了CAT_DEBUG=0模式下的相对路径依赖问题
