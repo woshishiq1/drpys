@@ -24,16 +24,18 @@ import {validatePwd} from "../utils/api_validate.js";
 import {startJsonWatcher, getApiEngine} from "../utils/api_helper.js";
 import * as drpyS from '../libs/drpyS.js';
 import hipy from '../libs/hipy.js';
+import php from '../libs/php.js';
 import xbpq from '../libs/xbpq.js';
 import catvod from '../libs/catvod.js';
 
 /**
  * 支持的引擎映射表
- * 包含drpyS、hipy、xbpq、catvod四种引擎
+ * 包含drpyS、hipy、phipy、xbpq、catvod五种引擎
  */
 const ENGINES = {
     drpyS,
     hipy,
+    php,
     xbpq,
     catvod,
 };

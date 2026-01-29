@@ -23,6 +23,7 @@ import {validateBasicAuth, validatePwd} from "../utils/api_validate.js";
 import {getSitesMap} from "../utils/sites-map.js";
 import {getParsesDict} from "../utils/file.js";
 import batchExecute from '../libs_drpy/batchExecute.js';
+import {isPhpAvailable} from '../utils/phpEnv.js';
 
 const {jsEncoder} = drpyS;
 
@@ -76,6 +77,7 @@ async function generateSiteJSON(options, requestHost, sub, pwd) {
     const jsDir = options.jsDir;
     const dr2Dir = options.dr2Dir;
     const pyDir = options.pyDir;
+    const phpDir = options.phpDir;
     const catDir = options.catDir;
     const configDir = options.configDir;
     const jsonDir = options.jsonDir;
@@ -490,6 +492,63 @@ async function generateSiteJSON(options, requestHost, sub, pwd) {
         await batchExecute(py_tasks, listener);
 
     }
+
+    // 根据用户是否启用php源去生成对应配置
+    const enable_php = ENV.get('enable_php', '1');
+    console.log('isPhpAvailable:', isPhpAvailable);
+    if (enable_php === '1' && isPhpAvailable) {
+        const php_files = readdirSync(phpDir);
+        const api_type = 4;
+        let php_valid_files = php_files.filter((file) => file.endsWith('.php') && !file.startsWith('_') && !['config.php', 'index.php', 'test_runner.php'].includes(file));
+        log(`开始生成php的T${api_type}配置，phpDir:${phpDir},源数量: ${php_valid_files.length}`);
+
+        const php_tasks = php_valid_files.map((file) => {
+            return {
+                func: async ({file, phpDir, requestHost, pwd, SitesMap}) => {
+                    const baseName = path.basename(file, '.php');
+                    let api = `${requestHost}/api/${baseName}?do=php`;
+                    let ext = '';
+                    if (pwd) {
+                        api += `&pwd=${pwd}`;
+                    }
+                    let ruleObject = {
+                        searchable: 1,
+                        filterable: 1,
+                        quickSearch: 1,
+                    };
+                    let ruleMeta = {...ruleObject};
+                    const filePath = path.join(phpDir, file);
+
+                    Object.assign(ruleMeta, {
+                        title: baseName,
+                        lang: 'php',
+                    });
+                    ruleMeta.title = enableRuleName ? ruleMeta.title || baseName : baseName;
+
+                    let fileSites = [];
+                    let key = `php_${ruleMeta.title}`;
+                    let name = `${ruleMeta.title}(PHP)`;
+                    fileSites.push({key, name, ext});
+
+                    fileSites.forEach((fileSite) => {
+                        const site = {
+                            key: fileSite.key,
+                            name: fileSite.name,
+                            type: api_type,
+                            api,
+                            ...ruleMeta,
+                            ext: fileSite.ext || "",
+                        };
+                        sites.push(site);
+                    });
+                },
+                param: {file, phpDir, requestHost, pwd, SitesMap},
+                id: file,
+            };
+        });
+        await batchExecute(php_tasks, listener);
+    }
+
     const enable_cat = ENV.get('enable_cat', '1');
     // 根据用户是否启用cat源去生成对应配置
     if (enable_cat === '1' || enable_cat === '2') {
@@ -660,78 +719,82 @@ async function generateSiteJSON(options, requestHost, sub, pwd) {
  * @returns {Promise<Object>} 包含parses数组的对象
  */
 async function generateParseJSON(jxDir, requestHost) {
-    const files = readdirSync(jxDir);
-    const jx_files = files.filter((file) => file.endsWith('.js') && !file.startsWith('_')) // 筛选出不是 "_" 开头的 .js 文件
-    const jx_dict = getParsesDict(requestHost);
+    let enable_self_jx = ENV.get('enable_self_jx', '0') === '1';
     let parses = [];
-    const tasks = jx_files.map((file) => {
-        return {
-            func: async ({file, jxDir, requestHost, drpyS}) => {
-                const baseName = path.basename(file, '.js'); // 去掉文件扩展名
-                const api = `${requestHost}/parse/${baseName}?url=`;  // 使用请求的 host 地址，避免硬编码端口
+    let sorted_parses = [];
+    const jx_dict = getParsesDict(requestHost);
+    if (enable_self_jx) {
+        const files = readdirSync(jxDir);
+        const jx_files = files.filter((file) => file.endsWith('.js') && !file.startsWith('_')) // 筛选出不是 "_" 开头的 .js 文件
+        const tasks = jx_files.map((file) => {
+            return {
+                func: async ({file, jxDir, requestHost, drpyS}) => {
+                    const baseName = path.basename(file, '.js'); // 去掉文件扩展名
+                    const api = `${requestHost}/parse/${baseName}?url=`;  // 使用请求的 host 地址，避免硬编码端口
 
-                let jxObject = {
-                    type: 1, // 固定值
-                    ext: {
-                        flag: [
-                            "qiyi",
-                            "imgo",
-                            "爱奇艺",
-                            "奇艺",
-                            "qq",
-                            "qq 预告及花絮",
-                            "腾讯",
-                            "youku",
-                            "优酷",
-                            "pptv",
-                            "PPTV",
-                            "letv",
-                            "乐视",
-                            "leshi",
-                            "mgtv",
-                            "芒果",
-                            "sohu",
-                            "xigua",
-                            "fun",
-                            "风行"
-                        ]
-                    },
-                    header: {
-                        "User-Agent": "Mozilla/5.0"
+                    let jxObject = {
+                        type: 1, // 固定值
+                        ext: {
+                            flag: [
+                                "qiyi",
+                                "imgo",
+                                "爱奇艺",
+                                "奇艺",
+                                "qq",
+                                "qq 预告及花絮",
+                                "腾讯",
+                                "youku",
+                                "优酷",
+                                "pptv",
+                                "PPTV",
+                                "letv",
+                                "乐视",
+                                "leshi",
+                                "mgtv",
+                                "芒果",
+                                "sohu",
+                                "xigua",
+                                "fun",
+                                "风行"
+                            ]
+                        },
+                        header: {
+                            "User-Agent": "Mozilla/5.0"
+                        }
+                    };
+                    try {
+                        let _jxObject = await drpyS.getJx(path.join(jxDir, file));
+                        jxObject = {...jxObject, ..._jxObject};
+                    } catch (e) {
+                        throw new Error(`Error parsing jx object for file: ${file}, ${e.message}`);
                     }
-                };
-                try {
-                    let _jxObject = await drpyS.getJx(path.join(jxDir, file));
-                    jxObject = {...jxObject, ..._jxObject};
-                } catch (e) {
-                    throw new Error(`Error parsing jx object for file: ${file}, ${e.message}`);
+
+                    parses.push({
+                        name: baseName,
+                        url: jxObject.url || api,
+                        type: jxObject.type,
+                        ext: jxObject.ext,
+                        header: jxObject.header
+                    });
+                },
+                param: {file, jxDir, requestHost, drpyS},
+                id: file,
+            };
+        });
+
+        const listener = {
+            func: (param, id, error, result) => {
+                if (error) {
+                    console.error(`Error processing file ${id}:`, error.message);
+                } else {
+                    // console.log(`Successfully processed file ${id}:`, result);
                 }
-
-                parses.push({
-                    name: baseName,
-                    url: jxObject.url || api,
-                    type: jxObject.type,
-                    ext: jxObject.ext,
-                    header: jxObject.header
-                });
             },
-            param: {file, jxDir, requestHost, drpyS},
-            id: file,
+            param: {}, // 外部参数可以在这里传入
         };
-    });
-
-    const listener = {
-        func: (param, id, error, result) => {
-            if (error) {
-                console.error(`Error processing file ${id}:`, error.message);
-            } else {
-                // console.log(`Successfully processed file ${id}:`, result);
-            }
-        },
-        param: {}, // 外部参数可以在这里传入
-    };
-    await batchExecute(tasks, listener);
-    let sorted_parses = naturalSort(parses, 'name', ['JSON并发', 'JSON合集', '虾米', '奇奇']);
+        await batchExecute(tasks, listener);
+        sorted_parses = naturalSort(parses, 'name', ['JSON并发', 'JSON合集', '虾米', '奇奇']);
+    }
     let sorted_jx_dict = naturalSort(jx_dict, 'name', ['J', 'W']);
     parses = sorted_parses.concat(sorted_jx_dict);
     return {parses};
