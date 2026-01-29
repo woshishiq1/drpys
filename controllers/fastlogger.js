@@ -11,9 +11,9 @@ dotenv.config();
 const LOG_WITH_FILE = Number(process.env.LOG_WITH_FILE) || 0;
 const LOG_LEVEL = process.env.LOG_LEVEL && ['trace', 'debug', 'info', 'warn', 'error', 'fatal'].includes(process.env.LOG_LEVEL) ? process.env.LOG_LEVEL : 'info';
 const COOKIE_AUTH_CODE = process.env.COOKIE_AUTH_CODE || 'drpys';
-console.log('LOG_WITH_FILE:', LOG_WITH_FILE);
-console.log('LOG_LEVEL:', LOG_LEVEL);
-console.log('COOKIE_AUTH_CODE:', COOKIE_AUTH_CODE);
+// console.log('LOG_WITH_FILE:', LOG_WITH_FILE);
+// console.log('LOG_LEVEL:', LOG_LEVEL);
+// console.log('COOKIE_AUTH_CODE:', COOKIE_AUTH_CODE);
 let _logger = true;
 let logStream = null;
 

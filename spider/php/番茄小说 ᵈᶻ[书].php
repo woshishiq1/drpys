@@ -227,6 +227,15 @@ class Spider extends BaseSpider {
         $parts = explode('@', $id);
         $itemId = $parts[0];
         $title = $parts[1] ?? '';
+
+        // Handle Title$ItemId format
+        if (strpos($itemId, '$') !== false) {
+            $subParts = explode('$', $itemId);
+            $itemId = $subParts[1];
+            if (empty($title)) {
+                $title = $subParts[0];
+            }
+        }
         
         $url = self::API_HOST . "/api/content?tab=小说&item_id=$itemId";
         

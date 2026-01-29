@@ -70,7 +70,7 @@ export class SmartCacheManager {
         // 启动定期清理任务
         this.startCleanupTimer();
         
-        console.log(`[${this.name}] SmartCacheManager initialized: maxSize=${this.maxSize}, defaultTTL=${this.defaultTTL}ms`);
+        // console.log(`[${this.name}] SmartCacheManager initialized: maxSize=${this.maxSize}, defaultTTL=${this.defaultTTL}ms`);
     }
     
     /**

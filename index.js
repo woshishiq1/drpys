@@ -3,6 +3,7 @@ const startTime = performance.now();
 
 import * as fastlogger from './controllers/fastlogger.js'
 import path from 'path';
+import {checkPhpAvailable} from './utils/phpEnv.js';
 import os from 'os';
 import qs from 'qs';
 import {fileURLToPath} from 'url';
@@ -33,6 +34,7 @@ const jsonDir = path.join(__dirname, 'json');
 const jsDir = path.join(__dirname, 'spider/js');
 const dr2Dir = path.join(__dirname, 'spider/js_dr2');
 const pyDir = path.join(__dirname, 'spider/py');
+const phpDir = path.join(__dirname, 'spider/php');
 const catDir = path.join(__dirname, 'spider/catvod');
 const catLibDir = path.join(__dirname, 'spider/catLib');
 const xbpqDir = path.join(__dirname, 'spider/xbpq');
@@ -46,6 +48,7 @@ setTimeout(() => {
 
 // 添加钩子事件
 fastify.addHook('onReady', async () => {
+    await checkPhpAvailable();
     const endTime = performance.now();
     console.log(`🚀 Server started in ${(endTime - startTime).toFixed(2)}ms`);
     try {
@@ -176,6 +179,7 @@ const registerOptions = {
     jsDir,
     dr2Dir,
     pyDir,
+    phpDir,
     catDir,
     catLibDir,
     xbpqDir,

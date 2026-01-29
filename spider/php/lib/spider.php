@@ -299,6 +299,9 @@ abstract class BaseSpider {
      * 自动运行，处理路由
      */
     public function run() {
+        if (defined('DRPY_BRIDGE')) {
+            return;
+        }
         $ac = $_GET['ac'] ?? '';
         $t = $_GET['t'] ?? '';
         $pg = $_GET['pg'] ?? '1';

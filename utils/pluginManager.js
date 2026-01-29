@@ -14,7 +14,7 @@ const exampleConfigPath = path.join(__dirname, "../.plugins.example.js");
 // 尝试加载用户配置，如果没有就用 example
 let plugins = [];
 try {
-    console.log(`检查插件配置文件: ${userConfigPath} 是否存在`);
+    // console.log(`检查插件配置文件: ${userConfigPath} 是否存在`);
     if (fs.existsSync(userConfigPath)) {
         plugins = (await import(pathToFileURL(userConfigPath).href)).default;
         console.log("[pluginManager] 使用用户 .plugins.js 配置");

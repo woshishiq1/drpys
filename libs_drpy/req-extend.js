@@ -40,6 +40,9 @@ async function request(url, obj = {}, ocr_flag = false) {
             obj.headers["Content-Type"] = 'text/html; charset=' + rule.encoding;
         }
     }
+    if (rule.timeout && typeof obj.timeout === 'undefined') {
+        obj.timeout = rule.timeout;
+    }
     if (typeof (obj.body) != 'undefined' && obj.body && typeof (obj.body) === 'string') {
         // 传body加 "Content-Type":"application/x-www-form-urlencoded;" 即可post form
         if (!obj.headers.hasOwnProperty('Content-Type') && !obj.headers.hasOwnProperty('content-type')) { // 手动指定了就不管
@@ -75,7 +78,7 @@ async function request(url, obj = {}, ocr_flag = false) {
     // }
 
     log(`[request] headers: ${JSON.stringify(obj.headers)}`);
-    log('[request] url:' + url + `  |method:${obj.method || 'GET'}  |body:${obj.body || ''}`);
+    log('[request] url:' + url + `  |method:${obj.method || 'GET'}|timeout:${obj.timeout}  |body:${obj.body || ''}`);
     let res = await req(url, obj);
     let html = res.content || '';
     if (obj.withHeaders) {
