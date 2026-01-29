@@ -2,6 +2,71 @@
 
 本文档总结了基于 `spider.php` 框架开发、调试、转换 PHP 爬虫源的核心经验与最佳实践。旨在帮助开发者快速上手，并作为后续开发的参考手册。
 
+## 0. 环境搭建 (Windows)
+
+为了运行和调试 PHP 爬虫，需要在本地配置 PHP 环境。推荐使用 PHP 8.3+ NTS (Non Thread Safe) 版本。
+
+### 0.1 下载与安装
+1.  **下载 PHP**:
+    可以直接点击下载推荐版本：
+    [php-8.3.29-nts-Win32-vs16-x64.zip](https://windows.php.net/downloads/releases/php-8.3.29-nts-Win32-vs16-x64.zip)
+2.  **解压**:
+    将下载的压缩包解压到固定目录，例如 `C:\php` (建议路径不包含空格和中文)。
+3.  **配置环境变量**:
+    - 右键 "此电脑" -> "属性" -> "高级系统设置" -> "环境变量"。
+    - 在 "系统变量" 中找到 `Path`，点击 "编辑"。
+    - 点击 "新建"，输入你的 PHP 解压路径 (如 `C:\php`)。
+    - 连续点击 "确定" 保存设置。
+
+### 0.2 配置 php.ini
+1.  进入 PHP 解压目录，找到 `php.ini-development` 文件，复制一份并重命名为 `php.ini`。
+2.  使用文本编辑器打开 `php.ini`，查找并修改以下配置 (去掉行首的 `;` 分号以启用)：
+    ```ini
+    ; 指定扩展目录
+    extension_dir = "ext"
+
+    ; 启用核心扩展 (爬虫必须)
+    extension=curl
+    extension=mbstring
+    extension=openssl
+    extension=sockets
+    ```
+3.  **验证安装**:
+    打开新的 CMD 或 PowerShell 窗口，输入 `php -v`。
+    如果看到类似 `PHP 8.3.29 (cli) ...` 的输出，即表示环境配置成功。
+
+## 0.5 环境搭建 (Linux/Ubuntu - 升级至 PHP 8.3)
+
+如果您在 Linux 环境（如 Ubuntu/Debian）下使用，建议通过 PPA 源安装或升级到 PHP 8.3。
+
+### 0.5.1 卸载旧版 (可选)
+如果系统中已安装旧版（如 PHP 8.1），建议先卸载以避免冲突：
+```bash
+sudo apt purge php8.1* -y
+sudo apt autoremove -y
+```
+
+### 0.5.2 添加 PPA 源
+使用 Ondřej Surý 的 PPA 源获取最新 PHP 版本：
+```bash
+sudo apt install software-properties-common -y
+sudo add-apt-repository ppa:ondrej/php -y
+sudo apt update
+```
+
+### 0.5.3 安装 PHP 8.3 及扩展
+安装 CLI 版本及 Drpy 爬虫所需的常用扩展 (curl, mbstring, xml, mysql 等)：
+```bash
+# 注意：openssl 通常已包含在核心或 common 包中，无需单独指定 php8.3-openssl
+sudo apt install php8.3-cli php8.3-curl php8.3-mbstring php8.3-xml php8.3-mysql -y
+```
+
+### 0.5.4 验证安装
+```bash
+php -v
+# 输出应显示 PHP 8.3.x
+```
+
 ## 1. 核心架构与工具
 
 ### 1.1 基础框架 (`lib/spider.php`)
