@@ -24,7 +24,8 @@ const {getRandomFromList} = $.require('./_lib.random.js');
 const {requestHtml} = $.require('./_lib.request.js');
 // const fqweb_host = 'http://fqweb.jsj66.com';
 // const fqweb_host = 'http://fanqie.mduge.com';
-const fqweb_host = 'https://qkfqapi.vv9v.cn';
+// const fqweb_host = 'https://qkfqapi.vv9v.cn';
+const fqweb_host = 'http://101.35.133.34:5000';
 // const fqweb_host = 'http://101.35.133.34:5000/docs'; //备选
 // const fqweb_host = 'http://103.236.91.147:9999/docs'; //备选
 // const fqweb_host = 'http://47.108.80.161:5005/docs'; //备选
@@ -62,7 +63,7 @@ var rule = {
         api: 'https://novel.snssdk.com/api',
         封面域名: 'http://p6-novel.byteimg.com/large/',
     },
-    timeout: 5000,
+    timeout: 20000,
     play_parse: true,
     class_parse: async () => {
         // let html = (await req(rule.homeUrl)).content;
@@ -208,7 +209,8 @@ var rule = {
         content = content.replace(/<\/p>/g, '\n').replace(/<\w+>/g, '').replace(/<[^>]*>/g, '');
         */
 
-        let html = (await req(content_url, {headers: {Cookie: getFqCookie()}})).content;
+        // let html = (await req(content_url, {headers: {Cookie: getFqCookie()},timeout:this.timeout})).content;
+        let html = await request(content_url);
         /*
         let json = JSON.parse(html).data.data;
         title = json.novel_data.title;

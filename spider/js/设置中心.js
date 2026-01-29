@@ -401,6 +401,8 @@ var rule = {
                 d.push(getInput('get_enable_dr2', '查看drpy2源启用状态', images.settings));
                 d.push(genMultiInput('enable_py', '设置py源启用状态', '设置为1可启用此功能,设置为2启用T4(默认没设置也属于启动，设置其他值关闭)', images.settings));
                 d.push(getInput('get_enable_py', '查看py源启用状态', images.settings));
+                d.push(genMultiInput('enable_php', '设置php源启用状态', '设置为1可启用此功能,设置为0可关闭(默认没设置也属于启动，设置其他值关闭)', images.settings));
+                d.push(getInput('get_enable_php', '查看php源启用状态', images.settings));
                 d.push(genMultiInput('enable_cat', '设置cat源启用状态', '设置为1可启用此功能,设置为2启用T4(默认没设置也属于启动，设置其他值关闭)', images.settings));
                 d.push(getInput('get_enable_cat', '查看cat源启用状态', images.settings));
                 d.push(genMultiInput('enable_old_config', '设置兼容性配置', '设置为1可启用此功能(默认关闭)', images.settings));
@@ -457,6 +459,9 @@ var rule = {
 
                 d.push(genMultiInput('PROXY_AUTH', '设置代理播放授权', '默认为drpys，可自行配置成其他值', images.settings));
                 d.push(getInput('get_PROXY_AUTH', '查看代理播放授权', images.settings));
+
+                d.push(genMultiInput('enable_self_jx', '设置启用自建解析', '默认为关闭，可自行配置成其他值(0关闭 1启用)', images.settings));
+                d.push(getInput('get_enable_self_jx', '查看启用自建解析', images.settings));
                 break;
         }
         return d
@@ -1272,6 +1277,7 @@ var rule = {
             'play_proxy_mode',
             'enable_dr2',
             'enable_py',
+            'enable_php',
             'enable_cat',
             'enable_old_config',
             'enable_rule_name',
@@ -1290,6 +1296,7 @@ var rule = {
             'must_sub_code',
             'mg_hz',
             'PROXY_AUTH',
+            'enable_self_jx',
         ];
         let get_cookie_sets = [
             'get_quark_cookie',
@@ -1306,6 +1313,7 @@ var rule = {
             'get_play_proxy_mode',
             'get_enable_dr2',
             'get_enable_py',
+            'get_enable_php',
             'get_enable_cat',
             'get_enable_old_config',
             'get_enable_rule_name',
@@ -1324,6 +1332,7 @@ var rule = {
             'get_must_sub_code',
             'get_mg_hz',
             'get_PROXY_AUTH',
+            'get_enable_self_jx',
         ];
         if (cookie_sets.includes(action) && value) {
             try {
