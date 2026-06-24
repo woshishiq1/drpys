@@ -1,0 +1,90 @@
+name: Sync repo
+
+on:
+  schedule:
+    - cron: '3 * * * *'
+  workflow_dispatch:
+
+jobs:
+  sync_zourjke:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout your repo
+        uses: actions/checkout@v4
+        with:
+          ref: main  # 使用你重命名后的 main 分支
+          fetch-depth: 0
+
+      - name: Set up Git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Add zourjke upstream and fetch
+        run: |
+          git remote add upstream_zourjke https://github.com/zourjke/drpy-node.git || true
+          git fetch upstream_zourjke
+
+      - name: Force Sync to main and Merge Workflows
+        run: |
+          # 1. 动态获取 zourjke 的默认分支名
+          UPSTREAM_BRANCH=$(git remote show upstream_zourjke | grep 'HEAD branch' | cut -d' ' -f5)
+          echo "zourjke 默认分支为: $UPSTREAM_BRANCH"
+
+          # 2. 核心防刷：定义你当前这个同步脚本的文件名
+          # 📝 注意：如果你的这个 yaml 文件在仓库里不叫 sync.yml，请把下面这行改为你实际的文件名！
+          MY_SCRIPT=".github/workflows/sync.yml"
+          
+          # 3. 排除掉你自己的同步脚本，对比上游和你本地 main 分支的代码内容
+          if git diff --quiet origin/main upstream_zourjke/$UPSTREAM_BRANCH -- . ":!$MY_SCRIPT"; then
+            echo "------------------------------------------------"
+            echo "✅ 上游没有新代码更新（已忽略自身脚本差异）。"
+            echo "✅ 拒绝上推，优雅退出，不刷新仓库置顶时间。"
+            echo "------------------------------------------------"
+            exit 0
+          fi
+
+          echo "🚀 检测到上游有代码或工作流更新，准备同步..."
+
+          # 4. 备份当前的同步脚本（防止被上游覆盖）
+          if [ -f "$MY_SCRIPT" ]; then
+            mkdir -p /tmp/workflow_backup
+            cp "$MY_SCRIPT" /tmp/workflow_backup/
+            echo "已成功备份本地同步脚本"
+          fi
+
+          # 5. 强行将本地 main 重置为上游最新状态（带过来上游所有的工作流更新）
+          git checkout -B main upstream_zourjke/$UPSTREAM_BRANCH
+
+          # 6. 把你的同步脚本安全地恢复回去
+          if [ -f "/tmp/workflow_backup/$(basename $MY_SCRIPT)" ]; then
+            mkdir -p .github/workflows
+            cp /tmp/workflow_backup/* .github/workflows/
+            echo "已将本地同步脚本恢复到工作流目录"
+          fi
+
+          # 7. 提交并强推回你自己的 main 分支
+          git add -A
+          git commit --allow-empty -m "Sync: 自动同步 zourjke 代码及工作流（已保留本地同步脚本）"
+          git push origin main --force
+
+  # ----------------------------------------------------
+  # 任务二：清理历史
+  # ----------------------------------------------------
+  cleanup_runs:
+    runs-on: ubuntu-latest
+    needs: sync_zourjke
+    if: always()
+    permissions:
+      actions: write
+    steps:
+      - name: Delete old workflow runs
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          retain_days: 0
+          keep_minimum_runs: 5
