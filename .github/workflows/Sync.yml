@@ -1,4 +1,4 @@
-name: Sync repo from zourjke
+name: Sync repo from zourjkeon
 
 on:
   schedule:
@@ -6,66 +6,82 @@ on:
   workflow_dispatch:
 
 jobs:
+  # ----------------------------------------------------
+  # 唯一任务：智能过滤上游工作流，仅同步全量纯代码
+  # ----------------------------------------------------
   sync_zourjke:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      actions: write      # 增加这个
-      workflows: write    # 关键：明确声明 workflow 写入权限
-
     steps:
       - name: Checkout your repo
         uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}   # 显式传入
 
-      - name: Add upstream and fetch
+      - name: Add zourjke upstream and fetch
         run: |
           git remote add upstream_zourjke https://github.com/zourjke/drpy-node.git || true
-          git fetch upstream_zourjke --tags --force
+          git fetch upstream_zourjke
 
-      - name: Smart Sync
+      - name: Smart Sync & Filter Workflows
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # 1. 获取上游默认分支
           UPSTREAM_BRANCH=$(git remote show upstream_zourjke | grep 'HEAD branch' | cut -d' ' -f5)
-          echo "上游默认分支: $UPSTREAM_BRANCH"
+          echo "zourjke 默认分支为: $UPSTREAM_BRANCH"
 
-          MY_SCRIPT="Sync.yml"   # ← 改成你实际的文件名
-
-          # 检查是否有实质代码更新（排除 workflow 目录干扰）
+          # 2. 核心防刷：对比上游和你本地的纯代码（排除整个工作流目录的干扰）
           if git diff --quiet origin/main upstream_zourjke/$UPSTREAM_BRANCH -- . ':!.github/workflows'; then
-            echo "✅ 上游无新代码更新，跳过"
+            echo "------------------------------------------------"
+            echo "✅ 上游纯代码没有新更新。"
+            echo "✅ 拒绝同步，优雅退出，不刷新仓库置顶时间。"
+            echo "------------------------------------------------"
             exit 0
           fi
 
-          echo "🚀 检测到更新，开始同步..."
+          echo "🚀 检测到上游有新代码，准备开始同步..."
 
-          # 备份自己的同步脚本
-          mkdir -p /tmp/backup
-          cp ".github/workflows/$MY_SCRIPT" /tmp/backup/ 2>/dev/null || true
-
-          # 切换到上游最新状态
-          git checkout -B main upstream_zourjke/$UPSTREAM_BRANCH --force
-
-          # 恢复自己的同步脚本
-          mkdir -p .github/workflows
-          cp /tmp/backup/$MY_SCRIPT .github/workflows/ 2>/dev/null || true
-
+          # 3. 配置 Git 身份
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add -A
-          git commit --allow-empty -m "Sync: zourjke upstream ($(date -u +'%Y-%m-%d %H:%M:%S UTC'))" || echo "Nothing to commit"
-
-          # === 更强力的推送方式 ===
-          LOCAL_SHA=$(git rev-parse HEAD)
-
-          echo "通过 GitHub API 强制更新 main 分支..."
-          gh api --method PATCH "/repos/${{ github.repository }}/git/refs/heads/main" \
-            -f sha="$LOCAL_SHA" \
-            -f force=true
+          # 4. 【核心修改】只同步代码，完全隔离上游的工作流
+          # 强行将本地工作区重置为本地 main 的最新状态
+          git checkout main
           
-          echo "🎉 同步完成（含 .github/workflows）"
+          # 从上游分支拉取所有文件，但明确排除上游的 .github/workflows 目录
+          # 这样上游的 workflow 绝不会污染你的仓库，你自己的 Sync.yml 也会完好损
+          git checkout upstream_zourjke/$UPSTREAM_BRANCH -- . ':!.github/workflows'
+
+          # 5. 提交变动
+          git add -A
+          git commit --allow-empty -m "Sync: 自动同步 zourjke 纯代码（已过滤上游工作流）"
+
+          # 6. 安全推送
+          # 既然彻底过滤了上游工作流，不涉及任何敏感权限变更，
+          # 我们可以直接使用标准的 git push，不再需要使用 API 强推指针，更安全稳定。
+          echo "正在推送到远程仓库..."
+          git push origin main
+
+          echo "🎉 同步成功！已完美同步上游纯代码，并成功过滤上游工作流。"
+
+  # ----------------------------------------------------
+  # 任务二：清理历史
+  # ----------------------------------------------------
+  cleanup_runs:
+    runs-on: ubuntu-latest
+    needs: sync_zourjke
+    if: always()
+    permissions:
+      actions: write
+    steps:
+      - name: Delete old workflow runs
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          retain_days: 0
+          keep_minimum_runs: 5
