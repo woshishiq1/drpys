@@ -1,4 +1,4 @@
-name: Sync repo
+name: Sync repo from zourjke
 
 on:
   schedule:
@@ -6,16 +6,20 @@ on:
   workflow_dispatch:
 
 jobs:
+  # ----------------------------------------------------
+  # 唯一任务：完美同步 zourjke 到 main 并智能保护自身工作流
+  # ----------------------------------------------------
   sync_zourjke:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      workflows: write  # 🔑 核心修复：允许脚本创建和更新上游的其他工作流文件
 
     steps:
       - name: Checkout your repo
         uses: actions/checkout@v4
         with:
-          ref: main  # 使用你重命名后的 main 分支
+          ref: main
           fetch-depth: 0
 
       - name: Set up Git identity
