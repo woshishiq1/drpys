@@ -7,13 +7,12 @@ on:
 
 jobs:
   # ----------------------------------------------------
-  # 唯一任务：完美同步 zourjke 到 main 并智能保护自身工作流
+  # 唯一任务：利用官方 CLI 完美同步全量代码及工作流（零配置）
   # ----------------------------------------------------
   sync_zourjke:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      workflows: write  # 🔑 核心修复：允许脚本创建和更新上游的其他工作流文件
+      contents: write  # 保持默认的写入权限即可
 
     steps:
       - name: Checkout your repo
@@ -22,58 +21,63 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Set up Git identity
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
       - name: Add zourjke upstream and fetch
         run: |
           git remote add upstream_zourjke https://github.com/zourjke/drpy-node.git || true
           git fetch upstream_zourjke
 
-      - name: Force Sync to main and Merge Workflows
+      - name: Smart Sync via GitHub CLI
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # 直接借用默认自带的 Token
         run: |
-          # 1. 动态获取 zourjke 的默认分支名
+          # 1. 获取上游默认分支
           UPSTREAM_BRANCH=$(git remote show upstream_zourjke | grep 'HEAD branch' | cut -d' ' -f5)
           echo "zourjke 默认分支为: $UPSTREAM_BRANCH"
 
-          # 2. 核心防刷：定义你当前这个同步脚本的文件名
-          # 📝 注意：如果你的这个 yaml 文件在仓库里不叫 sync.yml，请把下面这行改为你实际的文件名！
-          MY_SCRIPT=".github/workflows/sync.yml"
+          # 2. 核心防刷：定义你当前这个同步脚本的名字
+          # 📝 注意：请确保大小写一致，如果是 Sync.yml 就写 Sync.yml
+          MY_SCRIPT="Sync.yml"
           
-          # 3. 排除掉你自己的同步脚本，对比上游和你本地 main 分支的代码内容
-          if git diff --quiet origin/main upstream_zourjke/$UPSTREAM_BRANCH -- . ":!$MY_SCRIPT"; then
+          # 3. 核心防刷：对比上游和你本地的纯代码（排除整个工作流目录的干扰）
+          if git diff --quiet origin/main upstream_zourjke/$UPSTREAM_BRANCH -- . ':!.github/workflows'; then
             echo "------------------------------------------------"
-            echo "✅ 上游没有新代码更新（已忽略自身脚本差异）。"
-            echo "✅ 拒绝上推，优雅退出，不刷新仓库置顶时间。"
+            echo "✅ 上游没有新代码更新。"
+            echo "✅ 拒绝同步，优雅退出，不刷新仓库置顶时间。"
             echo "------------------------------------------------"
             exit 0
           fi
 
-          echo "🚀 检测到上游有代码或工作流更新，准备同步..."
+          echo "🚀 检测到上游有新代码，准备开始同步..."
 
-          # 4. 备份当前的同步脚本（防止被上游覆盖）
-          if [ -f "$MY_SCRIPT" ]; then
-            mkdir -p /tmp/workflow_backup
-            cp "$MY_SCRIPT" /tmp/workflow_backup/
-            echo "已成功备份本地同步脚本"
+          # 4. 先把本地运行的这个同步脚本备份出来
+          mkdir -p /tmp/workflow_backup
+          if [ -f ".github/workflows/$MY_SCRIPT" ]; then
+            cp ".github/workflows/$MY_SCRIPT" /tmp/workflow_backup/
           fi
 
-          # 5. 强行将本地 main 重置为上游最新状态（带过来上游所有的工作流更新）
-          git checkout -B main upstream_zourjke/$UPSTREAM_BRANCH
+          # 5. 【核心大招】利用 GitHub 官方 CLI 工具，强行在云端把上游分支同步过来
+          # 这一步是服务器内部同步，会把上游的所有工作流（包括 build-docker.yml）全部带过来
+          gh repo sync ${{ github.repository }} --source zourjke/drpy-node --force
 
-          # 6. 把你的同步脚本安全地恢复回去
-          if [ -f "/tmp/workflow_backup/$(basename $MY_SCRIPT)" ]; then
-            mkdir -p .github/workflows
-            cp /tmp/workflow_backup/* .github/workflows/
-            echo "已将本地同步脚本恢复到工作流目录"
+          # 6. 云端同步成功后，我们需要把你的同步脚本安全地插回去，防止被上游冲掉
+          # 所以我们重新拉取刚刚同步完的最新代码
+          git fetch origin main
+          git checkout main
+
+          # 7. 把你完好无损的同步脚本放回去
+          mkdir -p .github/workflows
+          if [ -f "/tmp/workflow_backup/$MY_SCRIPT" ]; then
+            cp "/tmp/workflow_backup/$MY_SCRIPT" .github/workflows/
           fi
 
-          # 7. 提交并强推回你自己的 main 分支
-          git add -A
-          git commit --allow-empty -m "Sync: 自动同步 zourjke 代码及工作流（已保留本地同步脚本）"
-          git push origin main --force
+          # 8. 设置身份并提交你的这个同步脚本（GitHub 允许你修改“当前正在运行”的这一个脚本）
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .github/workflows/$MY_SCRIPT
+          
+          # 如果你的脚本和上游刚好重名且内容一致，diff 就会为空，加 --allow-empty 防止报错
+          git commit --allow-empty -m "Sync: 恢复本地专属同步脚本"
+          git push origin main
 
   # ----------------------------------------------------
   # 任务二：清理历史
