@@ -6,13 +6,12 @@ on:
   workflow_dispatch:
 
 jobs:
-  # ----------------------------------------------------
-  # 唯一任务：利用官方 API 底层写入，完美同步全量代码及工作流
-  # ----------------------------------------------------
   sync_zourjke:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # 保持默认的写入权限即可
+      contents: write
+      actions: write      # 增加这个
+      workflows: write    # 关键：明确声明 workflow 写入权限
 
     steps:
       - name: Checkout your repo
@@ -20,84 +19,53 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}   # 显式传入
 
-      - name: Add zourjke upstream and fetch
+      - name: Add upstream and fetch
         run: |
           git remote add upstream_zourjke https://github.com/zourjke/drpy-node.git || true
-          git fetch upstream_zourjke
+          git fetch upstream_zourjke --tags --force
 
-      - name: Smart Sync via Low-Level Git
+      - name: Smart Sync
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # 直接借用默认自带的 Token
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # 1. 获取上游默认分支
           UPSTREAM_BRANCH=$(git remote show upstream_zourjke | grep 'HEAD branch' | cut -d' ' -f5)
-          echo "zourjke 默认分支为: $UPSTREAM_BRANCH"
+          echo "上游默认分支: $UPSTREAM_BRANCH"
 
-          # 2. 核心防刷：定义你当前这个同步脚本的名字
-          # 📝 注意：请确保大小写一致，如果是 Sync.yml 就写 Sync.yml
-          MY_SCRIPT="Sync.yml"
-          
-          # 3. 核心防刷：对比上游和你本地的纯代码（排除整个工作流目录的干扰）
+          MY_SCRIPT="Sync.yml"   # ← 改成你实际的文件名
+
+          # 检查是否有实质代码更新（排除 workflow 目录干扰）
           if git diff --quiet origin/main upstream_zourjke/$UPSTREAM_BRANCH -- . ':!.github/workflows'; then
-            echo "------------------------------------------------"
-            echo "✅ 上游没有新代码更新。"
-            echo "✅ 拒绝同步，优雅退出，不刷新仓库置顶时间。"
-            echo "------------------------------------------------"
+            echo "✅ 上游无新代码更新，跳过"
             exit 0
           fi
 
-          echo "🚀 检测到上游有新代码，准备开始同步..."
+          echo "🚀 检测到更新，开始同步..."
 
-          # 4. 先把本地运行的这个同步脚本备份出来
-          mkdir -p /tmp/workflow_backup
-          if [ -f ".github/workflows/$MY_SCRIPT" ]; then
-            cp ".github/workflows/$MY_SCRIPT" /tmp/workflow_backup/
-          fi
+          # 备份自己的同步脚本
+          mkdir -p /tmp/backup
+          cp ".github/workflows/$MY_SCRIPT" /tmp/backup/ 2>/dev/null || true
 
-          # 5. 【核心大招】不用 push，直接在本地用硬核 Git 强行把上游的树结构（含所有工作流）融合进来
-          git checkout -B main upstream_zourjke/$UPSTREAM_BRANCH
+          # 切换到上游最新状态
+          git checkout -B main upstream_zourjke/$UPSTREAM_BRANCH --force
 
-          # 6. 把你完好无损的同步脚本放回去（确保不被上游同名文件冲掉）
+          # 恢复自己的同步脚本
           mkdir -p .github/workflows
-          if [ -f "/tmp/workflow_backup/$MY_SCRIPT" ]; then
-            cp "/tmp/workflow_backup/$MY_SCRIPT" .github/workflows/
-          fi
+          cp /tmp/backup/$MY_SCRIPT .github/workflows/ 2>/dev/null || true
 
-          # 7. 配置 Git 身份
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
           git add -A
+          git commit --allow-empty -m "Sync: zourjke upstream ($(date -u +'%Y-%m-%d %H:%M:%S UTC'))" || echo "Nothing to commit"
 
-          # 8. 【规避报错的终极推法】
-          # 我们把文件全部提交。为了防止直接 git push 报工作流权限错，
-          # 我们先用底层命令把本地 main 的最新状态直接做成一个 commit 树，然后通过 GitHub 官方的 API 强行更新你的远程 main 分支指针！
-          # 这种更新方式是服务器内网直接移动指针，完全不触发 Git 传输层对工作流文件的拦截。
+          # === 更强力的推送方式 ===
+          LOCAL_SHA=$(git rev-parse HEAD)
+
+          echo "通过 GitHub API 强制更新 main 分支..."
+          gh api --method PATCH "/repos/${{ github.repository }}/git/refs/heads/main" \
+            -f sha="$LOCAL_SHA" \
+            -f force=true
           
-          git commit --allow-empty -m "Sync: 自动同步 zourjke 代码及工作流（已保留本地同步脚本）"
-          LOCAL_COMMIT=$(git rev-parse HEAD)
-
-          echo "正在通过官方 API 绿色通道强推分支指针..."
-          gh api -X PATCH /repos/${{ github.repository }}/git/refs/heads/main \
-            -f sha="$LOCAL_COMMIT" \
-            -F force=true
-
-          echo "🎉 同步成功！代码和 .github/workflows 目录已完美同步。"
-
-  # ----------------------------------------------------
-  # 任务二：清理历史
-  # ----------------------------------------------------
-  cleanup_runs:
-    runs-on: ubuntu-latest
-    needs: sync_zourjke
-    if: always()
-    permissions:
-      actions: write
-    steps:
-      - name: Delete old workflow runs
-        uses: Mattraks/delete-workflow-runs@v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          repository: ${{ github.repository }}
-          retain_days: 0
-          keep_minimum_runs: 5
+          echo "🎉 同步完成（含 .github/workflows）"
