@@ -1,0 +1,131 @@
+name: Sync full repo from jasondd1983
+
+on:
+  schedule:
+    - cron: '3 * * * *'
+  workflow_dispatch:
+
+jobs:
+  # ----------------------------------------------------
+  # 任务一：原封不动，同步 jasondd1983 到本地 main 分支
+  # ----------------------------------------------------
+  sync_full:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout your repo
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Add upstream and fetch
+        run: |
+          git remote add upstream https://github.com/jasondd1983/drpy-node.git || true
+          git fetch upstream main
+
+      - name: Smart Sync and Protect Workflow
+        run: |
+          if git merge-base --is-ancestor upstream/main HEAD; then
+            echo "------------------------------------------------"
+            echo "✅ 上游代码已同步过，本地无须更新。退出任务。"
+            echo "------------------------------------------------"
+            exit 0
+          fi
+
+          echo "🚀 检测到上游有新代码，准备开始同步..."
+
+          mkdir -p /tmp/workflow_backup
+          cp .github/workflows/*.yml /tmp/workflow_backup/
+
+          git reset --hard upstream/main
+
+          mkdir -p .github/workflows
+          cp /tmp/workflow_backup/*.yml .github/workflows/
+
+          git add .github/workflows/*.yml
+          
+          if git diff --staged --quiet; then
+            echo "代码内容与上游一致，且 Workflow 无变动，取消推送。"
+            exit 0
+          fi
+
+          git commit -m "Sync: 自动同步上游代码并保留本地工作流"
+          git push origin main --force
+
+  # ----------------------------------------------------
+  # 任务二：完美强制覆盖 zourjke 到 master（终极防报错版）
+  # ----------------------------------------------------
+  sync_zourjke:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout your repo
+        uses: actions/checkout@v4
+        with:
+          ref: main # 借用 main 进来，避免 master 不存在时报错
+          fetch-depth: 0
+
+      - name: Set up Git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Add zourjke upstream and fetch
+        run: |
+          git remote add upstream_zourjke https://github.com/zourjke/drpy-node.git || true
+          git fetch upstream_zourjke
+
+      - name: Force Sync to Master without Workflows
+        run: |
+          # 动态获取 zourjke 的默认分支名
+          UPSTREAM_BRANCH=$(git remote show upstream_zourjke | grep 'HEAD branch' | cut -d' ' -f5)
+          echo "zourjke 默认分支为: $UPSTREAM_BRANCH"
+
+          # 1. 强行创建或切到本地普通的 master 分支，并将内容强行重置为 zourjke 的最新代码
+          git checkout -B master upstream_zourjke/$UPSTREAM_BRANCH
+
+          # 2. 终极绝招：直接从 Git 追踪和物理层面上，把所有工作流文件全部抹除！
+          # 这样推送到 master 分支的内容里就绝对不带有任何工作流，彻底绕过 GitHub 的拦截
+          if [ -d ".github/workflows" ]; then
+            git rm -rf .github/workflows/ || true
+            rm -rf .github/workflows/
+          fi
+
+          # 3. 检查是否有实际差异
+          git add -A
+          if git diff --staged --quiet; then
+            echo "代码内容与上游一致（无更新），取消推送。"
+            exit 0
+          fi
+
+          # 4. 提交并强行覆盖远程的 master 分支
+          git commit -m "Sync: 自动强行覆盖 zourjke 代码至 master 分支（已移除工作流）"
+          git push origin master --force
+
+  # ----------------------------------------------------
+  # 任务三：清理历史
+  # ----------------------------------------------------
+  cleanup_runs:
+    runs-on: ubuntu-latest
+    needs: [sync_full, sync_zourjke]
+    if: always()
+    permissions:
+      actions: write
+    steps:
+      - name: Delete old workflow runs
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          retain_days: 0
+          keep_minimum_runs: 5
