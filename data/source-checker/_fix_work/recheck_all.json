@@ -1,0 +1,1153 @@
+[
+  {
+    "name": "人人影视[优](DS)",
+    "lang": "ds",
+    "key": "drpyS_人人影视[优]",
+    "api": "http://localhost:5757/api/人人影视[优]?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"class\":[{\"type_id\":\"1\",\"type_name\":\"电影\"},{\"type_id\":\"2\",\"type_name\":\"电视剧\"},{\"type_id\":\"3\",\"type_name\":\"综艺\"},{\"type_id\":\"5\",\"type_name\":\"动漫\"},{\"type_id\":\"4\",\"type_name\":\"纪录片\"},{\"t"
+  },
+  {
+    "name": "七味[优](DS)",
+    "lang": "ds",
+    "key": "drpyS_七味[优]",
+    "api": "http://localhost:5757/api/七味[优]?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"type\":\"影视\",\"class\":[{\"type_id\":\"1\",\"type_name\":\"电影\"},{\"type_id\":\"2\",\"type_name\":\"剧集\"},{\"type_id\":\"3\",\"type_name\":\"综艺\"},{\"type_id\":\"4\",\"type_name\":\"动漫\"},{\"type_id\":\"30\",\"type_name"
+  },
+  {
+    "name": "樱花动漫[优](DS)",
+    "lang": "ds",
+    "key": "drpyS_樱花动漫[优]",
+    "api": "http://localhost:5757/api/樱花动漫[优]?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": true,
+    "body": "{\"type\":\"影视\",\"class\":[{\"type_id\":\"20\",\"type_name\":\"电视剧\"},{\"type_id\":\"21\",\"type_name\":\"电影\"},{\"type_id\":\"33\",\"type_name\":\"动画\"},{\"type_id\":\"23\",\"type_name\":\"热门推荐\"},{\"type_id\":\"34\",\"ty"
+  },
+  {
+    "name": "二小[盘](DS)",
+    "lang": "ds",
+    "key": "drpyS_二小[盘]",
+    "api": "http://localhost:5757/api/二小[盘]?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"type\":\"影视\",\"class\":[{\"type_id\":\"22\",\"type_name\":\"热播资源\"},{\"type_id\":\"1\",\"type_name\":\"电影\"},{\"type_id\":\"2\",\"type_name\":\"剧集\"},{\"type_id\":\"3\",\"type_name\":\"动漫\"},{\"type_id\":\"17\",\"type_n"
+  },
+  {
+    "name": "麻雀视频[优](DS)",
+    "lang": "ds",
+    "key": "drpyS_麻雀视频[优]",
+    "api": "http://localhost:5757/api/麻雀视频[优]?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"class\":[{\"type_id\":\"/type/movie\",\"type_name\":\"电影\"},{\"type_id\":\"/type/tv\",\"type_name\":\"电视剧\"},{\"type_id\":\"/type/va\",\"type_name\":\"综艺\"},{\"type_id\":\"/type/ct\",\"type_name\":\"动漫\"}],\"filt"
+  },
+  {
+    "name": "玩偶哥哥DM[盘](DS)",
+    "lang": "ds",
+    "key": "drpyS_玩偶哥哥DM[盘]",
+    "api": "http://localhost:5757/api/玩偶哥哥DM[盘]?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"class\":[{\"type_id\":\"1\",\"type_name\":\"电影\"},{\"type_id\":\"2\",\"type_name\":\"剧集\"},{\"type_id\":\"3\",\"type_name\":\"动漫\"},{\"type_id\":\"4\",\"type_name\":\"综艺\"},{\"type_id\":\"5\",\"type_name\":\"音乐\"},{\"typ"
+  },
+  {
+    "name": "3Q影视[优](DS)",
+    "lang": "ds",
+    "key": "drpyS_3Q影视[优]",
+    "api": "http://localhost:5757/api/3Q影视[优]?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": true,
+    "body": "{\"class\":[{\"type_id\":\"1\",\"type_name\":\"电影\"},{\"type_id\":\"2\",\"type_name\":\"剧集\"},{\"type_id\":\"3\",\"type_name\":\"动漫\"},{\"type_id\":\"4\",\"type_name\":\"综艺\"}],\"filters\":{},\"type\":\"影视\",\"list\":[{\"vo"
+  },
+  {
+    "name": "玩偶哥哥[盘](DS)",
+    "lang": "ds",
+    "key": "drpyS_玩偶哥哥[盘]",
+    "api": "http://localhost:5757/api/玩偶哥哥[盘]?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"class\":[{\"type_id\":\"1\",\"type_name\":\"玩偶电影\"},{\"type_id\":\"2\",\"type_name\":\"玩偶剧集\"},{\"type_id\":\"44\",\"type_name\":\"臻彩视界\"},{\"type_id\":\"6\",\"type_name\":\"玩偶短剧\"},{\"type_id\":\"3\",\"type_name\":\"玩"
+  },
+  {
+    "name": "耐看点播[优](DS)",
+    "lang": "ds",
+    "key": "drpyS_耐看点播[优]",
+    "api": "http://localhost:5757/api/耐看点播[优]?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"type\":\"影视\",\"class\":[{\"type_id\":\"1\",\"type_name\":\"电影\"},{\"type_id\":\"2\",\"type_name\":\"剧集\"},{\"type_id\":\"4\",\"type_name\":\"动漫\"},{\"type_id\":\"3\",\"type_name\":\"综艺\"}],\"filters\":{\"1\":[{\"key\":\"c"
+  },
+  {
+    "name": "木偶ᵐ[盘](DS)",
+    "lang": "ds",
+    "key": "drpyS_木偶ᵐ[盘]",
+    "api": "http://localhost:5757/api/网盘[模板]?pwd=dzyyds",
+    "code": 200,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"class\":[],\"filters\":{},\"type\":\"影视\",\"list\":[]}"
+  },
+  {
+    "name": "立播[盘](DS)",
+    "lang": "ds",
+    "key": "drpyS_立播[盘]",
+    "api": "http://localhost:5757/api/立播[盘]?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": true,
+    "body": "{\"type\":\"影视\",\"class\":[{\"type_id\":\"1\",\"type_name\":\"电影\"},{\"type_id\":\"2\",\"type_name\":\"电视剧\"},{\"type_id\":\"4\",\"type_name\":\"动漫\"},{\"type_id\":\"15\",\"type_name\":\"日韩剧\"},{\"type_id\":\"16\",\"type_n"
+  },
+  {
+    "name": "剧透社[盘](hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_剧透社[盘]",
+    "api": "http://localhost:5757/api/剧透社[盘]?do=py&pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module 剧透社[盘]: Failed to initialize module:Python错误: HTTPSConnectionPool(host='1.star2.cn', port=443): Max retries exceeded with url: /ju/ (Caused by SS"
+  },
+  {
+    "name": "嗷呜动漫[漫](DS)",
+    "lang": "ds",
+    "key": "drpyS_嗷呜动漫[漫]",
+    "api": "http://localhost:5757/api/嗷呜动漫[漫]?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"type\":\"影视\",\"class\":[{\"type_id\":\"20\",\"type_name\":\"当季新番\"},{\"type_id\":\"21\",\"type_name\":\"番剧\"},{\"type_id\":\"22\",\"type_name\":\"剧场\"}],\"filters\":null,\"list\":[]}"
+  },
+  {
+    "name": "雪花电影[磁](DS)",
+    "lang": "ds",
+    "key": "drpyS_雪花电影[磁]",
+    "api": "http://localhost:5757/api/雪花电影[磁]?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"type\":\"影视\",\"class\":[{\"type_id\":\"dongzuo/list\",\"type_name\":\"动作片\"},{\"type_id\":\"xiju/list\",\"type_name\":\"喜剧片\"},{\"type_id\":\"aiqing/list\",\"type_name\":\"爱情片\"},{\"type_id\":\"kehuan/list\",\"t"
+  },
+  {
+    "name": "剧海影视[优](DS)",
+    "lang": "ds",
+    "key": "drpyS_剧海影视[优]",
+    "api": "http://localhost:5757/api/剧海影视[优]?pwd=dzyyds",
+    "code": 200,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"class\":[],\"filters\":{},\"type\":\"影视\",\"list\":[]}"
+  },
+  {
+    "name": "追新影视[优](DS)",
+    "lang": "ds",
+    "key": "drpyS_追新影视[优]",
+    "api": "http://localhost:5757/api/追新影视[优]?pwd=dzyyds",
+    "code": 200,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"class\":[],\"filters\":{},\"type\":\"影视\",\"list\":[]}"
+  },
+  {
+    "name": "木兮[优](DS)",
+    "lang": "ds",
+    "key": "drpyS_木兮[优]",
+    "api": "http://localhost:5757/api/木兮[优]?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"type\":\"影视\",\"class\":[{\"type_id\":\"1\",\"type_name\":\"电视剧\"},{\"type_id\":\"2\",\"type_name\":\"电影\"},{\"type_id\":\"3\",\"type_name\":\"综艺\"},{\"type_id\":\"4\",\"type_name\":\"动漫\"},{\"type_id\":\"5\",\"type_name"
+  },
+  {
+    "name": "星辰影院[优](DS)",
+    "lang": "ds",
+    "key": "drpyS_星辰影院[优]",
+    "api": "http://localhost:5757/api/星辰影院[优]?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"type\":\"影视\",\"class\":[{\"type_id\":\"1\",\"type_name\":\"电影\"},{\"type_id\":\"2\",\"type_name\":\"电视剧\"},{\"type_id\":\"4\",\"type_name\":\"动漫\"},{\"type_id\":\"3\",\"type_name\":\"综艺\"}],\"filters\":{\"1\":[{\"key\":\""
+  },
+  {
+    "name": "软鸭短剧[短](DS)",
+    "lang": "ds",
+    "key": "drpyS_软鸭短剧[短]",
+    "api": "http://localhost:5757/api/软鸭短剧[短]?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"class\":[{\"type_id\":\"战神\",\"type_name\":\"战神\"},{\"type_id\":\"逆袭\",\"type_name\":\"逆袭\"},{\"type_id\":\"人物\",\"type_name\":\"人物\"},{\"type_id\":\"都市\",\"type_name\":\"都市\"},{\"type_id\":\"擦边\",\"type_name\":\"擦边\"},"
+  },
+  {
+    "name": "番茄短剧[短](DS)",
+    "lang": "ds",
+    "key": "drpyS_番茄短剧[短]",
+    "api": "http://localhost:5757/api/番茄短剧[短]?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"type\":\"短剧\",\"class\":[{\"type_id\":\"videoseries_hot\",\"type_name\":\"热剧\"},{\"type_id\":\"firstonlinetime_new\",\"type_name\":\"新剧\"},{\"type_id\":\"cate_739\",\"type_name\":\"逆袭\"},{\"type_id\":\"cate_29\""
+  },
+  {
+    "name": "嗷呜动漫[漫](cat)",
+    "lang": "cat",
+    "key": "catvod_嗷呜动漫[漫]",
+    "api": "http://localhost:5757/api/嗷呜动漫[漫]?do=cat&pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"class\":[{\"type_name\":\"新番\",\"type_id\":\"20\"},{\"type_name\":\"番剧\",\"type_id\":\"21\"},{\"type_name\":\"剧场\",\"type_id\":\"22\"}],\"filters\":{\"20\":[{\"key\":\"class\",\"name\":\"剧情\",\"value\":[{\"n\":\"全部\",\"v\":"
+  },
+  {
+    "name": "酷酷[官](cat)",
+    "lang": "cat",
+    "key": "catvod_酷酷[官]",
+    "api": "http://localhost:5757/api/酷酷[官]?do=cat&pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"class\":[{\"type_id\":\"电视剧\",\"type_name\":\"电视剧\"},{\"type_id\":\"电影\",\"type_name\":\"电影\"},{\"type_id\":\"综艺\",\"type_name\":\"综艺\"},{\"type_id\":\"动漫\",\"type_name\":\"动漫\"},{\"type_id\":\"少儿\",\"type_name\":\"少儿\""
+  },
+  {
+    "name": "虎斑[盘](DS)",
+    "lang": "ds",
+    "key": "drpyS_虎斑[盘]",
+    "api": "http://localhost:5757/api/虎斑[盘]?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"type\":\"影视\",\"class\":[{\"type_id\":\"1\",\"type_name\":\"电影\"},{\"type_id\":\"2\",\"type_name\":\"剧集\"},{\"type_id\":\"4\",\"type_name\":\"动漫\"},{\"type_id\":\"3\",\"type_name\":\"综艺\"},{\"type_id\":\"6\",\"type_name\""
+  },
+  {
+    "name": "爱玩音乐[听](DS)",
+    "lang": "ds",
+    "key": "drpyS_爱玩音乐[听]",
+    "api": "http://localhost:5757/api/爱玩音乐[听]?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"type\":\"音乐\",\"class\":[{\"type_id\":\"/radiolist/index.html\",\"type_name\":\"电台\"},{\"type_id\":\"/playtype/index.html\",\"type_name\":\"歌单\"},{\"type_id\":\"/albumlist/index.html\",\"type_name\":\"专辑\"},"
+  },
+  {
+    "name": "围观短剧 ᵈᶻ[短](PHP)",
+    "lang": "php",
+    "key": "php_围观短剧 ᵈᶻ[短]",
+    "api": "http://localhost:5757/api/围观短剧 ᵈᶻ[短]?do=php&pwd=dzyyds",
+    "code": 200,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"class\":[],\"filters\":[],\"list\":[]}"
+  },
+  {
+    "name": "番茄畅听[听](DS)",
+    "lang": "ds",
+    "key": "drpyS_番茄畅听[听]",
+    "api": "http://localhost:5757/api/番茄畅听[听]?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"type\":\"听书\",\"class\":[{\"type_id\":\"899\",\"type_name\":\"精品小说\"},{\"type_id\":\"445\",\"type_name\":\"相声评书\"},{\"type_id\":\"12\",\"type_name\":\"世界历史\"},{\"type_id\":\"132\",\"type_name\":\"名著解读\"},{\"type_id\":"
+  },
+  {
+    "name": "凤凰FM[听](DS)",
+    "lang": "ds",
+    "key": "drpyS_凤凰FM[听]",
+    "api": "http://localhost:5757/api/凤凰FM[听]?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"class\":[{\"type_name\":\"亲子\",\"type_id\":181},{\"type_name\":\"生活百科\",\"type_id\":186},{\"type_name\":\"财经科技\",\"type_id\":183},{\"type_name\":\"文史军事\",\"type_id\":182},{\"type_name\":\"情感\",\"type_id\":178}"
+  },
+  {
+    "name": "音乐磁场[听](DS)",
+    "lang": "ds",
+    "key": "drpyS_音乐磁场[听]",
+    "api": "http://localhost:5757/api/音乐磁场[听]?pwd=dzyyds",
+    "code": 200,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"class\":[],\"type\":\"影视\",\"hikerSkipEr\":1,\"mergeList\":1,\"filters\":null,\"list\":[]}"
+  },
+  {
+    "name": "播客[听](DS)",
+    "lang": "ds",
+    "key": "drpyS_播客[听]",
+    "api": "http://localhost:5757/api/播客[听]?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": true,
+    "body": "{\"type\":\"听书\",\"class\":[{\"type_id\":\"播客\",\"type_name\":\"播客\"},{\"type_id\":\"休闲\",\"type_name\":\"休闲\"},{\"type_id\":\"社会与文化\",\"type_name\":\"社会与文化\"},{\"type_id\":\"教育\",\"type_name\":\"教育\"},{\"type_id\":\"商务\","
+  },
+  {
+    "name": "网抑云[听](cat)",
+    "lang": "cat",
+    "key": "catvod_网抑云[听]",
+    "api": "http://localhost:5757/api/网抑云[听]?do=cat&pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"class\":[{\"type_id\":\"toplist\",\"type_name\":\"排行榜\"},{\"type_id\":\"recommend_playlist\",\"type_name\":\"推荐歌单\"},{\"type_id\":\"hot_playlist\",\"type_name\":\"热门歌单\"},{\"type_id\":\"top_artists\",\"type_n"
+  },
+  {
+    "name": "爱玩音乐[听](hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_爱玩音乐[听]",
+    "api": "http://localhost:5757/api/爱玩音乐[听]?do=py&pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"class\":[{\"type_name\":\"电台\",\"type_id\":\"/radiolist/index.html\"},{\"type_name\":\"歌单\",\"type_id\":\"/playtype/index.html\"},{\"type_name\":\"专辑\",\"type_id\":\"/albumlist/index.html\"},{\"type_name\""
+  },
+  {
+    "name": "甜圈短剧[短](cat)",
+    "lang": "cat",
+    "key": "catvod_甜圈短剧[短]",
+    "api": "http://localhost:5757/api/甜圈短剧[短]?do=cat&pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"class\":[{\"type_id\":\"逆袭\",\"type_name\":\"🎬 逆袭\"},{\"type_id\":\"霸总\",\"type_name\":\"🎬 霸总\"},{\"type_id\":\"现代言情\",\"type_name\":\"🎬 现代言情\"},{\"type_id\":\"打脸虐渣\",\"type_name\":\"🎬 打脸虐渣\"},{\"type_id\":\"豪门"
+  },
+  {
+    "name": "动漫啦[画](DS)",
+    "lang": "ds",
+    "key": "drpyS_动漫啦[画]",
+    "api": "http://localhost:5757/api/动漫啦[画]?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"type\":\"漫画\",\"class\":[{\"type_id\":\"japan\",\"type_name\":\"日本\"},{\"type_id\":\"guochan\",\"type_name\":\"国产\"},{\"type_id\":\"hongkongtaiwan\",\"type_name\":\"港台\"},{\"type_id\":\"oumei\",\"type_name\":\"欧美\"}"
+  },
+  {
+    "name": "爱听音乐[听](hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_爱听音乐[听]",
+    "api": "http://localhost:5757/api/爱听音乐[听]?do=py&pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"class\":[{\"type_name\":\"电台\",\"type_id\":\"/radiolist/index.html\"},{\"type_name\":\"歌单\",\"type_id\":\"/playtype/index.html\"},{\"type_name\":\"专辑\",\"type_id\":\"/albumlist/index.html\"},{\"type_name\""
+  },
+  {
+    "name": "顶点小说[书](DS)",
+    "lang": "ds",
+    "key": "drpyS_顶点小说[书]",
+    "api": "http://localhost:5757/api/顶点小说[书]?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"class\":[{\"type_id\":\"0\",\"type_name\":\"全本\"}],\"type\":\"小说\",\"hikerListCol\":\"text_1\",\"hikerClassListCol\":\"text_1\",\"filters\":{},\"list\":[]}"
+  },
+  {
+    "name": "番茄漫画 ᵈᶻ[画](PHP)",
+    "lang": "php",
+    "key": "php_番茄漫画 ᵈᶻ[画]",
+    "api": "http://localhost:5757/api/番茄漫画 ᵈᶻ[画]?do=php&pwd=dzyyds",
+    "code": 200,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"class\":[],\"filters\":{}}"
+  },
+  {
+    "name": "动漫啦 ᵈᶻ[画](PHP)",
+    "lang": "php",
+    "key": "php_动漫啦 ᵈᶻ[画]",
+    "api": "http://localhost:5757/api/动漫啦 ᵈᶻ[画]?do=php&pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"class\":[{\"type_name\":\"连载中\",\"type_id\":\"manhua/list/lianzai\"},{\"type_name\":\"已完结\",\"type_id\":\"manhua/list/wanjie\"},{\"type_name\":\"热血\",\"type_id\":\"manhua/list/rexue\"},{\"type_name\":\"恋爱\","
+  },
+  {
+    "name": "咖啡[M](GET)",
+    "lang": "unknown",
+    "key": "drpyS_咖啡_Appget",
+    "api": "http://localhost:5757/api/Appget[模板]?pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module Appget[模板]: Cannot read properties of undefined (reading 'initV')\"}"
+  },
+  {
+    "name": "奇奇[M](GET)",
+    "lang": "unknown",
+    "key": "drpyS_奇奇_Appget",
+    "api": "http://localhost:5757/api/Appget[模板]?pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module Appget[模板]: Cannot read properties of undefined (reading 'initV')\"}"
+  },
+  {
+    "name": "仓鼠[M](GET)",
+    "lang": "unknown",
+    "key": "drpyS_仓鼠_Appget",
+    "api": "http://localhost:5757/api/Appget[模板]?pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module Appget[模板]: Cannot read properties of undefined (reading 'initV')\"}"
+  },
+  {
+    "name": "云云[M](GET)",
+    "lang": "unknown",
+    "key": "drpyS_云云_Appget",
+    "api": "http://localhost:5757/api/Appget[模板]?pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module Appget[模板]: Cannot read properties of undefined (reading 'initV')\"}"
+  },
+  {
+    "name": "鲸鱼[M](GET)",
+    "lang": "unknown",
+    "key": "drpyS_鲸鱼_Appget",
+    "api": "http://localhost:5757/api/Appget[模板]?pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module Appget[模板]: Cannot read properties of undefined (reading 'initV')\"}"
+  },
+  {
+    "name": "蓝鹰[M](GET)",
+    "lang": "unknown",
+    "key": "drpyS_蓝鹰_Appget",
+    "api": "http://localhost:5757/api/Appget[模板]?pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module Appget[模板]: Cannot read properties of undefined (reading 'initV')\"}"
+  },
+  {
+    "name": "小猪[M](GET)",
+    "lang": "unknown",
+    "key": "drpyS_小猪_Appget",
+    "api": "http://localhost:5757/api/Appget[模板]?pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module Appget[模板]: Cannot read properties of undefined (reading 'initV')\"}"
+  },
+  {
+    "name": "五八[M](GET)",
+    "lang": "unknown",
+    "key": "drpyS_五八_Appget",
+    "api": "http://localhost:5757/api/Appget[模板]?pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module Appget[模板]: Cannot read properties of undefined (reading 'initV')\"}"
+  },
+  {
+    "name": "数字[M](GET)",
+    "lang": "unknown",
+    "key": "drpyS_数字_Appget",
+    "api": "http://localhost:5757/api/Appget[模板]?pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module Appget[模板]: Cannot read properties of undefined (reading 'initV')\"}"
+  },
+  {
+    "name": "剧梦[M](GET)",
+    "lang": "unknown",
+    "key": "drpyS_剧梦_Appget",
+    "api": "http://localhost:5757/api/Appget[模板]?pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module Appget[模板]: Cannot read properties of undefined (reading 'initV')\"}"
+  },
+  {
+    "name": "金牌[M](GET)",
+    "lang": "unknown",
+    "key": "drpyS_金牌_Appget",
+    "api": "http://localhost:5757/api/Appget[模板]?pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module Appget[模板]: Cannot read properties of undefined (reading 'initV')\"}"
+  },
+  {
+    "name": "爆炸[M](GET)",
+    "lang": "unknown",
+    "key": "drpyS_爆炸_Appget",
+    "api": "http://localhost:5757/api/Appget[模板]?pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module Appget[模板]: Cannot read properties of undefined (reading 'initV')\"}"
+  },
+  {
+    "name": "丫丫动漫[M](GET)",
+    "lang": "unknown",
+    "key": "drpyS_丫丫动漫_Appget",
+    "api": "http://localhost:5757/api/Appget[模板]?pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module Appget[模板]: Cannot read properties of undefined (reading 'initV')\"}"
+  },
+  {
+    "name": "方舟动漫[M](GET)",
+    "lang": "unknown",
+    "key": "drpyS_方舟动漫_Appget",
+    "api": "http://localhost:5757/api/Appget[模板]?pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module Appget[模板]: Cannot read properties of undefined (reading 'initV')\"}"
+  },
+  {
+    "name": "顾我[M](GET)",
+    "lang": "unknown",
+    "key": "drpyS_顾我_Appget",
+    "api": "http://localhost:5757/api/Appget[模板]?pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module Appget[模板]: Cannot read properties of undefined (reading 'initV')\"}"
+  },
+  {
+    "name": "php测试(DS)",
+    "lang": "ds",
+    "key": "drpyS_php测试",
+    "api": "http://localhost:5757/api/php?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"type\":\"影视\",\"class\":[{\"type_id\":\"1\",\"type_name\":\"电影\"},{\"type_id\":\"2\",\"type_name\":\"电视剧\"},{\"type_id\":\"3\",\"type_name\":\"动漫\"},{\"type_id\":\"4\",\"type_name\":\"短剧\"},{\"type_id\":\"5\",\"type_name"
+  },
+  {
+    "name": "六月听书[听](DS)",
+    "lang": "ds",
+    "key": "drpyS_六月听书[听]",
+    "api": "http://localhost:5757/api/六月听书[听]?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"type\":\"听书\",\"class\":[{\"type_id\":\"t0\",\"type_name\":\"全部分类\"},{\"type_id\":\"t1\",\"type_name\":\"玄幻奇幻\"},{\"type_id\":\"t2\",\"type_name\":\"修真武侠\"},{\"type_id\":\"t3\",\"type_name\":\"恐怖灵异\"},{\"type_id\":\"t4"
+  },
+  {
+    "name": "番茄漫画[画](cat)",
+    "lang": "ds",
+    "key": "catvod_番茄漫画[画]",
+    "api": "http://localhost:5757/api/番茄漫画[画]?do=cat&pwd=dzyyds",
+    "code": 200,
+    "classOk": false,
+    "listOk": false,
+    "body": "{}"
+  },
+  {
+    "name": "夜猫影视(DS)",
+    "lang": "ds",
+    "key": "drpyS_夜猫影视",
+    "api": "http://localhost:5757/api/夜猫影视?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": true,
+    "body": "{\"type\":\"影视\",\"class\":[{\"type_id\":\"1\",\"type_name\":\"电影\"},{\"type_id\":\"2\",\"type_name\":\"剧集\"},{\"type_id\":\"3\",\"type_name\":\"综艺\"},{\"type_id\":\"4\",\"type_name\":\"动漫\"},{\"type_id\":\"5\",\"type_name\""
+  },
+  {
+    "name": "TVB云播(DS)",
+    "lang": "ds",
+    "key": "drpyS_TVB云播",
+    "api": "http://localhost:5757/api/TVB云播?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"type\":\"影视\",\"class\":[{\"type_id\":\"1\",\"type_name\":\"电影\"},{\"type_id\":\"2\",\"type_name\":\"电视剧\"},{\"type_id\":\"3\",\"type_name\":\"综艺\"},{\"type_id\":\"4\",\"type_name\":\"动漫\"},{\"type_id\":\"16\",\"type_nam"
+  },
+  {
+    "name": "999片(DS)",
+    "lang": "ds",
+    "key": "drpyS_999片",
+    "api": "http://localhost:5757/api/999片?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"type\":\"影视\",\"class\":[{\"type_id\":\"dianying\",\"type_name\":\"电影\"},{\"type_id\":\"dianshiju\",\"type_name\":\"电视剧\"},{\"type_id\":\"zongyi\",\"type_name\":\"综艺\"},{\"type_id\":\"dongman\",\"type_name\":\"动漫\"}"
+  },
+  {
+    "name": "咕咕番(DS)",
+    "lang": "ds",
+    "key": "drpyS_咕咕番",
+    "api": "http://localhost:5757/api/咕咕番?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": true,
+    "body": "{\"type\":\"影视\",\"class\":[{\"type_id\":\"6\",\"type_name\":\"番剧\"},{\"type_id\":\"21\",\"type_name\":\"剧场版\"},{\"type_id\":\"23\",\"type_name\":\"特摄\"}],\"filters\":null,\"list\":[{\"title\":\"遭到流放的转生重骑士凭借游戏知识大开无双\","
+  },
+  {
+    "name": "天空影视(DS)",
+    "lang": "ds",
+    "key": "drpyS_天空影视",
+    "api": "http://localhost:5757/api/天空影视?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"type\":\"影视\",\"class\":[{\"type_id\":\"2\",\"type_name\":\"电影\"},{\"type_id\":\"1\",\"type_name\":\"电视剧\"},{\"type_id\":\"3\",\"type_name\":\"综艺\"},{\"type_id\":\"4\",\"type_name\":\"动漫\"}],\"filters\":null,\"list\":[]"
+  },
+  {
+    "name": "百思派(DS)",
+    "lang": "ds",
+    "key": "drpyS_百思派",
+    "api": "http://localhost:5757/api/百思派?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"class\":[{\"type_id\":\"20\",\"type_name\":\"电影\"},{\"type_id\":\"21\",\"type_name\":\"剧集\"},{\"type_id\":\"24\",\"type_name\":\"短剧\"},{\"type_id\":\"22\",\"type_name\":\"动漫\"},{\"type_id\":\"23\",\"type_name\":\"综艺\"}]"
+  },
+  {
+    "name": "无广告TV(DS)",
+    "lang": "ds",
+    "key": "drpyS_无广告TV",
+    "api": "http://localhost:5757/api/无广告TV?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"type\":\"影视\",\"class\":[{\"type_id\":\"1\",\"type_name\":\"电影\"},{\"type_id\":\"2\",\"type_name\":\"电视剧\"},{\"type_id\":\"3\",\"type_name\":\"综艺\"},{\"type_id\":\"4\",\"type_name\":\"动漫\"},{\"type_id\":\"23\",\"type_nam"
+  },
+  {
+    "name": "木偶[盘](DS)",
+    "lang": "ds",
+    "key": "drpyS_木偶[盘]",
+    "api": "http://localhost:5757/api/木偶[盘]?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"type\":\"影视\",\"class\":[{\"type_id\":\"1\",\"type_name\":\"电影\"},{\"type_id\":\"2\",\"type_name\":\"剧集\"},{\"type_id\":\"3\",\"type_name\":\"动漫\"},{\"type_id\":\"4\",\"type_name\":\"综艺\"},{\"type_id\":\"25\",\"type_name"
+  },
+  {
+    "name": "NT动漫[漫](DS)",
+    "lang": "ds",
+    "key": "drpyS_NT动漫[漫]",
+    "api": "http://localhost:5757/api/NT动漫[漫]?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"type\":\"影视\",\"class\":[{\"type_id\":\"riben\",\"type_name\":\"日本动漫\"},{\"type_id\":\"zhongguo\",\"type_name\":\"国产动漫\"},{\"type_id\":\"omei\",\"type_name\":\"欧美动漫\"}],\"filters\":{\"riben\":[{\"key\":\"year\",\"nam"
+  },
+  {
+    "name": "王子TV(DS)",
+    "lang": "ds",
+    "key": "drpyS_王子TV",
+    "api": "http://localhost:5757/api/王子TV?pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module 王子TV: Cannot read properties of undefined (reading 'url')\"}"
+  },
+  {
+    "name": "爱玩音乐(cat)",
+    "lang": "cat",
+    "key": "catvod_爱玩音乐",
+    "api": "http://localhost:5757/api/爱玩音乐?do=cat&pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"class\":[{\"type_name\":\"歌单\",\"type_id\":\"1\",\"type_flag\":\"2-0-S\"},{\"type_name\":\"歌手\",\"type_id\":\"2\",\"type_flag\":\"2-0-S\"},{\"type_name\":\"榜单\",\"type_id\":\"3\",\"type_flag\":\"1-0\"}],\"filters\":{\""
+  },
+  {
+    "name": "月光影视(cat)",
+    "lang": "cat",
+    "key": "catvod_月光影视",
+    "api": "http://localhost:5757/api/月光影视?do=cat&pwd=dzyyds",
+    "code": 200,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"class\":[],\"filters\":{\"1\":[{\"key\":\"cateId\",\"name\":\"类型\",\"value\":[{\"n\":\"全部\",\"v\":\"全部\"},{\"n\":\"动作片\",\"v\":\"6\"},{\"n\":\"喜剧片\",\"v\":\"7\"},{\"n\":\"爱情片\",\"v\":\"8\"},{\"n\":\"科幻片\",\"v\":\"9\"},{\"n\":\"恐怖片\",\"v\":"
+  },
+  {
+    "name": "草榴社区[密](DS)",
+    "lang": "ds",
+    "key": "drpyS_草榴社区[密]",
+    "api": "http://localhost:5757/api/草榴社区[密]?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"class\":[{\"type_id\":\"20\",\"type_name\":\"日本\",\"type_flag\":\"7-00-H\"},{\"type_id\":\"21\",\"type_name\":\"国产\",\"type_flag\":\"7-00-H\"},{\"type_id\":\"22\",\"type_name\":\"欧美\",\"type_flag\":\"7-00-H\"}],\"typ"
+  },
+  {
+    "name": "卫星影视(DS)",
+    "lang": "ds",
+    "key": "drpyS_卫星影视",
+    "api": "http://localhost:5757/api/卫星影视?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": true,
+    "body": "{\"type\":\"影视\",\"class\":[{\"type_id\":\"dianying\",\"type_name\":\"电影\"},{\"type_id\":\"dianshiju\",\"type_name\":\"电视剧\"},{\"type_id\":\"zongyi\",\"type_name\":\"综艺\"},{\"type_id\":\"dongman\",\"type_name\":\"动漫\"}"
+  },
+  {
+    "name": "TVB云播[AFX](hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_TVB云播[AFX]",
+    "api": "http://localhost:5757/api/AppFox?do=py&pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module AppFox: Failed to initialize module:Python错误: Expecting value: line 1 column 1 (char 0)\\nTraceback (most recent call last):\\n  File \\\"E:\\\\gitwork"
+  },
+  {
+    "name": "麒麟[AFX](hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_麒麟[AFX]",
+    "api": "http://localhost:5757/api/AppFox?do=py&pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module AppFox: Failed to initialize module:Python错误: Expecting value: line 1 column 1 (char 0)\\nTraceback (most recent call last):\\n  File \\\"E:\\\\gitwork"
+  },
+  {
+    "name": "粉象[AFX](hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_粉象[AFX]",
+    "api": "http://localhost:5757/api/AppFox?do=py&pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module AppFox: Failed to initialize module:Python错误: Expecting value: line 1 column 1 (char 0)\\nTraceback (most recent call last):\\n  File \\\"E:\\\\gitwork"
+  },
+  {
+    "name": "火猫影视[AFX](hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_火猫影视[AFX]",
+    "api": "http://localhost:5757/api/AppFox?do=py&pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module AppFox: Failed to initialize module:Python错误: Expecting value: line 1 column 1 (char 0)\\nTraceback (most recent call last):\\n  File \\\"E:\\\\gitwork"
+  },
+  {
+    "name": "茉莉[AG¹](hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_茉莉[AG¹]",
+    "api": "http://localhost:5757/api/AppGet?do=py&pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module AppGet: Failed to initialize module:Python错误: 'key'\\nTraceback (most recent call last):\\n  File \\\"E:\\\\gitwork\\\\drpy-node\\\\spider\\\\py\\\\core\\\\t4_da"
+  },
+  {
+    "name": "魔方[AG¹](hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_魔方[AG¹]",
+    "api": "http://localhost:5757/api/AppGet?do=py&pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module AppGet: Failed to initialize module:Python错误: 'key'\\nTraceback (most recent call last):\\n  File \\\"E:\\\\gitwork\\\\drpy-node\\\\spider\\\\py\\\\core\\\\t4_da"
+  },
+  {
+    "name": "五八[AG¹](hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_五八[AG¹]",
+    "api": "http://localhost:5757/api/AppGet?do=py&pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module AppGet: Failed to initialize module:Python错误: 'key'\\nTraceback (most recent call last):\\n  File \\\"E:\\\\gitwork\\\\drpy-node\\\\spider\\\\py\\\\core\\\\t4_da"
+  },
+  {
+    "name": "丫丫动漫[AG¹](hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_丫丫动漫[AG¹]",
+    "api": "http://localhost:5757/api/AppGet?do=py&pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module AppGet: Failed to initialize module:Python错误: 'key'\\nTraceback (most recent call last):\\n  File \\\"E:\\\\gitwork\\\\drpy-node\\\\spider\\\\py\\\\core\\\\t4_da"
+  },
+  {
+    "name": "AppMuou(hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_AppMuou",
+    "api": "http://localhost:5757/api/AppMuou?do=py&pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module AppMuou: Failed to initialize module:Python错误: 'host'\\nTraceback (most recent call last):\\n  File \\\"E:\\\\gitwork\\\\drpy-node\\\\spider\\\\py\\\\core\\\\t4_"
+  },
+  {
+    "name": "玲珑[AG¹](hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_玲珑[AG¹]",
+    "api": "http://localhost:5757/api/AppGet?do=py&pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module AppGet: Failed to initialize module:Python错误: 'key'\\nTraceback (most recent call last):\\n  File \\\"E:\\\\gitwork\\\\drpy-node\\\\spider\\\\py\\\\core\\\\t4_da"
+  },
+  {
+    "name": "OMOfun[AG¹](hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_OMOfun[AG¹]",
+    "api": "http://localhost:5757/api/AppGet?do=py&pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module AppGet: Failed to initialize module:Python错误: 'key'\\nTraceback (most recent call last):\\n  File \\\"E:\\\\gitwork\\\\drpy-node\\\\spider\\\\py\\\\core\\\\t4_da"
+  },
+  {
+    "name": "4KVM(hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_4KVM",
+    "api": "http://localhost:5757/api/4KVM?do=py&pwd=dzyyds",
+    "code": 200,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"class\":[],\"list\":[]}"
+  },
+  {
+    "name": "Free影视[AS](hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_Free影视[AS]",
+    "api": "http://localhost:5757/api/AppSk?do=py&pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module AppSk: Python错误: Invalid URL '/sk-api/vod/list?page=1&limit=12&type=randomlikeindex&area=&lang=&year=&mtype=': No scheme supplied. Perhaps you me"
+  },
+  {
+    "name": "闪影[AV²](hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_闪影[AV²]",
+    "api": "http://localhost:5757/api/AppV2²?do=py&pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module AppV2²: Python错误: Invalid URL '//api.php/app/nav?token=': No scheme supplied. Perhaps you meant https:////api.php/app/nav?token=?\\nTraceback (mos"
+  },
+  {
+    "name": "好震惊[AV²](hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_好震惊[AV²]",
+    "api": "http://localhost:5757/api/AppV2²?do=py&pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module AppV2²: Python错误: Invalid URL '//api.php/app/nav?token=': No scheme supplied. Perhaps you meant https:////api.php/app/nav?token=?\\nTraceback (mos"
+  },
+  {
+    "name": "零度(DS)",
+    "lang": "ds",
+    "key": "drpyS_零度",
+    "api": "http://localhost:5757/api/零度?pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module 零度: [init] Failed to initialize module:Unexpected token '<', \\\"<html>\\r\\n<h\\\"... is not valid JSON\"}"
+  },
+  {
+    "name": "皮皮虾[ATV⁵](hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_皮皮虾[ATV⁵]",
+    "api": "http://localhost:5757/api/AppToV5?do=py&pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module AppToV5: Python错误: Invalid URL '/apptov5/v1/home/data?id=1&mold=1&__platform=android': No scheme supplied. Perhaps you meant https:///apptov5/v1/"
+  },
+  {
+    "name": "七月[AG³](hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_七月[AG³]",
+    "api": "http://localhost:5757/api/getapp3.4.4?do=py&pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module getapp3.4.4: Failed to initialize module:Python错误: Expecting value: line 1 column 1 (char 0)\\nTraceback (most recent call last):\\n  File \\\"E:\\\\gi"
+  },
+  {
+    "name": "AppV2¹(hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_AppV2¹",
+    "api": "http://localhost:5757/api/AppV2¹?do=py&pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module AppV2¹: Failed to initialize module:Python错误: Expecting value: line 1 column 1 (char 0)\\nTraceback (most recent call last):\\n  File \\\"E:\\\\gitwork"
+  },
+  {
+    "name": "云云[AG³](hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_云云[AG³]",
+    "api": "http://localhost:5757/api/getapp3.4.4?do=py&pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module getapp3.4.4: Failed to initialize module:Python错误: Expecting value: line 1 column 1 (char 0)\\nTraceback (most recent call last):\\n  File \\\"E:\\\\gi"
+  },
+  {
+    "name": "小雅动漫[EM³](hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_小雅动漫[EM³]",
+    "api": "http://localhost:5757/api/emby?do=py&pwd=dzyyds",
+    "code": 200,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"msg\":\"获取Emby服务器信息出错\"}"
+  },
+  {
+    "name": "鲸鱼影视[AG³](hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_鲸鱼影视[AG³]",
+    "api": "http://localhost:5757/api/getapp3.4.4?do=py&pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module getapp3.4.4: Failed to initialize module:Python错误: Expecting value: line 1 column 1 (char 0)\\nTraceback (most recent call last):\\n  File \\\"E:\\\\gi"
+  },
+  {
+    "name": "哇哇APP(hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_哇哇APP",
+    "api": "http://localhost:5757/api/哇哇APP?do=py&pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module 哇哇APP: Failed to initialize module:Python错误: HTTPSConnectionPool(host='gitee.com', port=443): Max retries exceeded with url: /api/v5/repos/aycapp"
+  },
+  {
+    "name": "河马短剧(hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_河马短剧",
+    "api": "http://localhost:5757/api/河马短剧?do=py&pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"class\":[{\"type_id\":\"53@精选\",\"type_name\":\"精选\"},{\"type_id\":\"54@古装\",\"type_name\":\"古装\"},{\"type_id\":\"55@重生\",\"type_name\":\"重生\"},{\"type_id\":\"56@家庭\",\"type_name\":\"家庭\"},{\"type_id\":\"57@恋爱\",\"ty"
+  },
+  {
+    "name": "兄弟影视(hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_兄弟影视",
+    "api": "http://localhost:5757/api/兄弟影视?do=py&pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"class\":[{\"type_id\":\"Movies\",\"type_name\":\"电影\"},{\"type_id\":\"TV\",\"type_name\":\"剧集\"},{\"type_id\":\"Shows\",\"type_name\":\"综艺\"},{\"type_id\":\"Anime\",\"type_name\":\"动漫\"},{\"type_id\":\"Snaps\",\"type"
+  },
+  {
+    "name": "懒懒视频(hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_懒懒视频",
+    "api": "http://localhost:5757/api/懒懒视频?do=py&pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module 懒懒视频: Python错误: Expecting value: line 1 column 1 (char 0)\\nTraceback (most recent call last):\\n  File \\\"D:\\\\Program Files\\\\Python312\\\\Lib\\\\site-p"
+  },
+  {
+    "name": "端木(hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_端木",
+    "api": "http://localhost:5757/api/端木?do=py&pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module 端木: Python错误: Expecting value: line 1 column 1 (char 0)\\nTraceback (most recent call last):\\n  File \\\"D:\\\\Program Files\\\\Python312\\\\Lib\\\\site-pac"
+  },
+  {
+    "name": "爱瓜APP(hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_爱瓜APP",
+    "api": "http://localhost:5757/api/爱瓜APP?do=py&pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module 爱瓜APP: Failed to initialize module:Python错误: HTTPSConnectionPool(host='tvapi211.magicetech.com', port=443): Max retries exceeded with url: /hr_1_"
+  },
+  {
+    "name": "盘Ta[盘](DS)",
+    "lang": "ds",
+    "key": "drpyS_盘Ta[盘]",
+    "api": "http://localhost:5757/api/盘Ta[盘]?pwd=dzyyds",
+    "code": 200,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"type\":\"影视\",\"class\":[],\"filters\":null,\"list\":[]}"
+  },
+  {
+    "name": "麦田影院(hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_麦田影院",
+    "api": "http://localhost:5757/api/麦田影院?do=py&pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module 麦田影院: Python错误: Document is empty\\nTraceback (most recent call last):\\n  File \\\"D:\\\\Program Files\\\\Python312\\\\Lib\\\\site-packages\\\\pyquery\\\\pyquer"
+  },
+  {
+    "name": "猎手APP(hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_猎手APP",
+    "api": "http://localhost:5757/api/猎手APP?do=py&pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module 猎手APP: Failed to initialize module:Python错误: HTTPSConnectionPool(host='app-site.ecoliving168.com', port=443): Max retries exceeded with url: /dom"
+  },
+  {
+    "name": "瓜子(hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_瓜子",
+    "api": "http://localhost:5757/api/瓜子?do=py&pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"class\":[{\"type_name\":\"电影\",\"type_id\":\"1\"},{\"type_name\":\"电视剧\",\"type_id\":\"2\"},{\"type_name\":\"动漫\",\"type_id\":\"4\"},{\"type_name\":\"综艺\",\"type_id\":\"3\"},{\"type_name\":\"短剧\",\"type_id\":\"64\"}],\"f"
+  },
+  {
+    "name": "酷爱漫画[画](DS)",
+    "lang": "ds",
+    "key": "drpyS_酷爱漫画[画]",
+    "api": "http://localhost:5757/api/酷爱漫画[画]?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"type\":\"漫画\",\"class\":[{\"type_id\":\"1\",\"type_name\":\"国产\"},{\"type_id\":\"2\",\"type_name\":\"日本\"},{\"type_id\":\"3\",\"type_name\":\"韩国\"},{\"type_id\":\"5\",\"type_name\":\"欧美\"},{\"type_id\":\"7\",\"type_name\""
+  },
+  {
+    "name": "资源管理(hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_资源管理",
+    "api": "http://localhost:5757/api/资源管理?do=py&pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"class\":[{\"type_id\":\"recent\",\"type_name\":\"最近添加\"},{\"type_id\":\"online_live\",\"type_name\":\"📡 在线直播\"}]}"
+  },
+  {
+    "name": "新韩剧网(hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_新韩剧网",
+    "api": "http://localhost:5757/api/新韩剧网?do=py&pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"class\":[{\"type_id\":\"1\",\"type_name\":\"韩剧\"},{\"type_id\":\"3\",\"type_name\":\"韩国电影\"},{\"type_id\":\"4\",\"type_name\":\"韩国综艺\"},{\"type_id\":\"hot\",\"type_name\":\"排行榜\"},{\"type_id\":\"new\",\"type_name\":\"最"
+  },
+  {
+    "name": "麻雀视频(hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_麻雀视频",
+    "api": "http://localhost:5757/api/麻雀视频?do=py&pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module 麻雀视频: Python错误: HTTPSConnectionPool(host='www.mqtv.cc', port=443): Max retries exceeded with url: /libs/VodList.api.php?home=index&token=Lw0uHBEB"
+  },
+  {
+    "name": "嗷呜动漫 ᵈᶻ(PHP)",
+    "lang": "php",
+    "key": "php_嗷呜动漫 ᵈᶻ",
+    "api": "http://localhost:5757/api/嗷呜动漫 ᵈᶻ?do=php&pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"class\":[{\"type_id\":\"20\",\"type_name\":\"🔥 当季新番\"},{\"type_id\":\"21\",\"type_name\":\"🎬 番剧\"},{\"type_id\":\"22\",\"type_name\":\"🎥 剧场\"}],\"filters\":{\"20\":[{\"key\":\"class\",\"name\":\"剧情\",\"value\":[{\"n"
+  },
+  {
+    "name": "零度影视 ᵈᶻ(PHP)",
+    "lang": "php",
+    "key": "php_零度影视 ᵈᶻ",
+    "api": "http://localhost:5757/api/零度影视 ᵈᶻ?do=php&pwd=dzyyds",
+    "code": 200,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"class\":[],\"filters\":[]}"
+  },
+  {
+    "name": "人人影视 ᵈᶻ(PHP)",
+    "lang": "php",
+    "key": "php_人人影视 ᵈᶻ",
+    "api": "http://localhost:5757/api/人人影视 ᵈᶻ?do=php&pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"class\":[{\"type_id\":\"1\",\"type_name\":\"电影\"},{\"type_id\":\"2\",\"type_name\":\"电视剧\"},{\"type_id\":\"3\",\"type_name\":\"综艺\"},{\"type_id\":\"5\",\"type_name\":\"动漫\"},{\"type_id\":\"4\",\"type_name\":\"纪录片\"},{\"t"
+  },
+  {
+    "name": "麻雀视频 ᵈᶻ(PHP)",
+    "lang": "php",
+    "key": "php_麻雀视频 ᵈᶻ",
+    "api": "http://localhost:5757/api/麻雀视频 ᵈᶻ?do=php&pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"class\":[{\"type_id\":\"/type/movie\",\"type_name\":\"电影\"},{\"type_id\":\"/type/tv\",\"type_name\":\"电视剧\"},{\"type_id\":\"/type/va\",\"type_name\":\"综艺\"},{\"type_id\":\"/type/ct\",\"type_name\":\"动漫\"}],\"list"
+  },
+  {
+    "name": "玖月影视(DS)",
+    "lang": "ds",
+    "key": "drpyS_玖月影视",
+    "api": "http://localhost:5757/api/玖月影视?pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"type\":\"影视\",\"class\":[{\"type_id\":\"5\",\"type_name\":\"爱情\"},{\"type_id\":\"6\",\"type_name\":\"动作\"},{\"type_id\":\"7\",\"type_name\":\"科幻\"},{\"type_id\":\"8\",\"type_name\":\"剧情\"},{\"type_id\":\"9\",\"type_name\""
+  },
+  {
+    "name": "酷爱漫画 ᵈᶻ[画](PHP)",
+    "lang": "php",
+    "key": "php_酷爱漫画 ᵈᶻ[画]",
+    "api": "http://localhost:5757/api/酷爱漫画 ᵈᶻ[画]?do=php&pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"class\":[{\"type_name\":\"国产\",\"type_id\":\"1\"},{\"type_name\":\"日本\",\"type_id\":\"2\"},{\"type_name\":\"韩国\",\"type_id\":\"3\"},{\"type_name\":\"欧美\",\"type_id\":\"5\"},{\"type_name\":\"其他\",\"type_id\":\"7\"},{\"typ"
+  },
+  {
+    "name": "海龟(cat)",
+    "lang": "cat",
+    "key": "catvod_海龟",
+    "api": "http://localhost:5757/api/海龟?do=cat&pwd=dzyyds",
+    "code": 200,
+    "classOk": true,
+    "listOk": false,
+    "body": "{\"class\":[{\"type_id\":\"dianying\",\"type_name\":\"电影\"},{\"type_id\":\"dianshiju\",\"type_name\":\"电视剧\"},{\"type_id\":\"zongyi\",\"type_name\":\"综艺\"},{\"type_id\":\"dongman\",\"type_name\":\"动漫\"},{\"type_id\":"
+  },
+  {
+    "name": "4K影视(hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_4K影视",
+    "api": "http://localhost:5757/api/4K影视?do=py&pwd=dzyyds",
+    "code": 500,
+    "classOk": false,
+    "listOk": false,
+    "body": "{\"error\":\"Failed to process module 4K影视: Python错误: HTTPConnectionPool(host='127.0.0.1', port=7890): Read timed out. (read timeout=5)\\nTraceback (most recent call last):\\n  File \\\"D"
+  },
+  {
+    "name": "哔哩哔哩(hipy)",
+    "lang": "hipy",
+    "key": "hipy_py_哔哩哔哩",
+    "api": "http://localhost:5757/api/哔哩哔哩?do=py&pwd=dzyyds",
+    "err": "timeout"
+  },
+  {
+    "name": "山有木兮 ᵈᶻ(PHP)",
+    "lang": "php",
+    "key": "php_山有木兮 ᵈᶻ",
+    "api": "http://localhost:5757/api/山有木兮 ᵈᶻ?do=php&pwd=dzyyds",
+    "err": "timeout"
+  },
+  {
+    "name": "坚果视频 ᵈᶻ(PHP)",
+    "lang": "php",
+    "key": "php_坚果视频 ᵈᶻ",
+    "api": "http://localhost:5757/api/坚果视频 ᵈᶻ?do=php&pwd=dzyyds",
+    "err": "timeout"
+  }
+]

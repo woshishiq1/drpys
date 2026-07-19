@@ -14,10 +14,10 @@ var rule = {
     author: 'EylinSir',
     title: 'libvio影视',
     类型: '影视',
-    host: 'https://www.libvio.cc',
+    host: 'https://libhd.com',
     headers: {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36',
-        'Referer': 'https://www.libvio.cc'
+        'Referer': 'https://libhd.com'
     },
     编码: 'utf-8',
     timeout: 20000,

@@ -1267,6 +1267,7 @@ export async function commonDetailListParse(moduleObject, method, injectVars, ar
                         let new_vod_list = [];
                         if (typeof this.pdfl === 'function') {
                             new_vod_list = this.pdfl(html, p1, list_text, list_url, this.MY_URL);
+                            log(`[pdfl] 批量列表解析数量:${new_vod_list.length}`);
                             if (list_url_prefix) {
                                 new_vod_list = new_vod_list.map(it => it.split('$')[0] + '$' + list_url_prefix + it.split('$').slice(1).join('$'));
                             }
