@@ -204,29 +204,29 @@ class BaseSpider(metaclass=ABCMeta):  # 元类 默认的元类 type
                        src)
         return clean
 
-    def fetch(self, url, params=None, headers=None, cookies=None, timeout=5, verify=True,
+    def fetch(self, url, params=None, headers=None, cookies=None, timeout=5, verify=False,
               allow_redirects=True, stream=None):
         rsp = requests.get(url, params=params, headers=headers, cookies=cookies, timeout=timeout,
-                           verify=verify,
+                           verify=verify, proxies={},
                            allow_redirects=allow_redirects, stream=stream)
         rsp.encoding = 'utf-8'
         return rsp
 
-    def post(self, url, data=None, headers=None, cookies=None, timeout=5, verify=True, allow_redirects=True,
+    def post(self, url, data=None, headers=None, cookies=None, timeout=5, verify=False, allow_redirects=True,
              stream=None):
         rsp = requests.post(url, data=data, headers=headers, cookies=cookies, timeout=timeout, verify=verify,
-                            allow_redirects=allow_redirects, stream=stream)
+                            proxies={}, allow_redirects=allow_redirects, stream=stream)
         rsp.encoding = 'utf-8'
         return rsp
 
-    def postJson(self, url, json, headers=None, cookies=None, timeout=5, verify=True, allow_redirects=True,
+    def postJson(self, url, json, headers=None, cookies=None, timeout=5, verify=False, allow_redirects=True,
                  stream=None):
         rsp = requests.post(url, json=json, headers=headers, cookies=cookies, timeout=timeout, verify=verify,
-                            allow_redirects=allow_redirects, stream=stream)
+                            proxies={}, allow_redirects=allow_redirects, stream=stream)
         rsp.encoding = 'utf-8'
         return rsp
 
-    def postBinary(self, url, data: dict, boundary=None, headers=None, cookies=None, timeout=5, verify=True,
+    def postBinary(self, url, data: dict, boundary=None, headers=None, cookies=None, timeout=5, verify=False,
                    allow_redirects=True, stream=None):
         if boundary is None:
             boundary = f'--dio-boundary-{int(time.time())}'

@@ -5,7 +5,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
-.pnpm-debug.log*
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
@@ -57,12 +56,6 @@ web_modules/
 # Optional stylelint cache
 .stylelintcache
 
-# Microbundle cache
-.rpt2_cache/
-.rts2_cache_cjs/
-.rts2_cache_es/
-.rts2_cache_umd/
-
 # Optional REPL history
 .node_repl_history
 
@@ -74,10 +67,8 @@ web_modules/
 
 # dotenv environment variable files
 .env
-.env.development.local
-.env.test.local
-.env.production.local
-.env.local
+.env.*
+!.env.example
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
@@ -104,6 +95,15 @@ dist
 .temp
 .cache
 
+# Sveltekit cache directory
+.svelte-kit/
+
+# vitepress build output
+**/.vitepress/dist
+
+# vitepress cache directory
+**/.vitepress/cache
+
 # Docusaurus cache and generated files
 .docusaurus
 
@@ -116,56 +116,25 @@ dist
 # DynamoDB Local files
 .dynamodb/
 
+# Firebase cache directory
+.firebase/
+
 # TernJS port file
 .tern-port
 
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
 
-# yarn v2
-.yarn/cache
-.yarn/unplugged
-.yarn/build-state.yml
-.yarn/install-state.gz
+# yarn v3
 .pnp.*
-/local/
-!README.md
-.idea
-/config/env.json
-/spider/js/UC分享.js
-/json/UC分享.json
-/jx/奇奇.js
-/spider/js/百忙无果[官].js
-/data/settings/link_data.json
-/yarn.lock
-/t4_daemon.pid
-/custom.json
-/index.json
-/vod_cache/
-/jx/芒果关姐.js
-/data/mv/
-/database.db
-/scripts/python/XYQ提取结果.json
-*.pyc
-/scripts/python/appMap.txt
-/binary/
-/plugins/
-/.claude
-/.plugins.js
-/clipboard.txt
-/clipboard.txt.bak
-/apps/cat/
-/data/temp/
-/.playwright-mcp/
-/data/source-checker/_fix_work/
-/scripts/mjs/index.db
-/scripts/test/rsa-test.json
-/apps/salary/
-/jx/_30wmv.js
-.DS_Store
-/spider/catvod/mtv60w[差].js
-/drpy-node-bundle/jx/_30wmv.js
-/.git-token
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
 
-# mcpb
-drpy-node-mcp/*.mcpb
+# Vite logs files
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+/.idea/
