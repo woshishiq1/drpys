@@ -31,11 +31,10 @@ class Spider(Spider):
     
     def init(self, extend=""):
         self.session = requests.Session()
-        self.session.verify = False
         self.headers_with_referer = self.headers.copy()
         self.headers_with_referer["Referer"] = f"{self.host}/"
         self.session.headers.update(self.headers_with_referer)
-        self.session.get(f"{self.host}/ju/", allow_redirects=True, timeout=self.timeout/1000, verify=False)
+        self.session.get(f"{self.host}/ju/", allow_redirects=True, timeout=self.timeout/1000)
     
     def homeContent(self, filter):
         return {
@@ -61,7 +60,7 @@ class Spider(Spider):
         }
         url = f"{self.host}/{tid}/" if pg == 1 else f"{self.host}/{tid}/?page={pg}"
             
-        response = self.session.get(url, allow_redirects=True, timeout=self.timeout/1000, verify=False)
+        response = self.session.get(url, allow_redirects=True, timeout=self.timeout/1000)
         if response.status_code == 200:
             videos = self._parse_video_list(response.text)
             result['list'] = videos
@@ -100,7 +99,7 @@ class Spider(Spider):
             vod_id = array[0]
             detail_url = vod_id if vod_id.startswith("http") else f"{self.host}{vod_id}"
             
-            response = self.session.get(detail_url, allow_redirects=True, timeout=self.timeout/1000, verify=False)
+            response = self.session.get(detail_url, allow_redirects=True, timeout=self.timeout/1000)
             if response.status_code == 200:
                 vod = self._parse_detail_page(response.text, detail_url)
                 if vod:
@@ -136,7 +135,7 @@ class Spider(Spider):
     
     def searchContent(self, key, quick, pg='1'):
         url = f"{self.host}/search/?keyword={key}"
-        response = self.session.get(url, allow_redirects=True, timeout=self.timeout/1000, verify=False)
+        response = self.session.get(url, allow_redirects=True, timeout=self.timeout/1000)
         if response.status_code == 200:
             return {'list': self._parse_video_list(response.text)}
         

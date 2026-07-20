@@ -35,7 +35,7 @@ var rule = {
         dongman:{cateId:'dongman',by:'time'},
         duanju:{cateId:'duanju',by:'time'}
     },
-    headers: {'User-Agent': MOBILE_UA},
+    headers: {'User-Agent': 'MOBILE_UA'},
     class_name:'电影&电视剧&综艺&动漫&短剧',
     class_url:'dianying&dianshiju&zongyi&dongman&duanju',
     
@@ -47,16 +47,17 @@ var rule = {
         let {input, pdfa, pdfh, pd} = this;
         let html = await request(input);
         let d = [];
-        let data = pdfa(html, '.module-item');
+        let data = pdfa(html, '.vodlist.vodlist_wi li');
         data.forEach((it) => {
-            let title = pdfh(it, '.module-item-title&&title');
-            let url = pd(it, '.module-item-title&&href');
-            let id = url.match(/\/(\d+)/)?.[1] || '';
-            let pic_url = pd(it, 'img&&data-src');
+            let title = pdfh(it, 'a&&title');
+            title = title.split('/')[0].trim().replace(/.*《([^》]+)》.*/, "$1");
+            let url = pd(it, 'a&&href');
+            let id = url.match(/\/(\d+)\.html/)?.[1] || '';
+            let pic_url = pd(it, '.lazyload&&data-original');
             if (pic_url && !pic_url.startsWith('http')) {
                 pic_url = this.host + pic_url;
             }
-            let desc = pdfh(it, '.module-item-style.video-class&&Text') || pdfh(it, '.video-class&&Text') || '';
+            let desc = pdfh(it, '.pic_text&&Text');
             d.push({
                 title: title,
                 pic_url: pic_url,
@@ -72,16 +73,17 @@ var rule = {
         let {input, pdfa, pdfh, pd} = this;
         let html = await request(input);
         let d = [];
-        let data = pdfa(html, '.module-item');
+        let data = pdfa(html, '.vodlist.vodlist_wi li');
         data.forEach((it) => {
-            let title = pdfh(it, '.module-item-title&&title');
-            let url = pd(it, '.module-item-title&&href');
-            let id = url.match(/\/(\d+)/)?.[1] || '';
-            let pic_url = pd(it, 'img&&data-src');
+            let title = pdfh(it, 'a&&title');
+            title = title.split('/')[0].trim().replace(/.*《([^》]+)》.*/, "$1");
+            let url = pd(it, 'a&&href');
+            let id = url.match(/\/(\d+)\.html/)?.[1] || '';
+            let pic_url = pd(it, '.lazyload&&data-original');
             if (pic_url && !pic_url.startsWith('http')) {
                 pic_url = this.host + pic_url;
             }
-            let desc = pdfh(it, '.module-item-style.video-class&&Text') || pdfh(it, '.video-class&&Text') || '';
+            let desc = pdfh(it, '.pic_text&&Text');
             d.push({
                 title: title,
                 pic_url: pic_url,
