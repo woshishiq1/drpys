@@ -33,7 +33,7 @@ jobs:
           UPSTREAM_BRANCH=$(git remote show upstream_zourjke | grep 'HEAD branch' | cut -d' ' -f5)
           echo "zourjke 默认分支为: $UPSTREAM_BRANCH"
 
-          # 2. 核心防刷：对比上游和你本地的纯代码（排除整个工作流目录的干扰）
+          # 2. 对比上游和你本地的纯代码（初步过滤）
           if git diff --quiet origin/main upstream_zourjke/$UPSTREAM_BRANCH -- . ':!.github/workflows'; then
             echo "------------------------------------------------"
             echo "✅ 上游纯代码没有新更新。"
@@ -42,27 +42,29 @@ jobs:
             exit 0
           fi
 
-          echo "🚀 检测到上游有新代码，准备开始同步..."
+          echo "🚀 检测到上游有新代码，准备开始覆盖并验证..."
 
           # 3. 配置 Git 身份
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # 4. 【核心修改】只同步代码，完全隔离上游的工作流
-          # 强行将本地工作区重置为本地 main 的最新状态
-          git checkout main
-          
-          # 从上游分支拉取所有文件，但明确排除上游的 .github/workflows 目录
-          # 这样上游的 workflow 绝不会污染你的仓库，你自己的 Sync.yml 也会完好损
+          # 4. 从上游分支拉取所有文件，明确排除 .github/workflows 目录
           git checkout upstream_zourjke/$UPSTREAM_BRANCH -- . ':!.github/workflows'
 
-          # 5. 提交变动
-          git add -A
-          git commit --allow-empty -m "Sync: 自动同步 zourjke 纯代码（已过滤上游工作流）"
+          # 5. 【核心修复】再次检查本地工作区是否有实质文件修改
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "------------------------------------------------"
+            echo "✅ 覆盖后检查：无任何文件变动。"
+            echo "✅ 拒绝空提交，优雅退出，不刷新仓库置顶时间。"
+            echo "------------------------------------------------"
+            exit 0
+          fi
 
-          # 6. 安全推送
-          # 既然彻底过滤了上游工作流，不涉及任何敏感权限变更，
-          # 我们可以直接使用标准的 git push，不再需要使用 API 强推指针，更安全稳定。
+          # 6. 提交实质变动（严格移除 --allow-empty，确保无变动绝不提交）
+          git add -A
+          git commit -m "Sync: 自动同步 zourjke 纯代码（已过滤上游工作流）"
+
+          # 7. 推送到远程
           echo "正在推送到远程仓库..."
           git push origin main
 
