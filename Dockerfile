@@ -47,11 +47,13 @@ RUN apk add --no-cache \
     php83-json
 RUN ln -sf /usr/bin/php83 /usr/bin/php
 
-# 安装python3
+# 安装python3（alpine 的 venv/ensurepip 由 python3+py3-pip 覆盖，插件级 venv 依赖它）
+# 与 ffmpeg（cctv-h5e / hongguo-bridge 等解密插件的运行依赖）
 RUN apk add --no-cache python3 \
     py3-pip \
     py3-setuptools \
-    py3-wheel
+    py3-wheel \
+    ffmpeg
 RUN python3 -m venv /app/.venv && \
     . /app/.venv/bin/activate && \
     pip3 install -r /app/spider/py/base/requirements.txt

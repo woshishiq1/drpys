@@ -1,3 +1,4 @@
+import {log} from '../utils/log.js';
 import vm from "vm";
 import {
     dealJson,
@@ -59,13 +60,13 @@ class PageRequestCache {
         // 设置自动清理定时器
         const timer = setTimeout(() => {
             this.delete(key);
-            console.log(`[PageRequestCache] 自动清理过期缓存: ${key}`);
+            log(`[PageRequestCache] 自动清理过期缓存: ${key}`);
         }, this.maxAge);
         // 让定时器不阻止进程退出
         if (timer.unref) timer.unref();
         this.timers.set(key, timer);
 
-        console.log(`[PageRequestCache] 缓存已设置: ${key}, 当前缓存数量: ${this.cache.size}`);
+        log(`[PageRequestCache] 缓存已设置: ${key}, 当前缓存数量: ${this.cache.size}`);
     }
 
     delete(key) {
@@ -86,7 +87,7 @@ class PageRequestCache {
         this.cache.clear();
         this.accessOrder = [];
         this.timers.clear();
-        console.log('[PageRequestCache] 已清理所有缓存');
+        log('[PageRequestCache] 已清理所有缓存');
     }
 
     has(key) {
@@ -136,7 +137,7 @@ class PageRequestCache {
             // FIFO策略：移除最早访问的缓存项
             const oldestKey = this.accessOrder[0];
             if (oldestKey) {
-                console.log(`[PageRequestCache] FIFO淘汰缓存: ${oldestKey}`);
+                log(`[PageRequestCache] FIFO淘汰缓存: ${oldestKey}`);
                 this.delete(oldestKey);
             } else {
                 break;

@@ -3,6 +3,7 @@
  * 基于cheerio提供HTML和JSON解析功能，支持类似海阔视界的解析语法
  */
 
+import {log} from '../utils/log.js';
 import * as cheerio from 'cheerio';
 // import jsonpath from 'jsonpath';
 import {urljoin} from "../utils/utils.js";
@@ -455,7 +456,7 @@ class Jsoup {
         try {
             html = typeof html === 'string' ? JSON.parse(html) : html;
         } catch {
-            console.log('字符串转 JSON 失败');
+            log('字符串转 JSON 失败');
             return '';
         }
 
