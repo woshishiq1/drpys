@@ -60,7 +60,7 @@ export default (fastify, options, done) => {
      * M3U8 代理健康检查接口
      * GET /m3u8-proxy/health - 检查 M3U8 代理服务状态
      */
-    fastify.get('/m3u8-proxy/health', async (request, reply) => {
+    fastify.get('/m3u8-proxy/health', { config: { auth: 'public' } }, async (request, reply) => {
         setCorsHeaders(reply);
         
         const healthData = createHealthResponse(requestCache, m3u8Cache, {
@@ -80,7 +80,7 @@ export default (fastify, options, done) => {
      * M3U8 索引文件代理接口
      * GET /m3u8-proxy/playlist - 代理 M3U8 索引文件
      */
-    fastify.get('/m3u8-proxy/playlist', async (request, reply) => {
+    fastify.get('/m3u8-proxy/playlist', { config: { auth: 'public' } }, async (request, reply) => {
         // 验证身份认证
         if (!verifyAuth(request, reply)) {
             return;
@@ -172,6 +172,7 @@ export default (fastify, options, done) => {
     fastify.route({
         method: ['GET', 'HEAD'],
         url: '/m3u8-proxy/ts',
+        config: {auth: 'public'},
         handler: async (request, reply) => {
             // 验证身份认证
             if (!verifyAuth(request, reply)) {
@@ -298,7 +299,7 @@ export default (fastify, options, done) => {
      * M3U8 代理状态接口
      * GET /m3u8-proxy/status - 获取代理服务状态
      */
-    fastify.get('/m3u8-proxy/status', async (request, reply) => {
+    fastify.get('/m3u8-proxy/status', { config: { auth: 'public' } }, async (request, reply) => {
         // log(`[m3u8ProxyController] Status request`);
 
         try {
@@ -394,6 +395,7 @@ export default (fastify, options, done) => {
     fastify.route({
         method: ['GET', 'HEAD'],
         url: '/m3u8-proxy/proxy',
+        config: {auth: 'public'},
         handler: async (request, reply) => {
             // 验证身份认证
             if (!verifyAuth(request, reply)) {

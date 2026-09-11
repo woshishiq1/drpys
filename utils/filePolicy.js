@@ -32,11 +32,11 @@ export const PROTECTED_FILES = new Set([
     'json/mv/1万部电影.txt',
     'json/mv/电影天堂.txt',
     'json/mv/索尼电影.txt',
-    'json/tv/ipv6.m3u',
-    'json/tv/live_1905.txt',
-    'json/tv/live_cntv.txt',
-    'json/tv/live_sc_unicom.m3u',
-    'json/tv/live_sc_unicom.txt',
+    'json/lives/ipv6.m3u',
+    'json/lives/live_1905.txt',
+    'json/lives/live_cntv.txt',
+    'json/lives/live_sc_unicom.m3u',
+    'json/lives/live_sc_unicom.txt',
     'json/webdav.json',
     'json/webdav影视.json',
     'json/十六万歌曲.txt',
@@ -94,7 +94,7 @@ export function isProtectedPath(relPath) {
 
 /**
  * 修改判定：已存在文件的编辑许可。
- * - .txt / .m3u 数据文件（如 json/tv、json/mv 下的直播与影片清单）全局允许编辑
+ * - .txt / .m3u 数据文件（如 json/lives、json/mv 下的直播与影片清单）全局允许编辑
  * - 根目录 json 与 config 下 js/json：保护文件也可改（保护仅禁删，env.json/player.json 等本就是用户日常维护对象）
  * - json/ 下：框架 33 个中 json 类只读（txt/m3u 数据文件除外），仅用户自建 json 可改
  * - 白名单外的已存在文件（如 spider 源）返回 false——UI 不显示编辑入口；

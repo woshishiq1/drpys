@@ -6,7 +6,6 @@
 import path from 'path';
 import fs from '../utils/fsWrapper.js';
 import multipart from '@fastify/multipart';
-import { validateBasicAuth } from '../utils/api_validate.js';
 import { MAX_UPLOAD_BYTES } from '../utils/pluginMarket.js';
 
 // 导入子控制器
@@ -80,20 +79,15 @@ const FULL_ENV_TEMPLATE = {
     "must_sub_code": "0",
     "bili_cookie": "",
     "mg_hz": "4",
-    "unified_proxy_self_redirect": "0"
+    "unified_proxy_self_redirect": "0",
+    "LIVE_URL": "",
+    "EPG_URL": "",
+    "LOGO_URL": ""
 };
 
 // 导出路由配置
 export default async function adminController(fastify, options) {
-    // 注册 Basic Auth 验证钩子
-    fastify.addHook('preHandler', (request, reply, done) => {
-        // 只对 /api/admin/* 接口进行验证
-        if (request.url.startsWith('/api/admin')) {
-            validateBasicAuth(request, reply, done);
-        } else {
-            done();
-        }
-    });
+    // 鉴权由 index.js 全局 preHandler 统一处理（/api/admin/* 无 config.auth 声明，走默认 Basic）
 
     // multipart：仅插件 zip 上传使用（流式落盘，不驻留内存；上限与市场下载一致 500MB）
     await fastify.register(multipart, {
@@ -237,6 +231,7 @@ export default async function adminController(fastify, options) {
             },
         },
     }, sourcesController.setSourcesEnabled);
+	
 
     // ==================== 文件管理 API ====================
     fastify.get('/api/admin/files/list', {

@@ -83,26 +83,69 @@ fastify.addHook('onClose', async () => {
     await onClose();
 });
 
-// 给静态目录插件中心挂载basic验证
-fastify.addHook('preHandler', (req, reply, done) => {
-    if (req.raw.url.startsWith('/apps/') || req.raw.url.startsWith('/api/admin/') || req.raw.url.startsWith('/clash')) {
-        if (req.raw.url.includes('clipboard-pusher/index.html')) {
-            validateBasicAuth(req, reply, async () => {
-                validatHtml(req, reply, rootDir).then(() => done());
-            });
-        } else {
-            validateBasicAuth(req, reply, done);
-        }
+// 全局鉴权（deny-by-default）：除显式豁免外，所有路由默认需要 Basic 鉴权。
+// 新增私有路由无需改动本文件（不带 config.auth 即自动 Basic）。
+// 豁免通道：
+//   - 控制器内路由级声明 config.auth = 'public' | 'pwd'（推荐，见各控制器）
+//   - 本钩子的 URL 映射，仅供 @fastify/static 托管目录使用（其无法携带 route-level config）
+// 判定顺序：特殊页 → URL 映射 → 路由级声明 → 默认 Basic
+// @fastify/static 托管目录的鉴权映射
+const STATIC_PREFIX_AUTH = [
+    { p: '/public/', a: 'public' },
+    { p: '/json/', a: 'public' },
+    { p: '/php/', a: 'pwd' },
+    { p: '/cat/', a: 'pwd' },
+    { p: '/catLib/', a: 'pwd' },
+    { p: '/xbpq/', a: 'pwd' },
+];
 
-    } else if (req.raw.url.startsWith('/js/') || req.raw.url.startsWith('/py/')) {
-        validatePwd(req, reply, done).then(async () => {
-            validateJs(req, reply, dr2Dir).then(() => done());
+fastify.addHook('preHandler', (req, reply, done) => {
+    const url = req.raw.url || '';
+    const path = url.split('?')[0];
+
+    // 剪切板落地页：Basic + 注入安全码
+    if (url.includes('clipboard-pusher/index.html')) {
+        validateBasicAuth(req, reply, async () => {
+            validatHtml(req, reply, rootDir).then(() => done());
         });
-    } else if (req.raw.url === '/lx' || req.raw.url === '/lx/' || req.raw.url === '/music' || req.raw.url === '/music/') {
-        validateBasicAuth(req, reply, done);
-    } else {
-        done();
+        return;
     }
+
+    // 猫配置页内嵌明文账密链接，强制 Basic（须先于 /cat/ 静态前缀，否则被降级为 pwd）
+    if (path === '/cat/index.html') {
+        validateBasicAuth(req, reply, done);
+        return;
+    }
+
+    // /js、/py：API_PWD + 文件头重写
+    if (url.startsWith('/js/') || url.startsWith('/py/')) {
+        validatePwd(req, reply).then(async () => {
+            if (reply.sent) return;
+            await validateJs(req, reply, dr2Dir);
+            if (!reply.sent) done();
+        });
+        return;
+    }
+
+    // 静态目录前缀映射（@fastify/static 无法携带 route-level config）
+    for (const { p, a } of STATIC_PREFIX_AUTH) {
+        if (url.startsWith(p)) {
+            if (a === 'public') return done();
+            validatePwd(req, reply).then(() => { if (!reply.sent) done(); });
+            return;
+        }
+    }
+
+    // 路由级声明（控制器内 config.auth）
+    const routeAuth = req.routeOptions?.config?.auth;
+    if (routeAuth === 'public') return done();
+    if (routeAuth === 'pwd') {
+        validatePwd(req, reply).then(() => { if (!reply.sent) done(); });
+        return;
+    }
+
+    // 默认：Basic 鉴权
+    validateBasicAuth(req, reply, done);
 });
 
 // 自定义插件替换 querystring 解析行为.避免出现两个相同参数被解析成列表

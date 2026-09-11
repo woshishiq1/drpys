@@ -10,8 +10,17 @@
   },
   {
     "name": "本地webdav",
-    "id": "local",
+    "id": "local1",
     "baseURL": "http://192.168.31.217/webdav",
+    "username": "your-username",
+    "password": "your-password",
+    "rejectUnauthorized": false,
+    "timeout": 30000
+  },
+  {
+    "name": "内网webdav",
+    "id": "local2",
+    "baseURL": "http://192.168.80.82/webdav",
     "username": "your-username",
     "password": "your-password",
     "rejectUnauthorized": false,

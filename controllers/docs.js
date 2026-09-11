@@ -8,7 +8,7 @@ import path from 'path';
 import {existsSync, readFileSync} from 'fs';
 import {getMimeType} from '../utils/mime-type.js';
 import '../utils/marked.min.js'; // Markdown解析库
-import {validateBasicAuth} from "../utils/api_validate.js";
+// import { marked } from "marked";
 
 /**
  * 文档路由插件
@@ -23,7 +23,7 @@ export default (fastify, options, done) => {
      * 处理/docs/*路径下的所有文件访问请求
      * 支持Markdown文件渲染和其他文件类型的直接访问
      */
-    fastify.get('/docs/*', {preHandler: validateBasicAuth}, async (request, reply) => {
+    fastify.get('/docs/*', async (request, reply) => {
         // 捕获整个路径参数
         const fullPath = request.params['*']; 
         log(`Request received for path: ${fullPath}`);

@@ -21,7 +21,6 @@ import path from 'path';
 import {existsSync, readFileSync, statSync} from 'fs';
 import {base64Decode} from '../libs_drpy/crypto-util.js';
 import {ENV} from "../utils/env.js";
-import {validatePwd} from "../utils/api_validate.js";
 import {startJsonWatcher, getApiEngine} from "../utils/api_helper.js";
 import {withTimeout as withTimeoutBase} from '../utils/with-timeout.js';
 import {createRuleEnvContext} from '../utils/rule-env.js';
@@ -163,7 +162,7 @@ export default (fastify, options, done) => {
     fastify.route({
         method: ['GET', 'POST'], // 同时支持 GET 和 POST
         url: '/api/:module',
-        preHandler: validatePwd, // 密码验证中间件
+        config: { auth: 'pwd' }, // 仅 API_PWD 鉴权（壳子/播放器兼容），不走全局 Basic
         schema: {
             consumes: ['application/json', 'application/x-www-form-urlencoded'], // 声明支持的内容类型
             tags: ['协议接口'],
@@ -449,6 +448,7 @@ export default (fastify, options, done) => {
      * 支持Range请求头，用于视频流的断点续传
      */
     fastify.get('/proxy/:module/*', {
+        config: { auth: 'public' }, // 播放/分片回流门面，免鉴权
         schema: {
             tags: ['协议接口'],
             summary: '模块代理接口',
@@ -536,7 +536,13 @@ export default (fastify, options, done) => {
                 }
 
                 // 构建重定向URL，使用媒体代理服务
-                const redirectUrl = `/mediaProxy?url=${encodeURIComponent(content)}&headers=${encodeURIComponent(JSON.stringify(new_headers))}&thread=${ENV.get('thread') || 1}`;
+                // 红果播放桥走的是「边解密边流式」端点（总大小未知，返回 Content-Range: bytes 0-/*），
+                // 而 /mediaProxy 默认的 proxyStreamMediaMulti 需要先探测 content-length 才能转发，
+                // 会对该类流式端点直接 500。因此命中桥地址(:57577)时强制走纯流式 proxyStreamMedia
+                // （stream=1，收到上游数据即吐给客户端，不需总大小），保证起播不被整文件阻塞。
+                // 正则锚定 host 部分，避免 query 中出现 :57577 时误判
+                const usePureStream = /^https?:\/\/[^\/?]*:57577(\/|$|\?)/.test(content);
+                const redirectUrl = `/mediaProxy?url=${encodeURIComponent(content)}&headers=${encodeURIComponent(JSON.stringify(new_headers))}&thread=${ENV.get('thread') || 1}${usePureStream ? '&stream=1' : ''}`;
 
                 // 执行重定向
                 return reply.redirect(redirectUrl);
@@ -590,6 +596,7 @@ export default (fastify, options, done) => {
      * 支持多种解析器，返回解析后的播放链接
      */
     fastify.get('/parse/:jx', {
+        config: { auth: 'public' }, // 解析器门面，免鉴权
         schema: {
             tags: ['协议接口'],
             summary: '解析接口',

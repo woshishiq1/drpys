@@ -26,5 +26,5 @@ export function resolvePath(p) {
 
 export function isSafePath(p) {
   const resolved = resolvePath(p);
-  return resolved.startsWith(PROJECT_ROOT);
+  return resolved === PROJECT_ROOT || resolved.startsWith(PROJECT_ROOT + path.sep);
 }

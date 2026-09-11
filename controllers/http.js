@@ -25,7 +25,7 @@ export default (fastify, options, done) => {
      * HTTP代理请求接口
      * POST /http - 代理HTTP请求
      */
-    fastify.post('/http', async (req, reply) => {
+    fastify.post('/http', {config: {auth: 'public'}}, async (req, reply) => {
         // 解构请求参数
         const {
             url,

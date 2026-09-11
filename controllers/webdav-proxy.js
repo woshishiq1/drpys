@@ -66,7 +66,7 @@ export default (fastify, options, done) => {
      * WebDAV 健康检查接口
      * GET /webdav/health - 检查 WebDAV 代理服务状态
      */
-    fastify.get('/webdav/health', async (request, reply) => {
+    fastify.get('/webdav/health', {config: {auth: 'public'}}, async (request, reply) => {
         log(`[webdavController] Health check request`);
 
         const healthData = createHealthResponse(webdavClients, fileCache, {
@@ -86,7 +86,7 @@ export default (fastify, options, done) => {
      * WebDAV 文件直链访问接口
      * GET /webdav/file - 获取文件直链
      */
-    fastify.get('/webdav/file', async (request, reply) => {
+    fastify.get('/webdav/file', {config: {auth: 'public'}}, async (request, reply) => {
         const {path: filePath, config: configParam} = request.query;
 
         log(`[webdavController] File request: ${filePath}`);
@@ -190,7 +190,7 @@ export default (fastify, options, done) => {
      * WebDAV 文件信息获取接口
      * GET /webdav/info - 获取文件或目录信息
      */
-    fastify.get('/webdav/info', async (request, reply) => {
+    fastify.get('/webdav/info', {config: {auth: 'public'}}, async (request, reply) => {
         const {path: filePath, config: configParam} = request.query;
 
         log(`[webdavController] Info request: ${filePath}`);
@@ -226,7 +226,7 @@ export default (fastify, options, done) => {
      * WebDAV 目录列表接口
      * GET /webdav/list - 获取目录内容列表
      */
-    fastify.get('/webdav/list', async (request, reply) => {
+    fastify.get('/webdav/list', {config: {auth: 'public'}}, async (request, reply) => {
         const {path: dirPath = '/', config: configParam} = request.query;
 
         log(`[webdavController] List request: ${dirPath}`);
@@ -329,7 +329,7 @@ export default (fastify, options, done) => {
      * WebDAV 代理状态接口
      * GET /webdav/status - 获取代理服务状态
      */
-    fastify.get('/webdav/status', async (request, reply) => {
+    fastify.get('/webdav/status', {config: {auth: 'public'}}, async (request, reply) => {
         log(`[webdavController] Status request`);
 
         try {

@@ -24,6 +24,8 @@ test('绝对路径一律拒绝（与原 isSafePath 对拍）', () => {
 test('../ 穿越出项目根被拒绝', () => {
     assert.equal(safePath('../../etc/passwd'), false);
     assert.equal(safePath('spider/../../.env'), false);
+    // 兄弟目录前缀重叠：../drpy-node-evil/x 解析结果以 PROJECT_ROOT 字符串开头但越界，必须拒绝
+    assert.equal(safePath('../drpy-node-evil/x'), false);
 });
 
 test('默认黑名单命中拒绝', () => {

@@ -14,7 +14,7 @@
   },
   {
     "name": "CNTV",
-    "url": "./tv/live_cntv.txt",
+    "url": "./live/live_cntv.txt",
     "img": "",
     "headers": {"user-agent":"okhttp/3.12.11"}
   },
@@ -25,12 +25,12 @@
   },
   {
     "name": "范冰冰-V6本地",
-    "url": "./tv/ipv6.m3u",
+    "url": "./live/ipv6.m3u",
     "img": "./lives.jpg"
   },
   {
     "name": "1905",
-    "url": "./tv/live_1905.txt",
+    "url": "./live/live_1905.txt",
     "img": "https://image11.m1905.cn/uploadfile/2022/0510/thumb_1_285_100_20220510030520666149.jpg"
   },
   {

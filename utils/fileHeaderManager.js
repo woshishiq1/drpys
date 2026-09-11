@@ -19,7 +19,10 @@ class FileHeaderManager {
             start: '"""',
             end: '"""',
             // 修改正则表达式，确保只匹配文件开头的注释块
-            regex: /^(\s*"""[\s\S]*?""")/,
+            // py 需容忍 PEP 263 coding 声明（# -*- coding: utf-8 -*-）与 shebang 在 docstring 之前，
+            // 否则此类文件 regex 不命中 → writeHeader 会把新 @header docstring 插到 coding 声明之前
+            // （coding 失效）且与文件内已有 @header docstring 重复
+            regex: /^(\s*(?:#![^\n]*\n)?(?:#[^\n]*coding[^\n]*\n)?\s*"""[\s\S]*?""")/,
             headerRegex: /@header\(([\s\S]*?)\)/,
             createComment: (content) => `"""\n${content}\n"""`,
             topCommentsRegex: /^(\s*(#[^\n]*\n|'''[\s\S]*?'''|"""[\s\S]*?""")\s*)+/
@@ -298,6 +301,11 @@ class FileHeaderManager {
                             // 异常情况，直接追加
                             updatedComment = fullComment + `\n${config.createComment(headerStr)}`;
                         }
+                    } else if (ext === '.py') {
+                        // py: coding/shebang 前缀保持在 docstring 之前（PEP 263），
+                        // @header 插入 docstring 开引号之后（不能 replace(end)——会误删开引号）
+                        const quoteEnd = fullComment.indexOf('"""') + 3;
+                        updatedComment = fullComment.substring(0, quoteEnd) + '\n' + headerStr + fullComment.substring(quoteEnd);
                     } else {
                          updatedComment = fullComment
                             .replace(config.end, '')
@@ -313,16 +321,24 @@ class FileHeaderManager {
         } else {
             // 没有找到注释块，在文件开头创建新的
             let newComment = config.createComment(headerStr) + '\n\n';
-            
+
             // PHP 特殊处理：确保 <?php 在最前面
             if (ext === '.php') {
                 if (content.trim().startsWith('<?php')) {
                     // 如果文件已经以 <?php 开头，把注释插到 <?php 后面
                     newContent = content.replace(/<\?php\s*/, `<?php\n\n${newComment.trim()}\n\n`);
                 } else {
-                    // 如果没有 <?php (可能是纯 HTML 混编? 或者短标签?) 
+                    // 如果没有 <?php (可能是纯 HTML 混编? 或者短标签?)
                     // 假设用户想要标准的 PHP 文件头
                     newContent = `<?php\n\n${newComment.trim()}\n\n` + content;
+                }
+            } else if (ext === '.py') {
+                // py: PEP 263 coding/shebang 声明必须保持在前两行，新注释块插到其后
+                const declMatch = content.match(/^(\s*#![^\n]*\n)?\s*#[^\n]*coding[^\n]*\n/);
+                if (declMatch) {
+                    newContent = content.substring(0, declMatch[0].length) + '\n' + newComment + content.substring(declMatch[0].length);
+                } else {
+                    newContent = newComment + content;
                 }
             } else {
                 newContent = newComment + content;

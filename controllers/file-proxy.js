@@ -32,7 +32,7 @@ export default (fastify, options, done) => {
      * 远程文件代理健康检查接口
      * GET /file-proxy/health - 检查远程文件代理服务状态
      */
-    fastify.get('/file-proxy/health', async (request, reply) => {
+    fastify.get('/file-proxy/health', { config: { auth: 'public' } }, async (request, reply) => {
         // log(`[fileProxyController] Health check request`);
         
         setCorsHeaders(reply);
@@ -58,6 +58,7 @@ export default (fastify, options, done) => {
     fastify.route({
         method: ['GET', 'HEAD'],
         url: '/file-proxy/proxy',
+        config: {auth: 'public'},
         handler: async (request, reply) => {
             // 验证身份认证
             if (!verifyAuth(request, reply)) {
@@ -141,7 +142,7 @@ export default (fastify, options, done) => {
      * 远程文件信息获取接口
      * GET /file-proxy/info - 获取远程文件信息（HEAD 请求）
      */
-    fastify.get('/file-proxy/info', async (request, reply) => {
+    fastify.get('/file-proxy/info', { config: { auth: 'public' } }, async (request, reply) => {
         // 验证身份认证
         if (!verifyAuth(request, reply)) {
             return;
@@ -232,7 +233,7 @@ export default (fastify, options, done) => {
     /**
      * 状态路由
      */
-    fastify.get('/file-proxy/status', async (request, reply) => {
+    fastify.get('/file-proxy/status', { config: { auth: 'public' } }, async (request, reply) => {
         setCorsHeaders(reply);
         
         const statusData = createStatusResponse(

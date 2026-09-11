@@ -96,7 +96,7 @@ export default (fastify, options, done) => {
      * FTP 健康检查接口
      * GET /ftp/health - 检查 FTP 代理服务状态
      */
-    fastify.get('/ftp/health', async (request, reply) => {
+    fastify.get('/ftp/health', {config: {auth: 'public'}}, async (request, reply) => {
         log(`[ftpController] Health check request`);
 
         const healthData = createHealthResponse(ftpClients, fileCache, {
@@ -237,7 +237,7 @@ export default (fastify, options, done) => {
      * FTP 文件信息获取接口
      * GET /ftp/info - 获取文件或目录信息
      */
-    fastify.get('/ftp/info', async (request, reply) => {
+    fastify.get('/ftp/info', {config: {auth: 'public'}}, async (request, reply) => {
         const {path: filePath, config: configParam} = request.query;
 
         log(`[ftpController] Info request: ${filePath}`);
@@ -279,7 +279,7 @@ export default (fastify, options, done) => {
      * FTP 目录列表接口
      * GET /ftp/list - 获取目录内容列表
      */
-    fastify.get('/ftp/list', async (request, reply) => {
+    fastify.get('/ftp/list', {config: {auth: 'public'}}, async (request, reply) => {
         const {path: dirPath = '/', config: configParam} = request.query;
 
         log(`[ftpController] List request: ${dirPath}`);
@@ -406,7 +406,7 @@ export default (fastify, options, done) => {
      * FTP 代理状态接口
      * GET /ftp/status - 获取代理服务状态
      */
-    fastify.get('/ftp/status', async (request, reply) => {
+    fastify.get('/ftp/status', {config: {auth: 'public'}}, async (request, reply) => {
         log(`[ftpController] Status request`);
 
         try {

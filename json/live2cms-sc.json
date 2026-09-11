@@ -17,7 +17,7 @@
   },
   {
     "name": "四川联通-本地M3U",
-    "url": "./tv/live_sc_unicom.m3u",
+    "url": "./live/live_sc_unicom.m3u",
     "img": "./lives.jpg",
     "headers": {
       "User-Agent": "kngx/1.10.2"

@@ -44,7 +44,7 @@ test('isProtectedPath: 框架自带文件全命中', () => {
     assert.equal(isProtectedPath('config/env.json'), true);
     assert.equal(isProtectedPath('config/map.txt'), true);
     assert.equal(isProtectedPath('json/alist.json'), true);
-    assert.equal(isProtectedPath('json/tv/live_cntv.txt'), true);
+    assert.equal(isProtectedPath('json/lives/live_cntv.txt'), true);
     assert.equal(isProtectedPath('json/采集[密]静态.json'), true);
     assert.equal(isProtectedPath('config/zz-test.json'), false);
     assert.equal(isProtectedPath('json/zz-user.json'), false);
@@ -55,9 +55,9 @@ test('isEditablePath: json/ 框架只读、自建可改；config/根目录保护
     assert.equal(isEditablePath('json/alist.json'), false);
     assert.equal(isEditablePath('json/采集[密]静态.json'), false);
     // .txt / .m3u 数据文件全局可编辑（含 json/ 框架文件）
-    assert.equal(isEditablePath('json/tv/live_cntv.txt'), true);
+    assert.equal(isEditablePath('json/lives/live_cntv.txt'), true);
     assert.equal(isEditablePath('json/mv/电影天堂.txt'), true);
-    assert.equal(isEditablePath('json/tv/ipv6.m3u'), true);
+    assert.equal(isEditablePath('json/lives/ipv6.m3u'), true);
     // json/ 自建可改
     assert.equal(isEditablePath('json/zz-user.json'), true);
     // config 框架 json 保护仅禁删，可改

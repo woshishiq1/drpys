@@ -9,7 +9,6 @@ import path from 'path';
 import {readdir, stat} from 'fs/promises';
 import {pathToFileURL} from 'url';
 import {CronJob} from 'cron';
-import {validateBasicAuth} from "../utils/api_validate.js"; // 官方 cron
 import {toBeijingTime} from "../utils/datetime-format.js"
 
 // 排除的脚本文件列表
@@ -255,7 +254,7 @@ export default (fastify, options, done) => {
      * 立即执行任务的API端点
      * GET /execute-now/:taskName? - 执行指定任务或所有任务
      */
-    fastify.get('/execute-now/:taskName?', {preHandler: validateBasicAuth}, async (request, reply) => {
+    fastify.get('/execute-now/:taskName?', async (request, reply) => {
         const {taskName} = request.params;
 
         if (taskName) {
@@ -291,7 +290,7 @@ export default (fastify, options, done) => {
      * 获取所有任务列表的API端点
      * GET /tasks - 返回所有注册的任务信息
      */
-    fastify.get('/tasks', {preHandler: validateBasicAuth}, async (request, reply) => {
+    fastify.get('/tasks', async (request, reply) => {
         const tasks = [...taskRegistry.values()].map(task => (format_task_object(task)));
 
         return tasks;
@@ -301,7 +300,7 @@ export default (fastify, options, done) => {
      * 获取指定任务信息的API端点
      * GET /tasks/:taskName - 返回指定任务的详细信息
      */
-    fastify.get('/tasks/:taskName', {preHandler: validateBasicAuth}, async (request, reply) => {
+    fastify.get('/tasks/:taskName', async (request, reply) => {
         const {taskName} = request.params;
 
         if (!taskRegistry.has(taskName)) {

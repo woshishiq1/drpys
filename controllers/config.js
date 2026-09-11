@@ -859,33 +859,59 @@ async function generateParseJSON(jxDir, requestHost) {
 
 /**
  * 生成直播源配置JSON数据
- * 根据环境变量配置生成直播源列表
+ * 配置来源：config/env.json（设置中心「直播配置」分组）优先，回退 .env 环境变量。
+ * LIVE_URL 支持多个订阅链接（; 或换行分隔），每条链接生成一个直播入口；
+ * 另自动扫描 json/lives 目录下的 .txt/.m3u 文件（每文件一条直播配置）。
+ * 文件通过 /json/ 静态挂载对外提供访问（static.js: jsonDir → /json/）
  *
  * @param {string} requestHost - 请求主机地址
+ * @param {string} jsonDir - json 静态目录（扫描其下 lives/ 子目录）
  * @returns {Object} 包含lives数组的对象
  */
-function generateLivesJSON(requestHost) {
+function generateLivesJSON(requestHost, jsonDir) {
     let lives = [];
-    let live_url = process.env.LIVE_URL || '';
-    let epg_url = process.env.EPG_URL || ''; // 从.env文件读取
-    let logo_url = process.env.LOGO_URL || ''; // 从.env文件读取
-    if (live_url && !live_url.startsWith('http')) {
-        let public_url = urljoin(requestHost, 'public/');
-        live_url = urljoin(public_url, live_url);
-    }
-    // log('live_url:', live_url);
-    if (live_url) {
+    let epg_url = ENV.get('EPG_URL') || process.env.EPG_URL || ''; // 从.env文件读取
+    let logo_url = ENV.get('LOGO_URL') || process.env.LOGO_URL || ''; // 从.env文件读取
+    // LIVE_URL 多订阅链接：; 或换行分隔，每条一个直播入口；单条保持「直播」命名兼容
+    const live_urls = String(ENV.get('LIVE_URL') || process.env.LIVE_URL || '')
+        .split(/[\n;；]+/).map(s => s.trim()).filter(Boolean);
+    live_urls.forEach((u, idx) => {
+        if (!u.startsWith('http')) {
+            u = urljoin(urljoin(requestHost, 'public/'), u);
+        }
         lives.push(
             {
-                "name": "直播",
+                "name": live_urls.length > 1 ? `直播${idx + 1}` : "直播",
                 "type": 0,
-                "url": live_url,
+                "url": u,
                 "playerType": 1,
                 "ua": "okhttp/3.12.13",
                 "epg": epg_url,
                 "logo": logo_url
             }
-        )
+        );
+    });
+    // 自动扫描 json/lives 下的直播源文件（.txt/.m3u），每文件一条配置，名称取文件名
+    try {
+        const livesDir = path.join(jsonDir, 'lives');
+        const livesFiles = readdirSync(livesDir)
+            .filter(f => (f.endsWith('.txt') || f.endsWith('.m3u')) && !f.startsWith('_') && !f.startsWith('.'))
+            .sort((a, b) => a.localeCompare(b, 'zh'));
+        livesFiles.forEach(f => {
+            lives.push(
+                {
+                    "name": path.basename(f, path.extname(f)),
+                    "type": 0,
+                    "url": `${requestHost}/json/lives/${encodeURIComponent(f)}`,
+                    "playerType": 1,
+                    "ua": "okhttp/3.12.13",
+                    "epg": epg_url,
+                    "logo": logo_url
+                }
+            )
+        });
+    } catch (e) {
+        log(`扫描 json/lives 直播源失败:${e.message}`);
     }
     return {lives}
 }
@@ -970,7 +996,7 @@ async function buildAndCacheConfig(options, requestHost, siteJSON, {healthy = ''
 
     // 生成各类配置数据
     const parseJSON = await generateParseJSON(options.jxDir, requestHost);
-    const livesJSON = generateLivesJSON(requestHost);
+    const livesJSON = generateLivesJSON(requestHost, options.jsonDir);
     const playerJSON = generatePlayerJSON(options.configDir, requestHost);
     // 合并所有配置数据
     const configObj = {sites_count: siteJSON.sites.length, ...playerJSON, ...siteJSON, ...parseJSON, ...livesJSON};
@@ -1010,7 +1036,7 @@ export default (fastify, options, done) => {
      * 获取索引配置接口
      * 返回预生成的index.json配置文件内容
      */
-    fastify.get('/index', {preHandler: validatePwd}, async (request, reply) => {
+    fastify.get('/index', {config: {auth: 'pwd'}}, async (request, reply) => {
         if (!existsSync(options.indexFilePath)) {
             reply.code(404).send({error: 'index.json not found'});
             return;

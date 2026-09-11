@@ -2,14 +2,14 @@ import {log} from '../utils/log.js';
 import path from 'path';
 import {readdirSync, readFileSync, writeFileSync, existsSync, createReadStream} from 'fs';
 import '../utils/marked.min.js';
+// import { marked } from "marked";
 import {computeHash} from '../utils/utils.js';
-import {validateBasicAuth} from "../utils/api_validate.js";
 import {daemon} from "../utils/daemonManager.js";
 import {toBeijingTime} from "../utils/datetime-format.js"
 
 export default (fastify, options, done) => {
     // 添加 / 接口
-    fastify.get('/', {preHandler: validateBasicAuth}, async (request, reply) => {
+    fastify.get('/', async (request, reply) => {
         let readmePath = null;
         const indexHtmlPath = path.join(options.rootDir, 'public/index.html');
         // log(`indexHtmlPath:${indexHtmlPath}`);
@@ -67,7 +67,7 @@ export default (fastify, options, done) => {
     });
 
     // 新增 /robots.txt 路由
-    fastify.get('/robots.txt', (request, reply) => {
+    fastify.get('/robots.txt', {config: {auth: 'public'}}, (request, reply) => {
         const filePath = path.join(options.rootDir, 'public', 'robots.txt');
         const fileStream = createReadStream(filePath);
         // reply.type('text/plain;charset=utf-8').sendFile('robots.txt', path.join(options.rootDir, 'public'));
@@ -75,7 +75,7 @@ export default (fastify, options, done) => {
     });
 
     // 新增 /favicon.ico 路由
-    fastify.get('/favicon.ico', async (request, reply) => {
+    fastify.get('/favicon.ico', {config: {auth: 'public'}}, async (request, reply) => {
         try {
             // 设置文件路径
             const faviconPath = path.join(options.rootDir, 'public', 'favicon.ico');
@@ -93,7 +93,7 @@ export default (fastify, options, done) => {
         }
     });
 
-    fastify.get('/cat/index.html', {preHandler: validateBasicAuth}, async (request, reply) => {
+    fastify.get('/cat/index.html', async (request, reply) => {
         try {
             // 设置文件路径
             const catHtmlPath = path.join(options.rootDir, 'data/cat/index.html');
@@ -119,6 +119,7 @@ export default (fastify, options, done) => {
 
     // 健康检查端点
     fastify.get('/health', {
+        config: {auth: 'public'},
         schema: {
             tags: ['协议接口'],
             summary: 'Python 守护进程健康检查',

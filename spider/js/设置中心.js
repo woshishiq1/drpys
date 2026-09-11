@@ -5,7 +5,7 @@
   quickSearch: 0,
   title: '设置中心',
   isProxyPath: true,
-  logo: 'https://avatars.githubusercontent.com/u/49803097?v=4',
+  logo: 'https://wsrv.nl/?url=https://github.com/EylinSir/drpy-node-old/blob/main/public/images/drpys.png?raw=true',
   more: {
     sourceTag: '设置,动作',
     actions: [
@@ -97,6 +97,11 @@ let quick_data1Q = {
     '史上最强师父': 'https://www.qimao.com/shuku/1817221/',
     '被逐出宗门后，美人师尊跪求我原谅': 'https://www.qimao.com/shuku/1886669/',
 };
+let quick_data1Y = {
+    '太荒吞天诀': 'https://api-bc.wtzw.com/api/v4/book/detail?id=195631',
+    '无敌天命': 'https://api-bc.wtzw.com/api/v4/book/detail?id=1862264',
+    '荒古武神': 'https://api-bc.wtzw.com/api/v4/book/detail?id=216404',
+};
 let quick_data2 = {
     '推送': 'push',
     '夸克': 'quark',
@@ -111,6 +116,7 @@ let quick_data2 = {
 let selectData = renderSelect(quick_data);
 let selectData1 = renderSelect(quick_data1);
 let selectDataList1Q = renderSelect(quick_data1Q);
+let selectDataList1Y = renderSelect(quick_data1Y);
 let selectData2 = renderSelect(quick_data2);
 
 function renderSelect(quick_data1) {
@@ -263,8 +269,8 @@ var rule = {
     aliScanCheck: null,
     biliScanCheck: null,
     host: 'http://empty',
-    class_name: '推送&夸克&UC&阿里&百度&哔哩&天翼&迅雷&系统配置&测试&接口挂载&视频解析',
-    class_url: 'push&quark&uc&ali&baidu&bili&cloud&xun&system&test&apiLink&videoParse',
+    class_name: '推送&夸克&UC&阿里&百度&哔哩&天翼&迅雷&系统配置&测试&接口挂载&视频解析&直播',
+    class_url: 'push&quark&uc&ali&baidu&bili&cloud&xun&system&test&apiLink&videoParse&lives',
     url: '/fyclass',
 
     预处理: async function (env) {
@@ -357,6 +363,28 @@ var rule = {
                     vod_pic: images.read,
                     vod_tag: 'action'
                 },);
+                
+
+                d.push({
+                    vod_id: JSON.stringify({
+                        actionId: '推送阅读助手',
+                        id: 'push',
+                        type: 'input',
+                        title: '推送阅读助手网页目录链接进行解析',
+                        tip: '支持阅读助手',
+                        value: 'https://api-bc.wtzw.com/api/v4/book/detail?id=157207',
+                        msg: '请输入待推送的阅读助手链接',
+                        imageUrl: images.read,
+                        imageHeight: 200,
+                        imageType: 'card_pic_3',
+                        keep: false,
+                        selectData: selectDataList1Y
+                    }),
+                    vod_name: '推送阅读助手',
+                    vod_pic: images.read,
+                    vod_tag: 'action'
+                },);
+
                 break;
 
             case 'quark':
@@ -513,6 +541,14 @@ var rule = {
                 d.push(genMultiInput('enable_self_jx', '设置启用自建解析', '默认为关闭，可自行配置成其他值(0关闭 1启用)', images.settings));
                 d.push(getInput('get_enable_self_jx', '查看启用自建解析', images.settings));
                 break;
+            case 'lives':
+                d.push(genMultiInput('LIVE_URL', '设置直播订阅链接', '支持多个订阅链接\n用分号;或换行分隔，每个链接生成一个直播入口\n留空时仅使用 json/lives 目录下的直播源文件', images.lives));
+                d.push(getInput('get_LIVE_URL', '查看直播订阅链接', images.lives));
+                d.push(genMultiInput('EPG_URL', '设置直播EPG节目单', '直播节目单地址，填写后所有直播源共用', images.lives));
+                d.push(getInput('get_EPG_URL', '查看直播EPG节目单', images.lives));
+                d.push(genMultiInput('LOGO_URL', '设置直播台标', '直播台标地址，填写后所有直播源共用', images.lives));
+                d.push(getInput('get_LOGO_URL', '查看直播台标', images.lives));
+                break;
         }
         return d
     },
@@ -554,6 +590,15 @@ var rule = {
     },
     action: async function (action, value) {
         let {httpUrl, imageApi, requestHost, publicUrl} = this;
+        try {
+            const _u = new URL(httpUrl);
+            const _port = _u.port || (_u.protocol === 'https:' ? '443' : '80');
+            // 仅 http 直连的非标端口改走本机回环自调用（更快更稳）；
+            // https 非标端口（反代）必须保持原样，否则会被降级成明文 http 打到反代端口导致扫码全挂
+            if (_u.protocol === 'http:' && _port !== '80') {
+                httpUrl = `http://127.0.0.1:${_port}/http`;
+            }
+        } catch (e) {}
         if (action === '迅雷登录') {
             if (ENV.get('xun_username') !== '') {
                 await Xun.getVerifyCode()
@@ -822,7 +867,7 @@ var rule = {
             log('用户取消扫码：' + value);
             rule.quarkScanCheck = null;
             qrcode.platformStates[QRCodeHandler.PLATFORM_QUARK] = null;
-            return;
+            return '扫码已取消';
         }
 
         if (action === 'UC扫码') {
@@ -920,7 +965,7 @@ var rule = {
             log('用户取消扫码：' + value);
             rule.UCScanCheck = null;
             qrcode.platformStates[QRCodeHandler.PLATFORM_UC] = null;
-            return;
+            return '扫码已取消';
         }
 
         if (action === '阿里扫码') {
@@ -1025,7 +1070,7 @@ var rule = {
             log('用户取消扫码：' + value);
             rule.aliScanCheck = null;
             qrcode.platformStates[QRCodeHandler.PLATFORM_ALI] = null;
-            return;
+            return '扫码已取消';
         }
 
         if (action === '哔哩扫码') {
@@ -1126,7 +1171,7 @@ var rule = {
             log('用户取消扫码：' + value);
             rule.biliScanCheck = null;
             qrcode.platformStates[QRCodeHandler.PLATFORM_BILI] = null;
-            return;
+            return '扫码已取消';
         }
 
         if (action === '百度扫码') {
@@ -1282,7 +1327,7 @@ var rule = {
             log('用户取消扫码：' + value);
             rule.baiduScanCheck = null;
             qrcode.platformStates[QRCodeHandler.PLATFORM_BAIDU] = null;
-            return;
+            return '扫码已取消';
         }
 
 
@@ -1332,6 +1377,22 @@ var rule = {
                 return '推送七猫小说发生错误：' + e.message;
             }
         }
+
+        if (action === '推送阅读助手') {
+            try {
+                const obj = JSON.parse(value);
+                return JSON.stringify({
+                    action: {
+                        actionId: '__detail__',
+                        skey: 'drpyS_阅读助手[书]',
+                        ids: obj.push,
+                    },
+                    toast: `开始解析小说:${obj.push}`
+                });
+            } catch (e) {
+                return '推送阅读助手发生错误：' + e.message;
+            }
+        }
         let cookie_sets = [
             'quark_cookie',
             'uc_cookie',
@@ -1370,6 +1431,9 @@ var rule = {
             'mg_hz',
             'PROXY_AUTH',
             'enable_self_jx',
+            'LIVE_URL',
+            'EPG_URL',
+            'LOGO_URL',
         ];
         let get_cookie_sets = [
             'get_quark_cookie',
@@ -1409,6 +1473,9 @@ var rule = {
             'get_mg_hz',
             'get_PROXY_AUTH',
             'get_enable_self_jx',
+            'get_LIVE_URL',
+            'get_EPG_URL',
+            'get_LOGO_URL',
         ];
         if (cookie_sets.includes(action) && value) {
             try {
@@ -1617,6 +1684,18 @@ function parseSaveCookie(key, value) {
             __puus: cookie_obj.__puus || '',
         });
         log('入库的cookie:', cookie_str);
+    }
+    if (key === 'bili_cookie') {
+        // B站扫码返回的是 URL 查询参数格式(& 分隔, 含 gourl/first_domain 等非 cookie 字段)
+        // 标准化为 cookie 格式(; 分隔), 过滤非 cookie 字段, 确保含 SESSDATA
+        cookie_str = value.split(/[;&]/).map(function (p) {
+            return p.trim();
+        }).filter(function (p) {
+            if (!p || p.indexOf('=') < 0) return false;
+            var k = p.split('=')[0].trim();
+            return ['gourl', 'first_domain', 'Expires', 'ticket'].indexOf(k) < 0;
+        }).join('; ');
+
     }
     // 调用 ENV.set 设置环境变量
     ENV.set(key, cookie_str);

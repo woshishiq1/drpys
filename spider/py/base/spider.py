@@ -10,14 +10,13 @@ import re
 import json
 import zlib
 import gzip
+import importlib.util
 from typing import List
 
 import requests
 import warnings
 import time
 from lxml import etree
-from abc import abstractmethod, ABCMeta
-from importlib.machinery import SourceFileLoader
 from urllib3 import encode_multipart_formdata
 from urllib.parse import urljoin, quote, unquote
 
@@ -43,72 +42,67 @@ warnings.filterwarnings("ignore")
 requests.packages.urllib3.disable_warnings()
 
 
-class BaseSpider(metaclass=ABCMeta):  # 元类 默认的元类 type
-    _instance = None
-    ENV: str
+class BaseSpider:
+    """
+    drpy python 源基类（T3 壳子 / T4 服务端通用）。
+
+    所有引擎调用方法均带默认实现（返回引擎期望的空结构），子类按需覆写即可，
+    未覆写的方法不会导致源加载失败，只是缺少对应功能。
+    核心业务方法（不实现则源无对应能力）：
+        homeContent / categoryContent / detailContent / searchContent / playerContent
+    """
+    ENV = ''
 
     def __init__(self, query_params=None, t4_api=None):
+        if getattr(self, '_inited', False):
+            return  # 单例二次实例化时不重置内部状态（如 _cache）
         self.query_params = query_params or {}
         self.t4_api = t4_api or ''
         self.extend = ''
         self.ENV = _ENV
         self._cache = {}
-        # self.log(f'BaseSpider __init__ t4_api:{t4_api}')
-        print(f'BaseSpider __init__ t4_api:{t4_api}')
+        self._inited = True
+        self.log(f'BaseSpider __init__ t4_api:{t4_api}')
 
     def __new__(cls, *args, **kwargs):
-        if cls._instance:
-            return cls._instance  # 有实例则直接返回
-        else:
-            cls._instance = super().__new__(cls)  # 没有实例则new一个并保存
-            return cls._instance  # 这个返回是给是给init，再实例化一次，也没有关系
+        # 只认类自身字典中的实例，避免子类经 MRO 复用基类/兄弟类的单例
+        inst = cls.__dict__.get('_instance')
+        if inst is None:
+            inst = super().__new__(cls)
+            cls._instance = inst
+        return inst
 
-    # # 这是简化的写法，上面注释的写法更容易提现判断思路
-    # if not cls._instance:               
-    #   cls._instance = super().__new__(cls)
-    # return cls._instance
-
-    @abstractmethod
+    # ==================== 引擎调用方法（按需覆写） ====================
     def init(self, extend=""):
         pass
 
-    @abstractmethod
     def homeContent(self, filter):
-        pass
+        return {'class': [], 'filters': {}}
 
-    @abstractmethod
     def homeVideoContent(self):
-        pass
+        return {}
 
-    @abstractmethod
     def categoryContent(self, tid, pg, filter, extend):
-        pass
+        return {'list': []}
 
-    @abstractmethod
     def detailContent(self, ids):
-        pass
+        return {}
 
-    @abstractmethod
     def searchContent(self, key, quick, pg=1):
-        pass
+        return {'list': []}
 
-    @abstractmethod
     def playerContent(self, flag, id, vipFlags=None):
-        pass
+        return {}
 
-    @abstractmethod
     def localProxy(self, params):
-        pass
+        return [404, 'text/plain', 'localProxy not implemented']
 
-    @abstractmethod
     def isVideoFormat(self, url):
-        pass
+        return False
 
-    @abstractmethod
     def manualVideoCheck(self):
-        pass
+        return False
 
-    # @abstractmethod
     def getName(self):
         return 'BaseSpider'
 
@@ -239,10 +233,7 @@ class BaseSpider(metaclass=ABCMeta):  # 元类 默认的元类 type
 
     def regStr(self, src, reg, group=1):
         m = re.search(reg, src)
-        src = ''
-        if m:
-            src = m.group(group)
-        return src
+        return m.group(group) if m else ''
 
     def custom_RegexGetText(self, Text, RegexText, Index, find_all=False):
         """改进版：支持返回所有匹配结果或单个匹配"""
@@ -259,27 +250,33 @@ class BaseSpider(metaclass=ABCMeta):  # 元类 默认的元类 type
                        src)
         return clean
 
-    def fetch(self, url, params=None, headers=None, cookies=None, timeout=5, verify=False,
-              allow_redirects=True, stream=None):
-        rsp = requests.get(url, params=params, headers=headers, cookies=cookies, timeout=timeout,
-                           verify=verify, proxies=self.get_proxies(),
-                           allow_redirects=allow_redirects, stream=stream)
+    def _req(self, method, url, **kw):
+        """统一请求出口：每源一个 Session（连接复用、cookie 按源隔离）+ 注入代理 + 强制 utf-8 解码"""
+        sess = getattr(self, '_session', None)
+        if sess is None:  # 懒创建：部分源覆写 __init__ 且不调父类构造
+            sess = self._session = requests.Session()
+        kw.setdefault('timeout', 5)
+        kw.setdefault('verify', False)
+        kw.setdefault('allow_redirects', True)
+        kw['proxies'] = kw.pop('proxies', None) or self.get_proxies()
+        rsp = sess.request(method, url, **kw)
         rsp.encoding = 'utf-8'
         return rsp
 
+    def fetch(self, url, params=None, headers=None, cookies=None, timeout=5, verify=False,
+              allow_redirects=True, stream=None):
+        return self._req('GET', url, params=params, headers=headers, cookies=cookies, timeout=timeout,
+                         verify=verify, allow_redirects=allow_redirects, stream=stream)
+
     def post(self, url, data=None, headers=None, cookies=None, timeout=5, verify=False, allow_redirects=True,
-             stream=None):
-        rsp = requests.post(url, data=data, headers=headers, cookies=cookies, timeout=timeout, verify=verify,
-                            proxies=self.get_proxies(), allow_redirects=allow_redirects, stream=stream)
-        rsp.encoding = 'utf-8'
-        return rsp
+             stream=None, json=None):
+        return self._req('POST', url, data=data, json=json, headers=headers, cookies=cookies, timeout=timeout,
+                         verify=verify, allow_redirects=allow_redirects, stream=stream)
 
     def postJson(self, url, json, headers=None, cookies=None, timeout=5, verify=False, allow_redirects=True,
                  stream=None):
-        rsp = requests.post(url, json=json, headers=headers, cookies=cookies, timeout=timeout, verify=verify,
-                            proxies=self.get_proxies(), allow_redirects=allow_redirects, stream=stream)
-        rsp.encoding = 'utf-8'
-        return rsp
+        return self._req('POST', url, json=json, headers=headers, cookies=cookies, timeout=timeout,
+                         verify=verify, allow_redirects=allow_redirects, stream=stream)
 
     def postBinary(self, url, data: dict, boundary=None, headers=None, cookies=None, timeout=5, verify=False,
                    allow_redirects=True, stream=None):
@@ -293,10 +290,8 @@ class BaseSpider(metaclass=ABCMeta):  # 元类 默认的元类 type
             fields.append((key, (None, value, None)))
         m = encode_multipart_formdata(fields, boundary=boundary)
         data = m[0]
-        rsp = requests.post(url, data=data, headers=headers, cookies=cookies, timeout=timeout, verify=verify,
-                            proxies=self.get_proxies(), allow_redirects=allow_redirects, stream=stream)
-        rsp.encoding = 'utf-8'
-        return rsp
+        return self._req('POST', url, data=data, headers=headers, cookies=cookies, timeout=timeout,
+                         verify=verify, allow_redirects=allow_redirects, stream=stream)
 
     def html(self, content):
         return etree.HTML(content)
@@ -309,7 +304,11 @@ class BaseSpider(metaclass=ABCMeta):  # 元类 默认的元类 type
             return ele[0]
 
     def loadModule(self, name, fileName):
-        return SourceFileLoader(name, fileName).load_module()
+        # spec 方式加载：load_module 自 3.4 起废弃，新 Python 版本随时会移除
+        spec = importlib.util.spec_from_file_location(name, fileName)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module
 
     # ==================== 静态函数 ======================
     def log(self, msg):
@@ -398,10 +397,10 @@ class BaseSpider(metaclass=ABCMeta):  # 元类 默认的元类 type
         @param no_space: 是否不带空格返回，默认是
         @return: hex字符串
         """
-        _str = ''.join(['%02X ' % b for b in _bytes])
+        _hex = _bytes.hex().upper()
         if no_space:
-            _str = _str.replace(" ", "")
-        return _str
+            return _hex
+        return ' '.join(_hex[i:i + 2] for i in range(0, len(_hex), 2))
 
     @staticmethod
     def urljoin(base_url, path):
@@ -434,23 +433,19 @@ class BaseSpider(metaclass=ABCMeta):  # 元类 默认的元类 type
         """
         if obj is None:
             return url
-        if '?' in url:
-            old_query = url.split('?')[1]
-            old_params = {}
+        base_url, _, old_query = url.partition('?')
+        old_params = {}
+        if old_query:
             for text in old_query.split('&'):
-                key = text.split('=')[0]
-                value = text.split('=')[1]
+                if not text:
+                    continue
+                key, _, value = text.partition('=')  # partition 保留 value 中的 '='（如 base64）
                 old_params[key] = value
-        else:
-            old_params = {}
 
         new_obj = old_params.copy()
         new_obj.update(obj)
-        param_list = [f'{i}={new_obj[i]}' for i in new_obj]
-        prs = '&'.join(param_list)
-        if param_list:
-            url = url.split('?')[0] + '?' + prs
-        return url
+        prs = '&'.join(f'{k}={v}' for k, v in new_obj.items())
+        return f'{base_url}?{prs}' if prs else base_url
 
     @staticmethod
     def to_lower_camel_case(x):
@@ -671,7 +666,7 @@ class BaseSpider(metaclass=ABCMeta):  # 元类 默认的元类 type
         length = len(ciphertext)
         # 长度不用分段
         if length < default_length:
-            plaintext = b''.join(decrypter.decrypt(ciphertext, b' '))
+            plaintext = decrypter.decrypt(ciphertext, b' ')
         else:
             # 需要分段
             offset = 0
@@ -695,10 +690,10 @@ class BaseSpider(metaclass=ABCMeta):  # 元类 默认的元类 type
         @param default_length: 分段加密长度默认 256
         @return: 密文
         """
-        public_key = "-----BEGIN RSA PRIVATE KEY-----\n" + public_key + "\n-----END RSA PRIVATE KEY-----"
+        public_key = "-----BEGIN PUBLIC KEY-----\n" + public_key + "\n-----END PUBLIC KEY-----"
         pub_key = RSA.importKey(public_key)
         cipher = PKCS1_cipher.new(pub_key)
-        text = text.encode("utf-8)")
+        text = text.encode("utf-8")
         length = len(text)
         if length < default_length:
             rsa_text = base64.b64encode(cipher.encrypt(text))  # 加密并转为b64编码
@@ -760,14 +755,16 @@ class BaseSpider(metaclass=ABCMeta):  # 元类 默认的元类 type
         else:
             ad_remove = None
 
-        print(ad_remove)
-
         # 开头
-        m3u8_start = m3u8_text[:m3u8_text.find('#EXTINF')].strip()
-        # 中间
-        m3u8_body = m3u8_text[m3u8_text.find('#EXTINF'):m3u8_text.find('#EXT-X-ENDLIST')].strip()
+        i_extinf = m3u8_text.find('#EXTINF')
+        if i_extinf < 0:
+            return m3u8_text  # 无分片标签，无从处理
+        i_end = m3u8_text.find('#EXT-X-ENDLIST')
+        m3u8_start = m3u8_text[:i_extinf].strip()
+        # 中间（直播 m3u8 可能没有 ENDLIST 标签）
+        m3u8_body = m3u8_text[i_extinf:i_end if i_end >= 0 else len(m3u8_text)].strip()
         # 结尾
-        m3u8_end = m3u8_text[m3u8_text.find('#EXT-X-ENDLIST'):].strip()
+        m3u8_end = m3u8_text[i_end:].strip() if i_end >= 0 else ''
 
         murls = []
         m3_body_list = m3u8_body.splitlines()
@@ -775,19 +772,17 @@ class BaseSpider(metaclass=ABCMeta):  # 元类 默认的元类 type
         i = 0
         while i < m3_len:
             mi = m3_body_list[i]
-            mi_1 = m3_body_list[i + 1]
-            if mi.startswith('#EXTINF'):
-                murls.append('&'.join([mi, mi_1]))
+            if mi.startswith('#EXTINF') and i + 1 < m3_len:
+                murls.append('&'.join([mi, m3_body_list[i + 1]]))
                 i += 2
-            elif mi.startswith('#EXT-X-DISCONTINUITY'):
-                mi_2 = m3_body_list[i + 2]
-                murls.append('&'.join([mi, mi_1, mi_2]))
+            elif mi.startswith('#EXT-X-DISCONTINUITY') and i + 2 < m3_len:
+                murls.append('&'.join([mi, m3_body_list[i + 1], m3_body_list[i + 2]]))
                 i += 3
             else:
                 break
         new_m3u8_body = []
         for murl in murls:
-            if ad_remove and self.regStr(murl, ad_remove):
+            if ad_remove and self.regStr(murl, ad_remove, 0):  # group 0：广告正则不强制带捕获组
                 pass
             else:
                 murl_list = murl.split('&')

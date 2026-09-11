@@ -364,7 +364,7 @@ export default (fastify, options, done) => {
      * 全能代理健康检查接口
      * GET /unified-proxy/health - 检查全能代理服务状态
      */
-    fastify.get('/unified-proxy/health', async (request, reply) => {
+    fastify.get('/unified-proxy/health', { config: { auth: 'public' } }, async (request, reply) => {
         // log(`[unifiedProxyController] Health check request`);
 
         setCorsHeaders(reply);
@@ -392,6 +392,7 @@ export default (fastify, options, done) => {
     fastify.route({
         method: ['GET', 'HEAD'],
         url: '/unified-proxy/proxy',
+        config: {auth: 'public'},
         handler: async (request, reply) => {
             // 验证身份认证
             if (!verifyAuth(request, reply)) {
@@ -525,7 +526,7 @@ export default (fastify, options, done) => {
      * 全能代理状态接口
      * GET /unified-proxy/status - 获取代理服务状态
      */
-    fastify.get('/unified-proxy/status', async (request, reply) => {
+    fastify.get('/unified-proxy/status', { config: { auth: 'public' } }, async (request, reply) => {
         // log(`[unifiedProxyController] Status request`);
 
         try {

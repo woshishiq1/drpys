@@ -4,7 +4,6 @@
  * @module websocket-controller
  */
 
-import {validateBasicAuth} from "../utils/api_validate.js";
 import {toBeijingTime} from "../utils/datetime-format.js";
 import util from 'util';
 
@@ -131,7 +130,7 @@ export default (fastify, options, done) => {
      * WebSocket连接路由
      * GET /ws - 建立WebSocket连接
      */
-    fastify.get('/ws', {websocket: true}, (socket, req) => {
+    fastify.get('/ws', {websocket: true, config: {auth: 'public'}}, (socket, req) => {
         const clientId = Date.now() + Math.random();
         originalConsole.log(`WebSocket client connected: ${clientId}`);
         originalConsole.log('Socket type:', typeof socket);
@@ -226,7 +225,7 @@ export default (fastify, options, done) => {
      * WebSocket状态查询接口
      * GET /ws/status - 获取WebSocket服务状态
      */
-    fastify.get('/ws/status', {preHandler: validateBasicAuth}, async (request, reply) => {
+    fastify.get('/ws/status', async (request, reply) => {
         return {
             status: 'ok',
             timestamp: toBeijingTime(new Date()),
@@ -239,7 +238,7 @@ export default (fastify, options, done) => {
      * 手动广播接口
      * POST /ws/broadcast - 向所有WebSocket客户端广播消息
      */
-    fastify.post('/ws/broadcast', {preHandler: validateBasicAuth}, async (request, reply) => {
+    fastify.post('/ws/broadcast', async (request, reply) => {
         const {message} = request.body;
         if (!message) {
             return reply.code(400).send({error: 'Message is required'});

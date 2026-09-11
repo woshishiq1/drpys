@@ -184,14 +184,18 @@ var rule = {
         }
         return '';
     },
-    一级: async function (tid) {
+    一级: async function (tid, pg) {
+        // 直播是固定单页数据：pg>1 返回空列表，防老壳子把重复内容当新页无限翻页
+        if (parseInt(pg) > 1) {
+            return [];
+        }
         // 直播分类：复制直链卡片 + 频道入口（二级进频道列表）
         if (tid === 'live') {
             let {requestHost, publicUrl} = this;
             let pic = liveImgUrl(publicUrl);
             return [
-                actionCard(requestHost, pic),
                 {vod_id: 'live', vod_name: '央视频直播·全部频道', vod_pic: pic, vod_remarks: '63个频道 cKey 纯算法直连'},
+                actionCard(requestHost, pic),
             ];
         }
         return [];

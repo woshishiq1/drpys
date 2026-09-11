@@ -17,13 +17,15 @@ export const DEFAULT_PATH_BLACKLIST = ['node_modules', 'database.db', '.git', '.
 function resolveRelative(filePath) {
     if (!filePath || typeof filePath !== 'string') return null;
 
-    // 用户输入直接给绝对路径一律拒绝
-    if (path.isAbsolute(filePath)) return null;
+    // 用户输入直接给绝对路径一律拒绝（含 Windows 盘符路径如 E:/x，保证跨平台语义一致：
+    // Linux 上 path.isAbsolute 不识别盘符，会被误当相对路径解析）
+    if (path.isAbsolute(filePath) || /^[a-zA-Z]:[\\/]/.test(filePath)) return null;
 
     const fullPath = path.resolve(PROJECT_ROOT, filePath);
     const cwd = PROJECT_ROOT;
 
-    if (!fullPath.startsWith(cwd)) return null;
+    // 目录前缀需以分隔符收尾，否则兄弟目录（如 ../drpy-node-evil/x）会因前缀重叠误判为项目内
+    if (fullPath !== cwd && !fullPath.startsWith(cwd + path.sep)) return null;
 
     return path.relative(cwd, fullPath);
 }

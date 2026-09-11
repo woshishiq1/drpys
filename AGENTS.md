@@ -71,7 +71,7 @@ drpy-node-admin 是 **SPA（vue-router createWebHistory）**，由主服务托�
 - **二级返回单个对象**（不是数组）：`{vod_name, vod_pic, vod_content, vod_play_from, vod_play_url}`；取详情 id 用 `this.orId`；`vod_play_url` 格式 `名称$id#名称$id`。**返回数组会丢 play 字段**。
 - **lazy(flag, id) 的 id 是 `vod_play_url` 里 `$` 后面的值**；播放分流**不要依赖 flag**（壳子回传 vod_play_from 形态不可控：缺失/小写/改写），按 id 特征/白名单判别（如频道 id 与 32 位 hex 的 guid 天然不冲突）。
 - 方法名清单：`class_parse`、`推荐`、`一级(tid, pg, filter, extend)`、`二级()`、`搜索(key, quick, pg)`、`lazy(flag, id, flags)`、`proxy_rule(params)`、`action`。中文方法名是引擎约定，不能改。
-- **接口测试姿势**（少一个参数结果完全不同）：分类 `?ac=class&t=<tid>&pg=`；详情 `?ac=vod&ids=`；搜索 `?wd=`；播放 `?flag=&play=`；只传 `?tid=` 不带 `ac` 走默认 home（返回推荐，易误判）。
+- **接口测试姿势**（少一个参数结果完全不同）：分类 `?ac=class&t=<tid>&pg=`；详情 `?ac=vod&ids=`；搜索 `?wd=`；播放 `?flag=&play=`；只传 `?tid=` 不带 `ac` 走默认 home（返回推荐，易误判）。**配置了 `API_PWD` 时所有请求必须带 `&pwd=`**：403 的 `{"error":"Forbidden"}` 被宽松解析（`j.list||[]`）会伪装成「空列表」假故障（真实踩坑：误判服务端全挂，实际只是没带 pwd）。注意 `.env` 可能是 `KEY = value` 等号带空格写法，`grep ^KEY=` 匹配不上、取值需 trim；解析响应先看 `error` 字段再读 `list`。
 - **播放/大文件回流一律走主服务 proxy 门面**：lazy 用 `this.requestHost` 拼 `/proxy/<模块>/?do=xxx`（`/proxy/:module/*` 的通配段必须有落点，**尾部斜杠必需**），壳子必然可达主服务；直发插件/本机服务的 `127.0.0.1:端口` 地址壳子（在别的设备）无法访问。proxy_rule 转发本机插件/服务，文本直接回，二进制用 `toBytes=1`（base64，小文件）或 `toBytes=2`（302 到 /mediaProxy 流式转发，支持 Range/拖动，大文件用这个）。播放/分片 URL 尾部补伪后缀 `#.m3u8`/`#.ts`/`#.mp4` 帮嗅探型播放器识别（fragment 不发给服务器）。
 - **沙箱 `req`/`request` 默认 timeout 5s**：慢操作（插件解密、长解析）必须显式 `{timeout: 120000}`。
 - **调试方法论**：怀疑"源方法没被调用"时先检查惯例字段；`log()` 探针在方法未被执行时无效，**最可靠的定位方式是在 node 里模拟沙箱直接跑源文件**（用 `node scripts/debug-source.mjs <源文件> <方法> '[参数JSON]'` 打桩 request/log/setResult 后直接调用源方法），正常则问题在引擎层（缺字段/参数名），异常则在源逻辑。

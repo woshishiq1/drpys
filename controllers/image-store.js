@@ -9,7 +9,6 @@
  */
 
 import {imageManager} from '../utils/imageManager.js'
-import {validateBasicAuth} from '../utils/api_validate.js'
 
 /**
  * Fastify插件导出
@@ -28,7 +27,6 @@ export default (fastify, options, done) => {
      * 需要基础认证，支持图片大小限制
      */
     fastify.post('/image/upload', {
-        preHandler: validateBasicAuth, // 需要基础认证
         schema: {
             body: {
                 type: 'object',
@@ -88,6 +86,7 @@ export default (fastify, options, done) => {
      * 支持浏览器缓存和适当的HTTP头设置
      */
     fastify.get('/image/:imageId', {
+        config: {auth: 'public'}, // 图片对外展示（封面等），写操作仍走默认 Basic
         schema: {
             params: {
                 type: 'object',
@@ -165,7 +164,6 @@ export default (fastify, options, done) => {
      * 需要基础认证，支持释放内存空间
      */
     fastify.delete('/image/:imageId', {
-        preHandler: validateBasicAuth, // 需要基础认证
         schema: {
             params: {
                 type: 'object',
@@ -232,7 +230,6 @@ export default (fastify, options, done) => {
      * 需要基础认证，支持自定义过期时间
      */
     fastify.post('/image/cleanup', {
-        preHandler: validateBasicAuth, // 需要基础认证
         schema: {
             body: {
                 type: 'object',
@@ -271,7 +268,6 @@ export default (fastify, options, done) => {
      * 需要基础认证，支持图片大小限制
      */
     fastify.put('/image/:imageId', {
-        preHandler: validateBasicAuth, // 需要基础认证
         schema: {
             params: {
                 type: 'object',

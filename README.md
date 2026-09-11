@@ -38,8 +38,8 @@ nodejs作为服务端的drpy实现。全面升级异步写法
 
 * [Admin 管理面板](/apps/admin)
 * [DrPlayer](/apps/drplayer)
-* [Music控制台](/lx/)
-* [音乐播放器](/music/)
+* [音乐播放器](/lx/)
+* [clash管理面板](/clash/ui/)
 * [Websocket实时日志](/apps/websocket)
 * [cookie管理插件](/apps/cookie-butler/index.html)
 * [cron表达式插件](/apps/cron-generator/index.html)

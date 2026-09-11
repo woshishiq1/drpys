@@ -1,7 +1,6 @@
 import {logError, logWarn} from '../utils/log.js';
 import {readFileSync, writeFileSync, existsSync, mkdirSync} from 'fs';
 import path from 'path';
-import {validateBasicAuth} from "../utils/api_validate.js";
 
 /**
  * Source Checker 相关路由
@@ -10,9 +9,7 @@ import {validateBasicAuth} from "../utils/api_validate.js";
 export default (fastify, options, done) => {
 
     // 获取系统默认配置地址
-    fastify.get('/source-checker/config/default', {
-        preHandler: validateBasicAuth
-    }, async (request, reply) => {
+    fastify.get('/source-checker/config/default', async (request, reply) => {
         try {
             const protocol = request.protocol;
             const host = request.headers.host;
@@ -34,7 +31,7 @@ export default (fastify, options, done) => {
     });
 
     // 保存检测报告接口
-    fastify.post('/source-checker/reports/save', {preHandler: validateBasicAuth}, async (request, reply) => {
+    fastify.post('/source-checker/reports/save', async (request, reply) => {
         try {
             const reportData = request.body;
 
@@ -106,7 +103,7 @@ export default (fastify, options, done) => {
     });
 
     // 获取检测报告接口（可选，用于查看已保存的报告）
-    fastify.get('/source-checker/reports/latest', {preHandler: validateBasicAuth}, async (request, reply) => {
+    fastify.get('/source-checker/reports/latest', async (request, reply) => {
         try {
             const reportPath = path.join(options.rootDir, 'data', 'source-checker', 'report.json');
 

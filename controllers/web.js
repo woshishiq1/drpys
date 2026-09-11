@@ -7,7 +7,6 @@ import {fileURLToPath} from 'url';
 import {createHash} from 'crypto';
 import {ENV} from '../utils/env.js';
 import COOKIE from '../utils/cookieManager.js';
-import {validateBasicAuth} from '../utils/api_validate.js';
 
 const COOKIE_AUTH_CODE = process.env.COOKIE_AUTH_CODE || 'drpys';
 const IS_VERCEL = process.env.VERCEL;
@@ -45,7 +44,7 @@ const findLatestPackage = (projectDir, packageName) => {
         const isGreen = packageName.includes('-green');
         const ext = packageName.split('.').pop();
         const baseName = packageName.replace(/-green\.[^.]+$/, '').replace(/\.[^.]+$/, '');
-        const pattern = new RegExp(`^(?:${baseName.replace(/\./g, '\\.')}|drpy-node)-\\d{8}${isGreen ? '-green' : ''}\\.${ext}`);
+        const pattern = new RegExp(`^${baseName.replace(/\./g, '\\.')}-\\d{8}${isGreen ? '-green' : ''}\\.${ext}`);
 
         log(`查找包: ${packageName}, 正则: ${pattern.source}, 父目录: ${parentDir}`);
         log('目录中的文件:', files.filter(f => f.includes('drpy-node')));
@@ -141,6 +140,17 @@ export default (fastify, options, done) => {
                 });
                 log(cookie_str);
             }
+            if (key === 'bili_cookie') {
+                // B站扫码返回的是 URL 查询参数格式(& 分隔, 含 gourl/first_domain 等非 cookie 字段)
+                // 标准化为 cookie 格式(; 分隔), 过滤非 cookie 字段, 确保含 SESSDATA
+                cookie_str = value.split(/[;&]/).map(function (p) {
+                    return p.trim();
+                }).filter(function (p) {
+                    if (!p || p.indexOf('=') < 0) return false;
+                    var k = p.split('=')[0].trim();
+                    return ['gourl', 'first_domain', 'Expires', 'ticket'].indexOf(k) < 0;
+                }).join('; ');
+            }
             // 调用 ENV.set 设置环境变量
             ENV.set(key, cookie_str);
 
@@ -160,9 +170,7 @@ export default (fastify, options, done) => {
         }
     });
 
-    fastify.get('/admin/download', {
-        preHandler: validateBasicAuth
-    }, async (request, reply) => {
+    fastify.get('/admin/download', async (request, reply) => {
         try {
             if (IS_VERCEL) {
                 return reply.code(403).send({
@@ -313,9 +321,7 @@ export default (fastify, options, done) => {
         }
     });
 
-    fastify.post('/admin/download/clear', {
-        preHandler: validateBasicAuth
-    }, async (request, reply) => {
+    fastify.post('/admin/download/clear', async (request, reply) => {
         try {
             if (IS_VERCEL) {
                 return reply.code(403).send({
@@ -426,9 +432,7 @@ export default (fastify, options, done) => {
         }
     };
 
-    fastify.get('/admin/backup/config', {
-        preHandler: validateBasicAuth
-    }, async (request, reply) => {
+    fastify.get('/admin/backup/config', async (request, reply) => {
         const backupDir = getBackupRootDir();
         let paths;
         let lastBackupAt = null;
@@ -446,9 +450,7 @@ export default (fastify, options, done) => {
         return reply.send({success: true, paths, lastBackupAt, lastRestoreAt});
     });
 
-    fastify.post('/admin/backup', {
-        preHandler: validateBasicAuth
-    }, async (request, reply) => {
+    fastify.post('/admin/backup', async (request, reply) => {
         if (IS_VERCEL) {
             return reply.code(403).send({ success: false, message: 'Vercel环境不支持备份' });
         }
@@ -488,9 +490,7 @@ export default (fastify, options, done) => {
         }
     });
 
-    fastify.post('/admin/restore', {
-        preHandler: validateBasicAuth
-    }, async (request, reply) => {
+    fastify.post('/admin/restore', async (request, reply) => {
         if (IS_VERCEL) {
             return reply.code(403).send({ success: false, message: 'Vercel环境不支持恢复' });
         }
