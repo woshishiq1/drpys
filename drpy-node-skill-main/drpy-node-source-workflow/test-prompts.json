@@ -1,0 +1,12 @@
+[
+  {
+    "id": 1,
+    "prompt": "一个 drpy 源 evaluate_spider_source 低分，但 category/detail/play 单测大多正常。请给出 workflow 应该怎么分流和排查。",
+    "expected": "应先区分规则不通与自动串联没接上，优先检查首页 class、class_parse、double、url/searchUrl，再决定是否分流到其他子 skill。"
+  },
+  {
+    "id": 2,
+    "prompt": "某站 detail 页真实能抓到多集，debug_spider_rule 对 ul/li/a 都能看到多项，但最终 vod_play_url 只出 1 集。workflow 应先怎么处理？",
+    "expected": "应优先检查二级字典的 lists/list_text/list_url 契约，先验证 lists 容器层级是否应落到 li，而不是直接切 async 二级或甩锅引擎。"
+  }
+]

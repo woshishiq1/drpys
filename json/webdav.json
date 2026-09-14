@@ -1,0 +1,29 @@
+[
+  {
+    "name": "Zn存档服",
+    "baseURL": "https://pan.8897122.xyz/dav",
+    "username": "webdavtv",
+    "password": "webdavtv",
+    "rejectUnauthorized": false,
+    "showAll": false,
+    "timeout": 30000
+  },
+  {
+    "name": "本地webdav",
+    "id": "local1",
+    "baseURL": "http://192.168.31.217/webdav",
+    "username": "your-username",
+    "password": "your-password",
+    "rejectUnauthorized": false,
+    "timeout": 30000
+  },
+  {
+    "name": "内网webdav",
+    "id": "local2",
+    "baseURL": "http://192.168.80.82/webdav",
+    "username": "your-username",
+    "password": "your-password",
+    "rejectUnauthorized": false,
+    "timeout": 30000
+  }
+]

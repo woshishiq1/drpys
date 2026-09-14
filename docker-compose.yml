@@ -1,0 +1,27 @@
+services:
+  drpyS:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: drpy-node:local
+    # image: ghcr.io/hjdhnx/drpy-node:latest
+    container_name: drpyS
+    ports:
+      - "5757:5757"
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./drpy-node/config:/app/config
+      - ./drpy-node/json:/app/json
+      - ./drpy-node/jx:/app/jx
+      - ./drpy-node/plugin:/app/plugin
+      - ./drpy-node/spider:/app/spider
+      - ./drpy-node/.plugins.js:/app/.plugins.js
+      - ./drpy-node/.env:/app/.env
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:5757 || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 20s

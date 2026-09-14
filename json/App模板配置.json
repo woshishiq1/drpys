@@ -1,0 +1,57 @@
+{
+    "Appget": {
+        "示例": {
+            "muban": "模板类型(AppGet,AppQiji)",
+            "host": "host和hosturl二填一",
+            "hosturl": "域名地址",
+            "key": "数据加解密秘钥",
+            "iv": "一般同上",
+            "verify": "是否启用搜索验证，字符串true或false",
+            "username": "APP账号用户名",
+            "password": "APP账号密码",
+            "会员时长": "会员函数(gzip压缩)",
+            "lazyheader": "视频播放请求头,JSON格式"
+        },
+        "王子": {
+            "muban": "AppGet",
+            "host": "https://app.95112475.xyz",
+            "hosturl": "",
+            "key": "5a9w6x58dsq6z3a6",
+            "iv": "5a9w6x58dsq6z3a6",
+            "verify": "true"
+        },
+        "火锅": {
+            "muban": "AppGet",
+            "host": "https://ios.hgyx.vip",
+            "hosturl": "",
+            "key": "062dec75d039980e",
+            "iv": "062dec75d039980e",
+            "verify": "true"
+        },
+        "元咲动漫": {
+            "muban": "AppGet",
+            "host": "http://cic.aicg.fun",
+            "hosturl": "",
+            "key": "2c4h36abd96se10u",
+            "iv": "2c4h36abd96se10u",
+            "verify": "true"
+        }
+    },
+    "Appmuou": {
+        "示例": {
+            "host": "",
+            "hosturl": "",
+            "version": ""
+        }
+    },
+    "AppShark": {
+        "示例": {
+            "host": "",
+            "hosturl": "",
+            "key": "",
+            "key1": "",
+            "key2": "",
+            "version": ""
+        }
+    }
+}
