@@ -2,7 +2,7 @@ import * as misc from '../utils/misc.js';
 
 export default (fastify, options, done) => {
     // 注册 /authcoder 路由
-    fastify.get('/authcoder', async (request, reply) => {
+    fastify.get('/authcoder', {config: {auth: 'public'}}, async (request, reply) => { // 随机码生成器，对齐旧版匿名语义
         const {len, number} = request.query;
 
         // 参数校验

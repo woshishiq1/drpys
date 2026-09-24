@@ -87,6 +87,7 @@ export default async function (fastify, options) {
 
     // ============ 添加文本接口 ============
     fastify.post('/clipboard/add', {
+        config: {auth: 'public'}, // 页面 JS 自带 Authorization: Bearer 头（安全码），须豁免全局 Basic，否则两者打架导致浏览器无限弹认证框
         preHandler: [validateVercel, authenticate],
     }, async (request, reply) => {
         const {text, mode = 'append'} = request.body;
@@ -151,6 +152,7 @@ export default async function (fastify, options) {
 
     // ============ 清空文本接口 ============
     fastify.post('/clipboard/clear', {
+        config: {auth: 'public'}, // 同 /clipboard/add：自带 Bearer 安全码，豁免全局 Basic
         preHandler: [validateVercel, authenticate],
     }, async (request, reply) => {
         const filePath = path.resolve(PROJECT_ROOT, 'clipboard.txt');
@@ -192,6 +194,7 @@ export default async function (fastify, options) {
 
     // ============ 读取文本接口 ============
     fastify.get('/clipboard/read', {
+        config: {auth: 'public'}, // 同 /clipboard/add：自带 Bearer 安全码，豁免全局 Basic
         preHandler: [validateVercel, authenticate],
     }, async (request, reply) => {
         const filePath = path.resolve(PROJECT_ROOT, 'clipboard.txt');

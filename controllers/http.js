@@ -103,7 +103,7 @@ export default (fastify, options, done) => {
      * AI聊天接口
      * GET /ai - 提供AI对话功能
      */
-    fastify.get('/ai', async (request, reply) => {
+    fastify.get('/ai', {config: {auth: 'public'}}, async (request, reply) => { // 公开小工具接口，对齐旧版匿名语义
         // 获取用户输入文本
         const userInput = request.query.text;
 
@@ -144,7 +144,7 @@ export default (fastify, options, done) => {
      * 请求转发接口
      * ALL /req/* - 转发HTTP请求到指定URL
      */
-    fastify.all('/req/*', async (request, reply) => {
+    fastify.all('/req/*', {config: {auth: 'public'}}, async (request, reply) => { // 自带 allow_forward 开关管控，豁免全局 Basic 对齐旧版匿名语义
         // 非VERCEL环境可在设置中心控制此功能是否开启
         if (!process.env.VERCEL) {
             if (ENV.get('allow_forward') !== '1') {

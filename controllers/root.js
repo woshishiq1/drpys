@@ -9,7 +9,7 @@ import {toBeijingTime} from "../utils/datetime-format.js"
 
 export default (fastify, options, done) => {
     // 添加 / 接口
-    fastify.get('/', async (request, reply) => {
+    fastify.get('/', {config: {auth: 'public'}}, async (request, reply) => { // 首页对齐旧版匿名语义，豁免全局 Basic
         let readmePath = null;
         const indexHtmlPath = path.join(options.rootDir, 'public/index.html');
         // log(`indexHtmlPath:${indexHtmlPath}`);

@@ -134,6 +134,7 @@ export default (fastify, options, done) => {
 
     // 本地状态探测：源可据此判断是否走本代
     fastify.get('/captcha/status', {
+        config: {auth: 'public'}, // 源探测依赖，与 /captcha/* 通配一致豁免全局 Basic
         schema: {
             tags: ['验证码代理'],
             summary: 'drpys 本地探测代理可用性',

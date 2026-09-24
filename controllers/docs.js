@@ -23,7 +23,7 @@ export default (fastify, options, done) => {
      * 处理/docs/*路径下的所有文件访问请求
      * 支持Markdown文件渲染和其他文件类型的直接访问
      */
-    fastify.get('/docs/*', async (request, reply) => {
+    fastify.get('/docs/*', {config: {auth: 'public'}}, async (request, reply) => { // 文档页对齐旧版匿名语义，豁免全局 Basic
         // 捕获整个路径参数
         const fullPath = request.params['*']; 
         log(`Request received for path: ${fullPath}`);

@@ -11,7 +11,7 @@ export default (fastify, options, done) => {
      * 路径: /gh/release
      * 参数: repo (可选，默认 hjdhnx/drpy-node)
      */
-    fastify.get('/gh/release', async (request, reply) => {
+    fastify.get('/gh/release', {config: {auth: 'public'}}, async (request, reply) => { // 公开 release 信息查询，对齐旧版匿名语义
         const repo = request.query.repo || 'hjdhnx/drpy-node';
         const proxyPrefix = 'https://github.catvod.com/';
         const apiUrl = `https://api.github.com/repos/${repo}/releases/latest`;

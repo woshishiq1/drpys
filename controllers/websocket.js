@@ -225,7 +225,7 @@ export default (fastify, options, done) => {
      * WebSocket状态查询接口
      * GET /ws/status - 获取WebSocket服务状态
      */
-    fastify.get('/ws/status', async (request, reply) => {
+    fastify.get('/ws/status', {config: {auth: 'public'}}, async (request, reply) => { // 只读状态，与 /ws 一致对齐旧版匿名语义
         return {
             status: 'ok',
             timestamp: toBeijingTime(new Date()),
@@ -238,7 +238,7 @@ export default (fastify, options, done) => {
      * 手动广播接口
      * POST /ws/broadcast - 向所有WebSocket客户端广播消息
      */
-    fastify.post('/ws/broadcast', async (request, reply) => {
+    fastify.post('/ws/broadcast', {config: {auth: 'public'}}, async (request, reply) => { // 与 /ws 一致对齐旧版匿名语义
         const {message} = request.body;
         if (!message) {
             return reply.code(400).send({error: 'Message is required'});
