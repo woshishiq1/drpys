@@ -75,6 +75,20 @@
 <li><a href="https://github.com/ingriddaleusag-dotcom/PeekPiliRelease">皮卡丘</a></li>
 </ul>
 <h2 id="更新记录">更新记录</h2>
+<h3 id="20260925b">20260925b</h3>
+<p>更新至V2.0.6</p>
+<ol>
+<li>修复后台备份/恢复超时：plugins 目录 GB 级串行拷贝叠加前端 30s 超时报错；前端备份/恢复单独放宽 60s</li>
+<li>新增并发拷贝（32 并发），同盘 1.2GB 实测由 42s 降至 24-31s，60s 内留 2 倍余量；备份/恢复拷贝逻辑带单测</li>
+</ol>
+<h3 id="20260925">20260925</h3>
+<p>更新至V2.0.5</p>
+<ol>
+<li>鉴权体系重构为 deny-by-default（默认 Basic + 路由级 config.auth 豁免），并完成两轮回归修复：剪切板推送页无限弹认证框等 10+ 条旧版匿名语义路由补回豁免；/php /cat 等静态目录收紧为 pwd 校验</li>
+<li>mediaProxy 重写：连接池 + Range 长度缓存 + pipeline 流式转发，起播更快内存更低；直播订阅支持多 LIVE_URL 与 json/lives 目录自动扫描</li>
+<li>哔哩影视[官] 新增 B站DASH 线路（动态 MPD + 游客试看）；新增短剧库、短剧库6源桥接源</li>
+<li>修复 json/tv→json/lives 迁移后 live2cms 本地直播线路 404、直播转点播[合] 在线线路自定义 UA 不生效（附空结果重试）、fileHeaderManager py 声明头误处理、腾云驾雾[官]旧接口下线等</li>
+</ol>
 <h3 id="20260831b">20260831b</h3>
 <p>更新至V2.0.4</p>
 <ol>

@@ -20,7 +20,7 @@
   title: '直播转点播[合]',
   lang: 'ds'
 })
-*/const __ext = {data_dict: {}};
+*/const __ext = {data_dict: {}, headers_dict: {}};
 var rule = {
     title: '直播转点播[合]',
     author: '道长',
@@ -89,6 +89,9 @@ var rule = {
                 if (it.img && !/^(http|file)/.test(it.img)) {
                     it.img = urljoin(_url, it.img);
                 }
+                if (it.headers) {
+                    __ext.headers_dict[it.url] = it.headers; // 条目自定义请求头（如 kstore CDN 的 kngx UA），此前仅播放阶段生效，拉取线路列表一直未带上
+                }
                 let _obj = {
                     type_name: it.name,
                     type_id: it.url,
@@ -135,7 +138,7 @@ var rule = {
             if (__ext.data_dict[_get_url]) {
                 html = __ext.data_dict[_get_url];
             } else {
-                html = await request(_get_url);
+                html = await requestLine(_get_url);
                 if (/#EXTM3U/.test(html)) {
                     html = convertM3uToNormal(html);
                 } else {
@@ -179,7 +182,7 @@ var rule = {
             if (__ext.data_dict[_get_url]) {
                 html = __ext.data_dict[_get_url];
             } else {
-                html = await request(_get_url);
+                html = await requestLine(_get_url);
                 if (/#EXTM3U/.test(html)) {
                     html = convertM3uToNormal(html);
                 } else {
@@ -249,7 +252,7 @@ var rule = {
                     if (__ext.data_dict[_get_url]) {
                         html = __ext.data_dict[_get_url];
                     } else {
-                        html = await request(_get_url);
+                        html = await requestLine(_get_url);
                         if (/#EXTM3U/.test(html)) {
                             html = convertM3uToNormal(html);
                         } else {
@@ -324,7 +327,7 @@ var rule = {
             if (__ext.data_dict[_get_url]) {
                 html = __ext.data_dict[_get_url];
             } else {
-                html = await request(_get_url);
+                html = await requestLine(_get_url);
                 if (/#EXTM3U/.test(html)) {
                     html = convertM3uToNormal(html);
                 } else {
@@ -493,6 +496,23 @@ function gen_group_dict(arr, parse) {
  * @param text
  * @returns {string}
  */
+/**
+ * 拉取单条线路内容（带条目自定义请求头 + 空结果重试一次）
+ * 引擎 request 对超时/TLS 断连等错误捕获后返回空串（不抛错），代理链路对部分 CDN
+ * 的 TLS 建连存在偶发失败，单次重试可显著提高线路拉取成功率
+ * @param url 线路地址（与 type_id 一致的绝对 URL）
+ * @returns {Promise<string>}
+ */
+async function requestLine(url) {
+    const opt = __ext.headers_dict[url] ? {headers: __ext.headers_dict[url]} : {};
+    let html = await request(url, opt);
+    if (!html) {
+        log(`[直播转点播] 线路拉取为空，重试一次: ${url}`);
+        html = await request(url, opt);
+    }
+    return html;
+}
+
 function mergeChannels(text) {
     const lines = text.split('\n');
     const channelMap = new Map();

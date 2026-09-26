@@ -1,5 +1,6 @@
 import path from 'path';
 import fs from '../../utils/fsWrapper.js';
+import { copyPath } from '../../utils/backupCopy.js';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -131,7 +132,7 @@ export const createBackup = async (request, reply) => {
             const destPath = path.join(backupDir, item);
             
             if (fs.existsSync(srcPath)) {
-                await fs.copy(srcPath, destPath, { overwrite: true });
+                await copyPath(srcPath, destPath);
                 details.push(`Backed up: ${item}`);
             } else {
                 details.push(`Skipped (not found): ${item}`);
@@ -172,7 +173,7 @@ export const restoreBackup = async (request, reply) => {
             const destPath = path.join(projectRootDir, item);
             
             if (fs.existsSync(srcPath)) {
-                await fs.copy(srcPath, destPath, { overwrite: true });
+                await copyPath(srcPath, destPath);
                 details.push(`Restored: ${item}`);
             } else {
                 details.push(`Skipped (not found in backup): ${item}`);
