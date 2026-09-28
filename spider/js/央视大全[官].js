@@ -102,12 +102,13 @@ var rule = {
         let liveImgUrl = urljoin(publicUrl, './images/lives.jpg');
         let html = await request(input);
         let vods = get_list_lm(html, '栏目大全');
-        vods.unshift({
-            vod_name: '央视直播',
-            vod_pic: liveImgUrl,
-            vod_id: 'https://tv.cctv.com/epg/index.shtml#央视直播',
-            vod_remarks: 'CCTV台',
-        });
+        // 这个直播本身就是坏的，放这里没意义
+        // vods.unshift({
+        //     vod_name: '央视直播',
+        //     vod_pic: liveImgUrl,
+        //     vod_id: 'https://tv.cctv.com/epg/index.shtml#央视直播',
+        //     vod_remarks: 'CCTV台',
+        // });
         return vods
     },
 

@@ -2,15 +2,13 @@ import {logError} from '../utils/log.js';
 import path from "path";
 import {readFile} from "fs/promises";
 import {fileURLToPath} from 'url';
-import {execFile} from 'child_process';
-import {promisify} from 'util';
+import {spawn} from 'child_process';
 import {LRUCache} from 'lru-cache';
 import {computeHash, deepCopy, getNowTime} from "../utils/utils.js";
 import {prepareBinary} from "../utils/binHelper.js";
 import {md5} from "../libs_drpy/crypto-util.js";
 import {fastify} from "../controllers/fastlogger.js";
 
-const execFileAsync = promisify(execFile);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const _bridge_path = path.join(__dirname, '../spider/php/_bridge.php');
 
@@ -60,6 +58,9 @@ const callPhpMethod = async (filePath, methodName, env, ...args) => {
     const phpMethodName = methodMapping[methodName] || methodName;
 
     const cliArgs = [
+        // db 版大响应源在 PHP 侧同样会撞默认 128M memory_limit（Fatal: Allowed memory
+        // size exhausted），随流式收集一并放开；仅是上限、不预分配，低内存设备安全
+        '-d', `memory_limit=${process.env.PHP_MEMORY_LIMIT || '512M'}`,
         _bridge_path,
         filePath,
         phpMethodName,
@@ -68,30 +69,57 @@ const callPhpMethod = async (filePath, methodName, env, ...args) => {
     ];
 
     try {
-        // fastify.log.info(`Calling PHP: ${phpPath} ${cliArgs.join(' ')}`);
-        const {stdout, stderr} = await execFileAsync(phpPath, cliArgs, {
-            encoding: 'utf8',
-            maxBuffer: 10 * 1024 * 1024, // 10MB buffer
-            // 比 Node 侧 withTimeout(API_TIMEOUT) 多 5s 宽限：超时后 kill php 进程，
-            // 避免孤儿进程继续占用连接与内存（输家 rejection 由 with-timeout 的 noop 分支静默）
-            timeout: (parseInt(process.env.API_TIMEOUT || '20') + 5) * 1000,
-            killSignal: 'SIGTERM',
-            env: {
-                ...process.env,
-                // Add any PHP specific env vars if needed
-            }
+        // 流式收集 stdout：上限=内存，不再有 execFile maxBuffer 的 10MB 硬顶
+        // （db 版大响应源动辄 >10MB，曾报 "stdout maxBuffer length exceeded"）
+        const {stdout, stderr, code} = await new Promise((resolve, reject) => {
+            const child = spawn(phpPath, cliArgs, {env: {...process.env}});
+            const chunks = [];
+            const stderrChunks = [];
+            let settled = false;
+
+            // 沿用原 execFile timeout 语义：超时 kill，避免孤儿 php 进程占用连接与内存
+            // （比 Node 侧 withTimeout(API_TIMEOUT) 多 5s 宽限；输家 rejection 由 with-timeout 的 noop 分支静默）
+            const timeoutMs = (parseInt(process.env.API_TIMEOUT || '20') + 5) * 1000;
+            const timer = setTimeout(() => {
+                if (settled) return;
+                settled = true;
+                child.kill('SIGTERM');
+                reject(new Error(`PHP process timeout (${timeoutMs}ms): ${phpMethodName} ${filePath}`));
+            }, timeoutMs);
+
+            child.stdout.on('data', (c) => chunks.push(c));
+            child.stderr.on('data', (c) => stderrChunks.push(c));
+            child.on('error', (err) => {
+                if (settled) return;
+                settled = true;
+                clearTimeout(timer);
+                reject(err);
+            });
+            child.on('close', (exitCode) => {
+                if (settled) return;
+                settled = true;
+                clearTimeout(timer);
+                resolve({
+                    stdout: Buffer.concat(chunks).toString('utf8'),
+                    stderr: Buffer.concat(stderrChunks).toString('utf8'),
+                    code: exitCode,
+                });
+            });
         });
 
-        if (stderr) {
-            // Log stderr but don't fail immediately unless stdout is empty or error
-            // fastify.log.warn(`PHP Stderr: ${stderr}`);
+        if (stderr.trim()) {
             logError(`PHP Stderr: ${stderr}`);
         }
 
         const result = json2Object(stdout.trim());
 
         if (result && result.error) {
+            // _bridge.php sendError 走 exit(1)：优先透出源内错误信息，而非笼统的退出码
             throw new Error(`PHP Error: ${result.error}\nTrace: ${result.traceback}`);
+        }
+
+        if (code !== 0) {
+            throw new Error(`PHP process exited with code ${code}${stderr.trim() ? `: ${stderr.trim().slice(0, 500)}` : ''}`);
         }
 
         return result;

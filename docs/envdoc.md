@@ -35,6 +35,7 @@
 | API_ACTION_TIMEOUT        | action接口专用超时时间                 | 60                                                                |
 | BRIDGE_TIMEOUT             | python桥接单次请求超时毫秒(Node侧bridge与守护进程共用)   | 30000                                                             |
 | BRIDGE_PACKET_MAX          | python桥接单包上限字节(Node侧默认10MB,守护进程旗舰版60MB/轻量版10MB) | 10485760                                                    |
+| PHP_MEMORY_LIMIT           | php源进程memory_limit(db版大响应源建议调大,默认512M,仅上限不预分配) | 512M                                                              |
 | MAX_TEXT_SIZE             | 设置最大文本大小(剪切板插件)                | 0.1 * 1024 * 1024                                                 |
 | MAX_IMAGE_SIZE            | 设置最大图片大小(图片插件)                 | 0.5 * 1024 * 1024                                                 |
 
