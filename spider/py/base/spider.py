@@ -62,7 +62,9 @@ class BaseSpider:
         self.ENV = _ENV
         self._cache = {}
         self._inited = True
-        self.log(f'BaseSpider __init__ t4_api:{t4_api}')
+        # 构造期禁走 self.log 虚分发：子类常重写 log 并引用 super().__init__()
+        # 之后才赋值的属性（资源管理.py 实锤），届时构造中断实例残废
+        _log(f'BaseSpider __init__ t4_api:{t4_api}')
 
     def __new__(cls, *args, **kwargs):
         # 只认类自身字典中的实例，避免子类经 MRO 复用基类/兄弟类的单例
