@@ -12,7 +12,7 @@
 import {distance} from 'assets://js/lib/mod.js'
 // import {sortListByCN} from '../catLib/sortName.js'
 import {sortListByCN} from 'assets://js/lib/sortName.js'
-import {ungzip} from "../../libs_drpy/drpyCustom.js";
+// import {ungzip} from "../../libs_drpy/drpyCustom.js";
 
 /**
  * alist js

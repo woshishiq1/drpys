@@ -38,6 +38,28 @@ from base.spider import BaseSpider
 # 兜底（顺序不变：本地 .lrc → 内嵌 → 网络双源并行）。2026-09-29 用户拍板
 # 性能优先，默认 False
 AUTO_MATCH_LRC_POSTER = False
+# 列表文件（txt/m3u/磁力）解析读行护栏：txt 1 行=1 条选集（m3u 2 行=1 台，
+# 即 m3u 约可容 50w 台）。实测 30w 条选集壳子可渲染；100w 行防真无限膨胀
+# 把手机 OOM，按需可调
+MAX_PARSE_ITEMS = 1000000
+
+
+def _safe_print(*args, **kwargs):
+    """stdout 打印容错：文件名含坏字节时 os 层返回 PEP 383 代理字符（surrogateescape），
+    直接 print 到 UTF-8 管道会抛 UnicodeEncodeError 中断业务流程（真机实锤：坏名
+    文件在根目录列表/播放歌词日志均会炸）。清洗后重打，仍失败则静默丢弃。"""
+    import builtins
+    try:
+        builtins.print(*args, **kwargs)
+    except UnicodeEncodeError:
+        try:
+            builtins.print(*(a.encode('utf-8', 'replace').decode('utf-8')
+                             if isinstance(a, str) else a for a in args), **kwargs)
+        except Exception:
+            pass
+
+
+print = _safe_print  # 模块级遮蔽：本模块全部 print（含 BaseSpider.log）统一容错
 
 # ==================== 在线直播配置 ====================
 ONLINE_LIVE_SOURCES = [
@@ -1139,7 +1161,12 @@ class Spider(BaseSpider):
 
     def b64u_encode(self, data):
         if isinstance(data, str):
-            data = data.encode('utf-8')
+            try:
+                data = data.encode('utf-8')
+            except UnicodeEncodeError:
+                # PEP 383：os 层文件名的坏字节以代理字符形式存在，还原回原
+                # 字节再 b64（路径信息无损）；解码侧 b64u_decode 用同款规则
+                data = data.encode('utf-8', 'surrogateescape')
         encoded = base64.b64encode(data).decode('ascii')
         return encoded.replace('+', '-').replace('/', '_').rstrip('=')
 
@@ -1149,9 +1176,86 @@ class Spider(BaseSpider):
         if pad:
             data += '=' * (4 - pad)
         try:
-            return base64.b64decode(data).decode('utf-8')
+            raw = base64.b64decode(data)
+            try:
+                return raw.decode('utf-8')
+            except UnicodeDecodeError:
+                # 与 b64u_encode 配对：还原带坏字节的原始路径。os 层
+                # open/stat 消费时会自动按 surrogateescape 编码回原字节，
+                # 文件可正常打开；仅 encode 给 JSON/print 时才需清洗
+                return raw.decode('utf-8', 'surrogateescape')
         except:
             return ''
+
+    def _safe_fs_name(self, s):
+        """os 层文件名 → 可安全 encode/进 JSON 的显示名。
+        正常名零开销直通；坏字节（PEP 383 代理字符）还原原字节后尽力还原
+        真中文（Windows 打包 zip 解压/老应用写入 GBK 字节名的常见来源），
+        兜底 '?' 替换。仅用于显示字段，承载路径的字段走 _file_path_id。"""
+        try:
+            s.encode('utf-8')
+            return s
+        except UnicodeEncodeError:
+            pass
+        try:
+            raw = s.encode('utf-8', 'surrogateescape')
+        except UnicodeEncodeError:
+            # 非 surrogateescape 产物的异常代理串，保守替换
+            return s.encode('utf-8', 'replace').decode('utf-8')
+        try:
+            text = raw.decode('utf-8')
+        except UnicodeDecodeError:
+            try:
+                return raw.decode('gbk')
+            except Exception:
+                return raw.decode('utf-8', 'replace')
+        # GBK 伪装嫌疑：字节流合法 UTF-8 但多字节全部落在两字节区
+        # （U+0080-U+07FF，西里尔/希腊区）。常用汉字的 GBK 双字节恰好
+        # 落在该区（如「影」=d3b0 同时是合法 UTF-8 的 U+04F0），先按
+        # UTF-8 解会显示成西里尔乱码；真 UTF-8 中文是三字节区（>U+07FF）
+        # 不受影响。中文生态按 GBK 优先还原，GBK 解不动再回 UTF-8。
+        if any(b >= 0x80 for b in raw) and all(
+                ord(c) <= 0x7FF for c in text if ord(c) >= 0x80):
+            try:
+                return raw.decode('gbk')
+            except Exception:
+                return text
+        return text
+
+    def _base_name_of(self, path):
+        """路径 → 可进 JSON 的显示名（basename + 坏字节清洗）"""
+        return self._safe_fs_name(os.path.basename(path))
+
+    def _file_path_id(self, path):
+        """本地路径 → vod_id 传输形态：正常名原样直通（行为零变化）；
+        含坏字节时用 b64u:// 包装（编码侧 surrogateescape 还原原字节，
+        解码侧无损还原）——清洗会丢字节导致打不开文件，故路径字段必须无损"""
+        try:
+            path.encode('utf-8')
+            return path
+        except UnicodeEncodeError:
+            return self.URL_B64U_PREFIX + self.b64u_encode(path)
+
+    def _file_url_of(self, path):
+        """本地路径 → file:// 直链：正常名原样；含坏字节时用清洗名
+        （坏字节路径无法以合法 JSON 传给宿主，终端播放/看图尽力而为）"""
+        try:
+            path.encode('utf-8')
+            return f"file://{path}"
+        except UnicodeEncodeError:
+            return f"file://{self._safe_fs_name(path)}"
+
+    def _read_lines_capped(self, f, file_path):
+        """列表文件受限读行：MAX_PARSE_ITEMS 行护栏（选集数 ≤ 行数），
+        防超大文件全量读入 OOM；触顶记日志截断"""
+        lines = []
+        for i, line in enumerate(f):
+            if i >= MAX_PARSE_ITEMS:
+                self.log(f"⚠️ 列表过大，仅解析前 {MAX_PARSE_ITEMS} 行: "
+                         f"{self._base_name_of(file_path)}")
+                break
+            lines.append(line)
+        return lines
 
     def get_file_ext(self, filename):
         idx = filename.rfind('.')
@@ -1238,7 +1342,7 @@ class Spider(BaseSpider):
                     continue
 
                 files.append({
-                    'name': name,
+                    'name': self._safe_fs_name(name),
                     'path': full_path,
                     'is_dir': is_dir,
                     'ext': ext,
@@ -1283,17 +1387,12 @@ class Spider(BaseSpider):
         items = []
         try:
             with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
-                lines = f.readlines()
+                lines = self._read_lines_capped(f, file_path)
 
             current_title = ''
             idx = 1
-            line_count = 0
 
             for line in lines:
-                line_count += 1
-                if line_count > 50000:
-                    break
-
                 line = line.strip()
                 if not line:
                     continue
@@ -1338,7 +1437,7 @@ class Spider(BaseSpider):
 
                 is_blacklisted = any(tag in sample for tag in BLACK_FINGERPRINTS)
                 if is_blacklisted:
-                    self.log(f"⛔ 文件包含黑名单关键词，已过滤: {os.path.basename(file_path)}")
+                    self.log(f"⛔ 文件包含黑名单关键词，已过滤: {self._base_name_of(file_path)}")
                     return []
 
                 has_proto = (PROTO_M in sample and COMMA in sample)
@@ -1351,7 +1450,7 @@ class Spider(BaseSpider):
                     has_genre = GENRE_M in more_sample
 
                     if not (has_proto or has_genre):
-                        self.log(f"⚠️ 文件不符合直播源格式，跳过: {os.path.basename(file_path)}")
+                        self.log(f"⚠️ 文件不符合直播源格式，跳过: {self._base_name_of(file_path)}")
                         return []
 
             encodings_to_try = ['utf-8', 'gb18030', 'gbk', 'gb2312', 'big5', 'utf-16']
@@ -1369,18 +1468,12 @@ class Spider(BaseSpider):
                         continue
 
             with open(file_path, 'r', encoding=detected_encoding, errors='ignore') as f:
-                max_lines = 50000
-                lines = []
-                for i, line in enumerate(f):
-                    if i >= max_lines:
-                        self.log(f"⚠️ 文件过大，只读取前{max_lines}行: {os.path.basename(file_path)}")
-                        break
-                    lines.append(line)
+                lines = self._read_lines_capped(f, file_path)
 
             has_genre = any(",#genre#" in line for line in lines)
 
             if has_genre:
-                self.log(f"📑 检测到#genre#格式: {os.path.basename(file_path)}")
+                self.log(f"📑 检测到#genre#格式: {self._base_name_of(file_path)}")
                 current_cat = None
                 current_lines = []
 
@@ -1418,7 +1511,7 @@ class Spider(BaseSpider):
                                         'url': url
                                     })
             else:
-                self.log(f"📄 检测到普通TXT格式: {os.path.basename(file_path)}")
+                self.log(f"📄 检测到普通TXT格式: {self._base_name_of(file_path)}")
                 valid_count = 0
 
                 for line in lines:
@@ -1445,10 +1538,6 @@ class Spider(BaseSpider):
                         })
                         valid_count += 1
 
-                    if valid_count >= 5000:
-                        self.log(f"⚠️ 达到最大解析条数限制(5000)，停止解析")
-                        break
-
             seen_urls = set()
             unique_items = []
             for item in items:
@@ -1456,7 +1545,7 @@ class Spider(BaseSpider):
                     seen_urls.add(item['url'])
                     unique_items.append(item)
 
-            self.log(f"✅ TXT文件解析完成: {os.path.basename(file_path)}, 共 {len(unique_items)} 条有效记录")
+            self.log(f"✅ TXT文件解析完成: {self._base_name_of(file_path)}, 共 {len(unique_items)} 条有效记录")
             return unique_items
 
         except Exception as e:
@@ -1487,7 +1576,7 @@ class Spider(BaseSpider):
             import traceback
             traceback.print_exc()
 
-        self.log(f"JSON文件解析完成: {os.path.basename(file_path)}, 共 {len(items)} 条记录")
+        self.log(f"JSON文件解析完成: {self._base_name_of(file_path)}, 共 {len(items)} 条记录")
         return items
 
     def parse_db_file(self, file_path):
@@ -1497,17 +1586,11 @@ class Spider(BaseSpider):
         items = []
         try:
             with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
-                content = f.read()
+                lines = self._read_lines_capped(f, file_path)
 
-            lines = content.split('\n')
-            line_count = 0
             magnet_pattern = re.compile(r'(magnet:\?[^\s\'"<>]+)', re.I)
 
             for line in lines:
-                line_count += 1
-                if line_count > 50000:
-                    break
-
                 line = line.strip()
                 if not line or line.startswith('#'):
                     continue
@@ -1585,7 +1668,7 @@ class Spider(BaseSpider):
                     seen_urls.add(item['url'])
                     unique_items.append(item)
 
-            print(f"✅ 磁力链接文件解析完成: {os.path.basename(file_path)}, 共 {len(unique_items)} 条有效链接")
+            print(f"✅ 磁力链接文件解析完成: {self._base_name_of(file_path)}, 共 {len(unique_items)} 条有效链接")
             return unique_items
 
         except Exception as e:
@@ -2038,7 +2121,7 @@ class Spider(BaseSpider):
 
     def get_lrc_for_audio(self, file_path):
         """为音频获取歌词：本地.lrc -> 内嵌 -> 网络双源并行（提速定稿版）"""
-        filename = os.path.basename(file_path)
+        filename = self._base_name_of(file_path)
         ext = self.get_file_ext(file_path).lower()
 
         print(f"\n{'=' * 60}")
@@ -2476,10 +2559,10 @@ class Spider(BaseSpider):
             if parent_root >= 0:
                 parent_id = f"root_{parent_root}"
                 parent_name = self.path_to_chinese.get(
-                    self.root_paths[parent_root], os.path.basename(parent))
+                    self.root_paths[parent_root], self._base_name_of(parent))
             else:
                 parent_id = self.FOLDER_PREFIX + self.b64u_encode(parent)
-                parent_name = os.path.basename(parent)
+                parent_name = self._base_name_of(parent)
 
             vlist.append(self._file_entry(
                 parent_id, f'⬅️ 返回 {parent_name}',
@@ -2519,14 +2602,14 @@ class Spider(BaseSpider):
                     label, self.file_icons['folder'], '文件夹', 'folder'))
             elif self.is_audio_file(f['ext']):
                 vlist.append(self._file_entry(
-                    f['path'], label, self.file_icons['audio'], '音频', 'audio'))
+                    self._file_path_id(f['path']), label, self.file_icons['audio'], '音频', 'audio'))
             elif self.is_media_file(f['ext']):
                 vlist.append(self._file_entry(
-                    f['path'], label, self.file_icons['video'], '视频', 'video'))
+                    self._file_path_id(f['path']), label, self.file_icons['video'], '视频', 'video'))
             elif self.is_image_file(f['ext']):
                 vlist.append(self._file_entry(
                     self._pics_vod_id(f['path']), label,
-                    f"file://{f['path']}", '照片', 'image', grid=True))
+                    self._file_url_of(f['path']), '照片', 'image', grid=True))
             elif self.is_list_file(f['ext']):
                 vlist.append(self._file_entry(
                     self.LIST_PREFIX + self.b64u_encode(f['path']),
@@ -2548,7 +2631,8 @@ class Spider(BaseSpider):
                     label, self.file_icons['magnet'], '磁力链接', 'magnet'))
             else:
                 vlist.append(self._file_entry(
-                    f['path'], label, self.file_icons['file'], '文件', 'file'))
+                    self._file_path_id(f['path']), label,
+                    self.file_icons['file'], '文件', 'file'))
 
         return {
             'list': vlist,
@@ -2607,13 +2691,13 @@ class Spider(BaseSpider):
             if self.is_image_file(f['ext']):
                 vlist.append(self._file_entry(
                     self._pics_vod_id(f['path']), f"{icon} {f['name']}",
-                    f"file://{f['path']}", remarks, 'file', grid=True))
+                    self._file_url_of(f['path']), remarks, 'file', grid=True))
             elif self._preview_kind(f['ext']):
                 # 文本类：动作条目直通壳子预览页（与列表/搜索层同款收口）
                 vlist.append(self._preview_action_item(
                     f['path'], f['name'], f['ext'], remarks=remarks))
             else:
-                vod_id = f['path']
+                vod_id = self._file_path_id(f['path'])
                 if self.is_db_file(f['ext']):
                     vod_id = self.LIST_PREFIX + self.b64u_encode(f['path'])
                 elif self.is_magnet_file(f['ext']):
@@ -2658,7 +2742,7 @@ class Spider(BaseSpider):
                             continue
                         if time.time() - mtime < 7 * 24 * 3600:
                             file_list.append({
-                                'name': name,
+                                'name': self._safe_fs_name(name),
                                 'path': full_path,
                                 'ext': ext,
                                 'mtime': mtime,
@@ -2689,7 +2773,7 @@ class Spider(BaseSpider):
                         mtime = 0
                     ext = self.get_file_ext(name)
                     file_list.append({
-                        'name': name,
+                        'name': self._safe_fs_name(name),
                         'path': full_path,
                         'ext': ext,
                         'mtime': mtime,
@@ -2708,7 +2792,7 @@ class Spider(BaseSpider):
                 text = f.read(512 * 1024)
         except Exception:
             text = ''
-        name = title or os.path.basename(file_path)
+        name = title or self._base_name_of(file_path)
         payload = urllib.parse.quote(
             json.dumps({'title': name, 'content': text}, ensure_ascii=False),
             safe='')
@@ -2748,7 +2832,7 @@ class Spider(BaseSpider):
             for img in images:
                 # episode 带 pics:// 前缀：DsPlayer resolver 识别后进看图器
                 # （不带前缀会落视频内核，图片必然播放失败）
-                url = f"{self.PICS_PREFIX}file://{img['path']}"
+                url = self.PICS_PREFIX + self._file_url_of(img['path'])
                 name = os.path.splitext(img['name'])[0]
                 play_urls.append(f"{name}${url}")
 
@@ -2757,11 +2841,11 @@ class Spider(BaseSpider):
             # 注意 pics:// 前缀只出现在整段开头一次，各段裸 file://——
             # 阅读器剥首前缀后按 && 拆，段内再带前缀会被当路径加载失败
             all_url = self.PICS_PREFIX + '&&'.join(
-                f"file://{img['path']}" for img in images)
+                self._file_url_of(img['path']) for img in images)
 
             return self._single_detail(
                 id_val,
-                f"📷 图片连播 - {os.path.basename(dir_path)} ({len(images)}张)",
+                f"📷 图片连播 - {self._base_name_of(dir_path)} ({len(images)}张)",
                 self.file_icons['image_playlist'], '图片浏览$$$全部连看',
                 '#'.join(play_urls) + '$$$' + f"查看全部${all_url}")
 
@@ -2780,19 +2864,26 @@ class Spider(BaseSpider):
                             file_name = os.path.basename(url[7:])
                         else:
                             file_name = os.path.basename(url.split('?')[0]) or "图片"
-                        play_urls.append(f"{file_name}${self.PICS_PREFIX}{raw}")
+                        play_urls.append(
+                            f"{self._safe_fs_name(file_name)}${self.PICS_PREFIX}{raw}")
 
                     return self._single_detail(
                         id_val, f'图片相册 ({len(pic_urls)}张)',
-                        pic_urls[0], '图片查看', '#'.join(play_urls))
+                        self._safe_fs_name(pic_urls[0]), '图片查看',
+                        '#'.join(play_urls))
                 else:
                     file_name = os.path.basename(pics_data.split('?')[0])
                     if pics_data.startswith('file://'):
                         file_name = os.path.basename(pics_data[7:])
 
                     return self._single_detail(
-                        id_val, file_name, pics_data, '图片查看',
-                        f"查看${self.PICS_PREFIX}{pics_data}")
+                        id_val, self._safe_fs_name(file_name),
+                        self._safe_fs_name(pics_data), '图片查看',
+                        f"查看${self.PICS_PREFIX}{self._safe_fs_name(pics_data)}")
+            elif decoded:
+                # 非 pics 载荷 = _file_path_id 包装的本地文件路径（坏字节名
+                # 场景）：解包回原路径落主流程，按普通文件处理
+                id_val = decoded
 
         if id_val.startswith(self.CAMERA_ALL_PREFIX):
             encoded = id_val[len(self.CAMERA_ALL_PREFIX):]
@@ -2808,7 +2899,7 @@ class Spider(BaseSpider):
 
             play_urls = []
             for img in images:
-                url = f"file://{img['path']}"
+                url = self._file_url_of(img['path'])
                 name = os.path.splitext(img['name'])[0]
                 play_urls.append(f"{name}${url}")
 
@@ -2834,16 +2925,16 @@ class Spider(BaseSpider):
                         if magnet_match:
                             magnet_url = magnet_match.group(1)
                             return self._single_detail(
-                                id_val, os.path.basename(file_path),
+                                id_val, self._base_name_of(file_path),
                                 self.file_icons['magnet'], '磁力链接',
-                                f"{os.path.splitext(os.path.basename(file_path))[0]}${magnet_url}")
+                                f"{os.path.splitext(self._base_name_of(file_path))[0]}${magnet_url}")
                 except:
                     pass
 
                 return self._single_detail(
-                    id_val, os.path.basename(file_path),
+                    id_val, self._base_name_of(file_path),
                     self.file_icons['magnet'], '磁力链接',
-                    f"打开文件$file://{file_path}")
+                    f"打开文件${self._file_url_of(file_path)}")
 
             play_urls = []
             for idx, item in enumerate(items):
@@ -2856,15 +2947,15 @@ class Spider(BaseSpider):
 
             if not play_urls:
                 return self._single_detail(
-                    id_val, os.path.basename(file_path),
+                    id_val, self._base_name_of(file_path),
                     self.file_icons['magnet'], '磁力链接',
-                    f"打开文件$file://{file_path}")
+                    f"打开文件${self._file_url_of(file_path)}")
 
             play_url_str = '#'.join(play_urls)
             self.log(f"磁力链接播放串: {play_url_str[:200]}...")
 
             return self._single_detail(
-                id_val, os.path.basename(file_path),
+                id_val, self._base_name_of(file_path),
                 self.file_icons['magnet'], '磁力链接列表', play_url_str)
 
         if id_val.startswith(self.LIST_PREFIX):
@@ -2883,23 +2974,23 @@ class Spider(BaseSpider):
 
                 if not items:
                     return self._single_detail(
-                        id_val, os.path.basename(file_path),
+                        id_val, self._base_name_of(file_path),
                         self.file_icons['database'], '数据库',
-                        f"播放$file://{file_path}")
+                        f"播放${self._file_url_of(file_path)}")
 
                 play_urls = self._build_play_urls(items)
 
                 if not play_urls:
                     return self._single_detail(
-                        id_val, os.path.basename(file_path),
+                        id_val, self._base_name_of(file_path),
                         self.file_icons['database'], '数据库',
-                        f"播放$file://{file_path}")
+                        f"播放${self._file_url_of(file_path)}")
 
                 play_url_str = '#'.join(play_urls)
                 self.log(f"数据库播放串预览: {play_url_str[:200]}...")
 
                 return self._single_detail(
-                    id_val, os.path.basename(file_path),
+                    id_val, self._base_name_of(file_path),
                     items[0].get('pic', ''), '数据库播放列表', play_url_str)
 
             items = []
@@ -2918,10 +3009,10 @@ class Spider(BaseSpider):
                 # 支持）：文本进阅读视图；m3u/json 空解析维持原直链回退
                 if ext == 'txt':
                     return self._novel_detail(id_val, file_path)
-                url = f"file://{file_path}"
-                name = os.path.splitext(os.path.basename(file_path))[0]
+                url = self._file_url_of(file_path)
+                name = os.path.splitext(self._base_name_of(file_path))[0]
                 return self._single_detail(
-                    id_val, os.path.basename(file_path),
+                    id_val, self._base_name_of(file_path),
                     self.file_icons['list'], '播放列表', f"{name}${url}")
 
             play_urls = self._build_play_urls(items)
@@ -2933,7 +3024,7 @@ class Spider(BaseSpider):
             self.log(f"播放串预览: {play_url_str[:200]}...")
 
             return self._single_detail(
-                id_val, os.path.basename(file_path),
+                id_val, self._base_name_of(file_path),
                 items[0].get('pic', ''), '播放列表', play_url_str)
 
         if id_val.startswith(self.A_ALL_PREFIX):
@@ -2946,7 +3037,7 @@ class Spider(BaseSpider):
 
             play_urls = []
             for a in audios:
-                url = f"file://{a['path']}"
+                url = self._file_url_of(a['path'])
                 name = os.path.splitext(a['name'])[0]
                 play_urls.append(f"{name}${url}")
 
@@ -2960,7 +3051,7 @@ class Spider(BaseSpider):
 
             return self._single_detail(
                 id_val,
-                f"音频连播 - {os.path.basename(dir_path)} ({len(audios)}首)",
+                f"音频连播 - {self._base_name_of(dir_path)} ({len(audios)}首)",
                 poster if poster else self.file_icons['audio_playlist'],
                 '本地音乐', '#'.join(play_urls))
 
@@ -2974,7 +3065,7 @@ class Spider(BaseSpider):
 
             play_urls = []
             for v in videos:
-                url = f"file://{v['path']}"
+                url = self._file_url_of(v['path'])
                 name = os.path.splitext(v['name'])[0]
                 play_urls.append(f"{name}${url}")
 
@@ -2983,7 +3074,7 @@ class Spider(BaseSpider):
 
             return self._single_detail(
                 id_val,
-                f"视频连播 - {os.path.basename(dir_path)} ({len(videos)}集)",
+                f"视频连播 - {self._base_name_of(dir_path)} ({len(videos)}集)",
                 self.file_icons['video_playlist'], '本地视频',
                 '#'.join(play_urls))
 
@@ -2994,7 +3085,7 @@ class Spider(BaseSpider):
         if os.path.isdir(id_val):
             return self.categoryContent(id_val, 1, None, None)
 
-        name = os.path.basename(id_val)
+        name = self._base_name_of(id_val)
         ext = self.get_file_ext(name)
         self.log(f"处理文件: {name}, 类型: {ext}")
 
@@ -3004,7 +3095,7 @@ class Spider(BaseSpider):
             return {'list': [self._preview_action_item(id_val, name, ext)]}
 
         vod = {
-            'vod_id': id_val,
+            'vod_id': self._file_path_id(id_val),
             'vod_name': name,
             'vod_play_from': '本地播放',
             'vod_play_url': '',
@@ -3015,10 +3106,10 @@ class Spider(BaseSpider):
             pics_id = self._pics_vod_id(id_val)
             vod['vod_id'] = pics_id
             vod['vod_play_url'] = f"查看${pics_id}"
-            vod['vod_pic'] = f"file://{id_val}"
+            vod['vod_pic'] = self._file_url_of(id_val)
             vod['vod_name'] = f"🖼️ {name}"
         elif self.is_audio_file(ext):
-            url = f"file://{id_val}"
+            url = self._file_url_of(id_val)
             display_name = os.path.splitext(name)[0]
             vod['vod_play_url'] = f"{display_name}${url}"
             vod['vod_name'] = f"🎵 {name}"
@@ -3032,7 +3123,7 @@ class Spider(BaseSpider):
             else:
                 vod['vod_pic'] = self.file_icons['audio']
         elif self.is_media_file(ext):
-            url = f"file://{id_val}"
+            url = self._file_url_of(id_val)
             display_name = os.path.splitext(name)[0]
             vod['vod_play_url'] = f"{display_name}${url}"
             vod['vod_pic'] = self.file_icons['video']
@@ -3171,7 +3262,7 @@ class Spider(BaseSpider):
         result = {
             "parse": 0,
             "playUrl": "",
-            "url": url,
+            "url": self._file_url_of(url[7:]) if url.startswith('file://') else url,
             "header": headers
         }
 
@@ -3222,11 +3313,11 @@ class Spider(BaseSpider):
             if os.path.exists(file_path) and self.is_audio_file(self.get_file_ext(file_path)):
                 # music:// 前缀：resolver 剥离后带 musicHint 直进音乐接管，
                 # 不再创建视频内核（file:// 音频此前会先拉视频播放器）
-                result["url"] = 'music://' + url
-                self.log(f"🔍 正在为音频文件获取信息: {os.path.basename(file_path)}")
+                result["url"] = 'music://' + self._file_url_of(file_path)
+                self.log(f"🔍 正在为音频文件获取信息: {self._base_name_of(file_path)}")
 
                 # 歌词+海报并行获取（原串行两段把 play 响应拖成两倍网络时长）
-                filename = os.path.basename(file_path)
+                filename = self._base_name_of(file_path)
                 artist, song = self.extract_song_info(filename)
                 res = self._run_parallel([
                     lambda: self.get_lrc_for_audio(file_path),
@@ -3290,7 +3381,7 @@ class Spider(BaseSpider):
                         results.append({
                             'vod_id': self._pics_vod_id(f['path']),
                             'vod_name': f"{icon} {f['name']}",
-                            'vod_pic': f"file://{f['path']}",
+                            'vod_pic': self._file_url_of(f['path']),
                             'vod_remarks': '',
                             'style': {'type': 'grid', 'ratio': 1}
                         })
@@ -3300,7 +3391,7 @@ class Spider(BaseSpider):
                         results.append(self._preview_action_item(
                             f['path'], f['name'], f['ext']))
                     else:
-                        vod_id = f['path']
+                        vod_id = self._file_path_id(f['path'])
                         if self.is_db_file(f['ext']):
                             vod_id = self.LIST_PREFIX + self.b64u_encode(f['path'])
                         elif self.is_magnet_file(f['ext']):
