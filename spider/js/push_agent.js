@@ -374,10 +374,12 @@ var rule = {
         if (flag === '推送') {
             if (tellIsJx(input)) {
                 return {parse: 1, jx: 1, url: input}
-            } else {
-                // 确保返回parse: 0和正确的URL格式，避免前端创建新的播放列表
+            }
+            // 明确的视频直链直接播；其余（网页等未知链接）交壳子 WebView 嗅探
+            if (/\.(m3u8|mp4|m4a|mp3|mkv|flv|ts)(\?|#|$)/i.test(input)) {
                 return {parse: 0, url: ["原画", input]}
             }
+            return {parse: 1, jx: 0, url: input}
         } else if (/Quark-|UC-|Ali-|Cloud-|Yun-|Pan123-|Baidu-|Xun-/.test(flag)) {
             const ids = id.split('*');
             let UCDownloadingCache = {};

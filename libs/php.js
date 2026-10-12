@@ -24,7 +24,7 @@ const methodMapping = {
     'detail': 'detailContent',
     'search': 'searchContent',
     'play': 'playerContent',
-    'proxy': 'proxy', // Not standard in BaseSpider, but might exist
+    'proxy': 'localProxy', // BaseSpider 标准钩子名（与 py 源 localProxy 统一；网关 /proxy/:module 回调入口）
     'action': 'action' // Not standard
 };
 

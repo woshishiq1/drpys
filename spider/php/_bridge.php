@@ -76,6 +76,12 @@ try {
     // 3. Instantiate Spider
     $spider = new Spider();
 
+    // env 注入（drpyS 服务层环境：proxyUrl 等，BaseSpider::getProxyUrl() 消费；
+    // 须在 AUTO-INIT 之前——init 内可能就要拼代理地址）
+    if (method_exists($spider, 'setEnv')) {
+        $spider->setEnv($env);
+    }
+
     // AUTO-INIT: Call init() before any other method if it's not init itself
     if ($methodName !== 'init' && method_exists($spider, 'init')) {
         $extend = $env['ext'] ?? '';
