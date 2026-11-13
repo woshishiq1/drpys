@@ -3,18 +3,18 @@ import {readFileSync, existsSync, readdirSync, statSync, unlinkSync, mkdirSync, 
 import {createReadStream} from 'fs';
 import {execSync} from 'child_process';
 import path from 'path';
-import {fileURLToPath} from 'url';
 import {createHash} from 'crypto';
 import {ENV} from '../utils/env.js';
 import COOKIE from '../utils/cookieManager.js';
+// 根路径统一走 pathHelper（支持 ROOT env 覆盖）：bundle 版整个启动图在
+// 单文件里，__dirname 相对推导必错位；树版行为不变（pathHelper 默认值
+// 与原推导一致）。package.json 随 bundle 版 zip 伴生发行
+import {PROJECT_ROOT as projectRootDir} from '../utils/pathHelper.js';
 
 const COOKIE_AUTH_CODE = process.env.COOKIE_AUTH_CODE || 'drpys';
 const IS_VERCEL = process.env.VERCEL;
 const DOWNLOAD_AUTH_SECRET = process.env.DOWNLOAD_AUTH_SECRET || 'drpys_download_secret';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const projectRootDir = path.dirname(__dirname);
 const pkg = JSON.parse(readFileSync(path.join(projectRootDir, 'package.json'), 'utf-8'));
 
 const generateDownloadToken = (filename) => {
@@ -101,7 +101,7 @@ export default (fastify, options, done) => {
         try {
             // 读取 HTML 文件内容
             const htmlContent = readFileSync(encoderFilePath, 'utf-8');
-            reply.type('text/html').send(htmlContent); // 返回 HTML 文件内容
+            return reply.type('text/html').send(htmlContent); // 返回 HTML 文件内容
         } catch (error) {
             fastify.log.error(`Failed to read encoder.html: ${error.message}`);
             return reply.status(500).send({error: 'Failed to load encoder page'});
@@ -234,7 +234,7 @@ export default (fastify, options, done) => {
             html = html.replace(/\{\{projectName\}\}/g, projectName);
             html = html.replace(/\{\{downloadItems\}\}/g, downloadItems);
 
-            reply.type('text/html').send(html);
+            return reply.type('text/html').send(html);
         } catch (error) {
             logError('获取下载页面失败:', error.message);
             return reply.code(500).send({
